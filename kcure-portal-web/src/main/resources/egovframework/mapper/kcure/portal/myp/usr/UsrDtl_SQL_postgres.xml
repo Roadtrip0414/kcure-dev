@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mypUsrDtl">
+	<update id="updateMypUsrDtlInfo" parameterType="egovMap">
+		UPDATE KCURE_COM_USER
+		   SET LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		   <if test="userMbphNo != null and userMbphNo !=''">
+		      ,USER_MBPH_NO = #{userMbphNo}
+		   </if>
+		   <if test="prtiId != null and prtiId !=''">
+		      ,PRTI_ID = #{prtiId}
+		   </if>
+		   <if test="emailRcvAgrYn != null and emailRcvAgrYn !=''">
+		      ,EMAIL_RCV_AGR_YN = #{emailRcvAgrYn}
+		   </if>
+		   <if test="smsRcvAgrYn != null and smsRcvAgrYn !=''">
+		      ,SMS_RCV_AGR_YN = #{smsRcvAgrYn}
+		   </if>
+		 WHERE USER_ID = #{userId}
+    </update>
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Api">
+	<select id="selectSvcDataAplcList" parameterType="String" resultType="EgovMap">
+		SELECT A.DATA_APLC_NO
+			, A.DATA_APLP_ID
+			, A.RSR_SDT AS DTU_SDT
+			, A.RSR_EDT	AS DTU_EDT
+			, A.DTTO_APLC_YN	AS CRY_OUT_APPLY
+			, (SELECT ATTF_PTH_NM FROM KCURE_SVC_ATTF WHERE DATA_APLC_NO = A.DATA_APLC_NO AND ATTF_SPCD = '03' limit 1) AS PRTI_FILE
+			, (SELECT ATTF_PTH_NM FROM KCURE_SVC_ATTF WHERE DATA_APLC_NO = A.DATA_APLC_NO AND ATTF_SPCD = '04' limit 1) AS CARRY_FILE
+		FROM KCURE_SVC_DATA_APLC A
+		WHERE A.DATA_APLP_ID =  #{userId}
+		ORDER BY A.DATA_APLC_NO
+	</select>
+
+	<select id="selectSvcDataAplcRvwList" parameterType="String" resultType="EgovMap">
+		SELECT A.DATA_APLC_NO
+			, A.FRST_REGP_ID AS RVWM_ID
+			, TO_CHAR(A.RVW_STDT, 'yyyyMMdd')	AS DTU_SDT
+			, TO_CHAR(A.RVW_EDDT, 'yyyyMMdd')	AS DTU_EDT
+			, (SELECT ATTF_PTH_NM FROM KCURE_SVC_ATTF WHERE DATA_APLC_NO = A.DATA_APLC_NO AND ATTF_SPCD = '01' limit 1) AS SUB_FILE
+		FROM KCURE_SVC_DATA_APLC_RVW A
+		WHERE A.FRST_REGP_ID = #{userId}
+		ORDER BY A.DATA_APLC_NO
+	</select>
+
+	<select id="selectSvcAttfList" parameterType="String" resultType="EgovMap">
+		SELECT ATTF_PTH_NM || '/'  || ATTF_NM AS DIR
+		FROM KCURE_SVC_ATTF
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectAttfSeq" parameterType="String" resultType="int">
+		SELECT COALESCE(MAX(ATTF_SEQ),0)+1 AS ATTF_SEQ
+		FROM KCURE_SVC_ATTF
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+	</select>
+	
+	<select id="selectSvcRsrAsmtNo" parameterType="String" resultType="String">
+		SELECT RSR_ASMT_NO
+		FROM KCURE_SVC_DATA_APLC
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<insert id="insertSvcDttoAplc" parameterType="java.util.Map">
+		INSERT INTO KCURE_SVC_DTTO_APLC
+		(
+			RSR_ASMT_NO, DATA_APLC_NO, DTTO_APLC_DT, DTTO_APLC_ID
+			, DTTO_APLC_PROG_STCD
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{rsrAsmtNo}, #{dataAplcNo}, TO_TIMESTAMP(#{dttoAplcDt}, 'YYYY-MM-DD HH24:MI:SS'), #{uploderId}
+			, #{dttoAplcProgStcd}
+			, #{uploderId}, NOW(), #{uploderId}, NOW()
+		)
+	</insert>
+	
+	<insert id="insertSvcDttoProg" parameterType="java.util.List">
+		INSERT INTO KCURE_SVC_DTTO_PROG(
+			RSR_ASMT_NO, DTTO_APLC_DT, ATTF_SEQ, DATA_APLC_NO, DTTO_APLC_PROG_STCD
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=" , ">
+        (
+			#{item.rsrAsmtNo}, TO_TIMESTAMP(#{item.dttoAplcDt}, 'YYYY-MM-DD HH24:MI:SS'), #{item.attfSeq}, #{item.dataAplcNo}
+			,#{item.dttoAplcProgStcd}, #{item.uploderId}, now(), #{item.uploderId}, now()
+		)
+        </foreach>
+	</insert>
+
+	<insert id="insertSvcAttf" parameterType="java.util.List">
+		INSERT INTO KCURE_SVC_ATTF(
+			DATA_APLC_NO, ATTF_SEQ, ATTF_SPCD, ATTD_NM_SPCD
+			, ATTF_OWNR_ID, ATTF_NM, ATTF_PTH_NM
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=" , ">
+        (
+			#{item.dataAplcNo}, #{item.attfSeq}, #{item.attfSpcd}, #{item.attdNmSpcd}
+			,#{item.uploderId}, #{item.attfNm}, #{item.attfPthNm}
+			, #{item.uploderId}, now(), #{item.uploderId}, now()
+		)
+        </foreach>
+	</insert>
+
+	<update id="updateDttoAplcYn" parameterType="java.util.Map">
+		UPDATE  KCURE_SVC_DATA_APLC SET
+			DTTO_APLC_YN = #{dttoAplcYn}
+			,LAST_MODP_ID = #{userId}
+			,LAST_MODF_DT = now()
+		WHERE DATA_APLC_NO =  #{dataAplcNo}
+	</update>
+
+	<delete id="deleteSvcDttoAplc" parameterType="java.util.Map">
+		DELETE
+		FROM	KCURE_SVC_DTTO_APLC
+		WHERE	(RSR_ASMT_NO, DATE_TRUNC('DAY', DTTO_APLC_DT))
+				IN
+				(
+					(#{rsrAsmtNo}, DATE_TRUNC('DAY', NOW()))
+				)
+	</delete>
+	<delete id="deleteSvcAttf" parameterType="java.util.List">
+		DELETE
+		FROM	KCURE_SVC_ATTF
+		WHERE	(DATA_APLC_NO, DATE_TRUNC('DAY', FRST_RGST_DT), ATTF_SPCD)
+				IN
+				(
+					<foreach collection="list" item="item" separator=", ">
+					(#{item.dataAplcNo}, DATE_TRUNC('DAY', NOW()), #{item.attfSpcd})
+					</foreach>
+				)
+	</delete>
+	<delete id="deleteSvcDttoProg" parameterType="java.util.List">
+		DELETE
+		FROM	KCURE_SVC_DTTO_PROG
+		WHERE	(RSR_ASMT_NO, DATE_TRUNC('DAY', DTTO_APLC_DT))
+				IN
+				(
+					<foreach collection="list" item="item" separator=", ">
+					(#{item.rsrAsmtNo}, DATE_TRUNC('DAY', NOW()))
+					</foreach>
+				)
+	</delete>
+</mapper>

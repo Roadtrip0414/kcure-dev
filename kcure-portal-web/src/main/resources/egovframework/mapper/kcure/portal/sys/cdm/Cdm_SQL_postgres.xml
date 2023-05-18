@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cdmManageDAO">
+
+	<resultMap id="grpList" type="kcure.portal.sys.cdm.mng.service.Impl.CdmMngGrpVO">
+		<result property="grpCd" column="GRP_CD"/>
+		<result property="grpCdNm" column="GRP_CD_NM"/>
+		<result property="grpCdExplCont" column="GRP_CD_EXPL_CONT"/>
+		<result property="grpCdOputOrd" column="GRP_CD_OPUT_ORD"/>
+		<result property="grpCdUseYn" column="GRP_CD_USE_YN"/>
+		<result property="hghrGrpCd" column="HGHR_GRP_CD"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="dtsComCdYn" column="DTS_COM_CD_YN"/>
+	</resultMap>
+
+ 	<select id="selectGrpCdList" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngGrpVO" resultMap="grpList">
+		SELECT
+		    GRP_CD
+		    , GRP_CD_NM
+		    , GRP_CD_EXPL_CONT
+		    , GRP_CD_OPUT_ORD
+		    , GRP_CD_USE_YN
+			, HGHR_GRP_CD
+		    , FRST_REGP_ID
+		    , TO_CHAR(FRST_RGST_DT,'yyyy-MM-dd') AS FRST_RGST_DT
+		    , DTS_COM_CD_YN
+			FROM KCURE_COM_GRP_CD
+		WHERE 1=1
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(dtsComCdYn)">
+			AND DTS_COM_CD_YN = #{dtsComCdYn}
+		</if>
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword)">
+			AND  UPPER(grp_cd) LIKE CONCAT('%',  UPPER(#{searchKeyword}), '%')
+		</if>
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword1)">
+			AND  UPPER(grp_cd_nm) LIKE CONCAT('%',  UPPER(#{searchKeyword1}), '%')
+		</if>
+		ORDER BY GRP_CD
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<!-- 총건수 조회 -->
+	<select id="selectGrpCdListTotCnt" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngGrpVO" resultType="int">
+		SELECT
+			COUNT(*) AS totcnt
+	 	FROM KCURE_COM_GRP_CD
+	 	WHERE 1=1
+	 	<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(dtsComCdYn)">
+			AND DTS_COM_CD_YN = #{dtsComCdYn}
+		</if>
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword)">
+			AND  UPPER(GRP_CD) LIKE CONCAT('%',  UPPER(#{searchKeyword}), '%')
+		</if>
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword1)">
+			AND  UPPER(GRP_CD_NM) LIKE CONCAT('%',  UPPER(#{searchKeyword1}), '%')
+		</if>
+	</select>
+
+	<!-- 마스터코드 등록 -->
+	<insert id="insertGrpCd" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngGrpVO">
+		INSERT INTO KCURE_COM_GRP_CD
+			(
+			    grp_cd
+			  , grp_cd_nm
+			  , grp_cd_expl_cont
+			  , grp_cd_oput_ord
+			  , grp_cd_use_yn
+			  , FRST_REGP_ID
+			  , FRST_RGST_DT
+			  , LAST_MODP_ID
+			  , LAST_MODF_DT
+			  , DTS_COM_CD_YN
+			 )
+		VALUES (
+				#{grpCd}
+			  , #{grpCdNm}
+			  , #{grpCdExplCont}
+			  , #{grpCdOputOrd}
+			  , #{grpCdUseYn}
+			  , #{frstRegpId}
+			  , NOW()
+			  , #{lastModpId}
+			  , NOW()
+			  , #{dtsComCdYn}
+			 )
+	</insert>
+
+	<!-- 마스터코드 수정 -->
+	<update id="updateGrpCd" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngGrpVO">
+			UPDATE kcure_com_grp_cd
+				SET grp_cd=#{grpCd}
+					, grp_cd_nm=#{grpCdNm}
+					, grp_cd_expl_cont =#{grpCdExplCont}
+					, grp_cd_oput_ord =#{grpCdOputOrd}
+					, grp_cd_use_yn = #{grpCdUseYn}
+					, last_modp_id = #{lastModpId}
+					, LAST_MODF_DT = NOW()
+					, DTS_COM_CD_YN = #{dtsComCdYn}
+		   WHERE   grp_cd=#{grpCd}
+	</update>
+
+	<!-- 마스터코드삭제 -->
+	<delete id="deleteGrpCd" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngGrpVO">
+			DELETE FROM kcure_com_grp_cd
+			WHERE grp_cd=#{grpCd}
+	</delete>
+
+	<!--  상세코드 -->
+	<resultMap id="detailCdList" type="kcure.portal.sys.cdm.mng.service.Impl.CdmMngDetailVO">
+        <result property="detlCd" column="detl_cd"/>
+        <result property="grpCd" column="GRP_CD"/>
+        <result property="detlCdNm" column="detl_cd_nm"/>
+        <result property="cdExplCont" column="cd_expl_cont"/>
+        <result property="cdOputOrd" column="cd_oput_ord"/>
+		<result property="cdClsTypeNm" column="cd_cls_type_nm"/>
+        <result property="cdUseYn" column="cd_use_yn"/>
+        <result property="frstRegpId" column="frst_regp_id"/>
+        <result property="frstRgstDt" column="frst_rgst_dt"/>
+        <result property="upDetlCd" column="UP_DETL_CD"/>
+        <result property="upGrpCd" column="UP_GRP_CD"/>
+    </resultMap>
+
+	<!-- 상세코드 조회 -->
+	<select id="selectDetailCdList" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngDetailVO" resultMap="detailCdList">
+		SELECT
+		    GRP_CD ,
+		    DETL_CD ,
+		    DETL_CD_NM ,
+		    CD_EXPL_CONT ,
+		    CD_OPUT_ORD ,
+		    CD_CLS_TYPE_NM,
+			CD_USE_YN ,
+		    FRST_REGP_ID,
+			TO_CHAR(FRST_RGST_DT,'yyyy-MM-dd') AS FRST_RGST_DT,
+			UP_DETL_CD ,
+			UP_GRP_CD
+		FROM KCURE_COM_CD
+		WHERE 1=1
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword3)">
+			AND  GRP_CD = #{searchKeyword3}
+		</if>
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword4)">
+			AND  UPPER(DETL_CD_NM) LIKE CONCAT('%',  UPPER(#{searchKeyword4}), '%')
+		</if>
+		ORDER BY DETL_CD
+	</select>
+
+	<!-- 총건수 조회 -->
+	<select id="selectDetailCdListTotCnt" parameterType="kcure.portal.sys.cdm.mng.service.Impl.CdmMngDetailVO" resultType="int">
+		SELECT
+			COUNT(*) AS totcnt
+	 	FROM KCURE_COM_CD
+	 	WHERE 1=1
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword3)">
+			AND  GRP_CD = #{searchKeyword3}
+		</if>
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(searchKeyword4)">
+			AND  UPPER(DETL_CD_NM) LIKE CONCAT('%',  UPPER(#{searchKeyword4}), '%')
+		</if>
+	</select>
+
+	<!-- 상세코드등록 -->
+	<insert id="insertDetailCd">
+		INSERT INTO KCURE_COM_CD
+		(
+			  GRP_CD
+			, DETL_CD
+			, DETL_CD_NM
+			, CD_EXPL_CONT
+			, CD_OPUT_ORD
+			, CD_USE_YN
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+			, UP_DETL_CD
+			, UP_GRP_CD
+		 )
+		VALUES (
+				#{grpCd}
+			  , #{detlCd}
+			  , #{detlCdNm}
+			  , #{cdExplCont}
+			  , #{cdOputOrd}
+			  , #{cdUseYn}
+			  , #{frstRegpId}
+			  , NOW()
+			  , #{lastModpId}
+			  , NOW()
+			  , #{upDetlCd}
+			  , #{upGrpCd}
+			 )
+	</insert>
+
+	<!-- 	상세코드수정 -->
+	<update id="updateDetailCd">
+		UPDATE KCURE_COM_CD
+			SET
+				  grp_cd=#{grpCd}
+				, detl_cd=#{detlCd}
+				, detl_cd_nm=#{detlCdNm}
+				, cd_expl_cont =#{cdExplCont}
+				, cd_oput_ord =#{cdOputOrd}
+				, cd_use_yn = #{cdUseYn}
+				, last_modp_id = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+				, UP_DETL_CD = #{upDetlCd}
+				, UP_GRP_CD = #{upGrpCd}
+	   WHERE   GRP_CD=#{grpCd} and detl_cd=#{detlCd}
+	</update>
+
+	<!-- 상세코드삭제 -->
+	<delete id="deleteDetailCd" >
+		DELETE FROM KCURE_COM_CD
+		WHERE grp_cd= #{grpCd}
+		<if test="@kcure.portal.cmn.util.CommonUtils@notEmpty(detlCd)">
+		AND DETL_CD= #{detlCd}
+		</if>
+	</delete>
+
+ </mapper>

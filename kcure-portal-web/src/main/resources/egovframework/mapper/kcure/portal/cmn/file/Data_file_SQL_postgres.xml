@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DataFile">
+	<insert id="insertDataFileInfo">
+		<selectKey keyProperty="attfSeq" resultType="int" order="BEFORE">
+	    	SELECT COALESCE(MAX(ATTF_SEQ),0)+1 FROM KCURE_SVC_ATTF WHERE DATA_APLC_NO=#{dataAplcNo}
+	  	</selectKey>
+
+		INSERT INTO KCURE_SVC_ATTF(
+			DATA_APLC_NO
+			, ATTF_SEQ
+			, ATTF_SPCD
+			, ATTD_NM_SPCD
+			, ATTF_OWNR_ID
+			, ATTF_NM
+			, ATTF_STR_NM
+			, ATTF_PTH_NM
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+			, DTU_APLC_NO
+		)VALUES (
+			#{dataAplcNo}
+			, #{attfSeq}
+			, #{attfSpcd}
+			, #{attdNmSpcd}
+			, #{attfOwnrId}
+			, #{attfNm}
+			, #{attfStrNm}
+			, #{attfPthNm}
+			, #{userId}
+			, now()
+			, #{userId}
+			, now()
+			, #{dtuAplcNo}
+		)
+	</insert>
+
+
+
+	<delete id="deletetDataFileInfo">
+		DELETE FROM KCURE_SVC_ATTF
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND ATTF_SPCD =  #{attfSpcd}
+		AND ATTD_NM_SPCD = #{attdNmSpcd}
+		<if test="attfOwnrId != null and attfOwnrId != ''">
+		AND ATTF_OWNR_ID = #{attfOwnrId}
+		</if>
+		<if test="attfSeq != null and attfSeq > 0">
+		AND ATTF_SEQ = #{attfSeq}
+		</if>
+	</delete>
+
+
+	<sql id="file_tbl_select">
+		SELECT DATA_APLC_NO
+			, ATTF_SEQ
+			, ATTF_SPCD
+			, ATTD_NM_SPCD
+			, ATTF_OWNR_ID
+			, ATTF_NM
+			, ATTF_STR_NM
+			, ATTF_PTH_NM
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		FROM KCURE_SVC_ATTF
+	</sql>
+	<select id="selectFileOne" resultType="kcure.portal.cmn.service.DataServiceFileVO">
+		<include refid="file_tbl_select" />
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND ATTF_SPCD =  #{attfSpcd}
+		AND ATTD_NM_SPCD = #{attdNmSpcd}
+		<if test="attfOwnrId != null and attfOwnrId != ''">
+		AND ATTF_OWNR_ID = #{attfOwnrId}
+		</if>
+		<if test="attfSeq != null and attfSeq > 0">
+		AND ATTF_SEQ = #{attfSeq}
+		</if>
+	</select>
+
+	<select id="selectFiles" parameterType="kcure.portal.cmn.service.DataServiceFileVO" resultType="kcure.portal.cmn.service.DataServiceFileVO">
+
+		<include refid="file_tbl_select" />
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+
+		<foreach collection="attfSpcdList" item="item" index="index" open=" AND ATTF_SPCD IN (" close=")" separator=",">
+			#{item}
+		</foreach>
+
+		<foreach collection="attdNmSpcdList" item="item" index="index" open="AND ATTD_NM_SPCD IN (" close=")" separator=",">
+			#{item}
+		</foreach>
+
+		<foreach collection="attfOwnrIdList" item="item" index="index" open="AND ATTF_OWNR_ID IN (" close=")" separator=",">
+			#{item}
+		</foreach>
+
+	</select>
+
+
+
+	<select id="selectPrtiNm" resultType="java.lang.String">
+		SELECT PRTI_NM FROM KCURE_SVC_PRTI
+		WHERE PRTI_ID = #{prtiId}
+	</select>
+
+
+	<insert id="fileDownLog" parameterType="kcure.portal.cmn.service.DataServiceFileVO">
+		  INSERT INTO KCURE_COM_ATTF_UNLD_HST(
+			ATTF_UNLD_DT, ATTF_ID, ATTF_NM, ATTF_PTH_NM, USER_ID, CONN_IP_ADDR, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT,MENU_NM,MENU_URI_ADDR
+		)VALUES (
+			now(), #{dataAplcNo}, #{attfNm},  #{attfPthNm}, #{userId},#{ip}, #{userId}, now(), #{userId}, now(),
+			(	SELECT RS.MENU_NM
+					FROM (
+						SELECT A.MENU_NM,
+							CASE  WHEN POSITION( A.MENU_URI_PATT_CONT IN C.URI) >0  THEN 'Y' ELSE 'N' END  CHECK_URI
+						FROM KCURE_COM_MENU A
+							,(SELECT #{menuUrl} AS URI) C
+						WHERE A.MENU_USE_YN = 'Y'
+						AND A.MENU_URI_PATT_CONT IS NOT NULL
+						AND A.MENU_URI_PATT_CONT !=''
+						) RS
+					WHERE RS.CHECK_URI = 'Y' )
+					,#{menuUrl}
+		)
+	</insert>
+
+	<select id="selectSvcDataAllFile" parameterType="String" resultType="kcure.portal.cmn.service.DataServiceFileVO">
+		<include refid="file_tbl_select" />
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<delete id="deleteSvcDataAllFile" parameterType="String">
+		DELETE FROM KCURE_SVC_ATTF
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+	</delete>
+</mapper>

@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Usr">
+    <resultMap id="usrList" type="kcure.portal.sys.usr.stt.service.impl.UsrVO">
+        <result property="userId" column="USER_ID"/>
+        <result property="userNm" column="USER_NM"/>
+		<result property="loginPswd" column="LOGIN_PSWD"/>
+		<result property="pin" column="PIN"/>
+		<result property="userStcd" column="USER_STCD"/>
+		<result property="userStcdNm" column="USER_STCD_NM"/>
+		<result property="prtiId" column="PRTI_ID"/>
+		<result property="instTpcd" column="INST_TPCD"/>
+		<result property="userMbphNo" column="USER_MBPH_NO"/>
+<!-- 		<result property="userEmailAddr" column="USER_EMAIL_ADDR"/> -->
+		<result property="userEntMedmCd" column="USER_ENT_MEDM_CD"/>
+		<result property="entMedmRcvId" column="ENT_MEDM_RCV_ID"/>
+		<result property="userEntDt" column="USER_ENT_DT"/>
+		<result property="userAprvDt" column="USER_APRV_DT"/>
+		<result property="drmtStatChanDt" column="DRMT_STAT_CHAN_DT"/>
+		<result property="userWthdDt" column="USER_WTHD_DT"/>
+		<result property="lastLoginDt" column="LAST_LOGIN_DT"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="lastModpId" column="LAST_MODP_ID"/>
+		<result property="lastModfDt" column="LAST_MODF_DT"/>
+		<result property="prtiNm" column="PRTI_NM"/>
+		<result property="statChanRsnCont" column="STAT_CHAN_RSN_CONT"/>
+    </resultMap>
+
+	<select id="selectUserList" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO" resultMap="usrList">
+		SELECT USER_ID		, USER_NM			, USER_STCD				, PRTI_NM
+			, INST_TPCD		, USER_MBPH_NO		, USER_ENT_MEDM_CD		, USER_ENT_DT
+			, USER_APRV_DT	, DRMT_STAT_CHAN_DT	, USER_WTHD_DT			, LAST_LOGIN_DT
+			, AUTH_ID		, USER_STCD_NM			, INST_TPCD_NM  <!-- , STAT_CHAN_RSN_CONT -->
+		FROM
+		(
+			SELECT A.USER_ID	, A.USER_NM
+			, A.USER_STCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'USER_STCD' AND DETL_CD = A.USER_STCD) AS USER_STCD_NM
+			, A.PRTI_ID
+			, B.PRTI_NM
+			, B.INST_TPCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'INST_TPCD' AND DETL_CD = B.INST_TPCD) AS	INST_TPCD_NM
+			, REGEXP_REPLACE(A.USER_MBPH_NO, '(.{3})(.*)(.{4})', '\1-\2-\3') USER_MBPH_NO
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'USER_ENT_MEDM_CD' AND DETL_CD = A.USER_ENT_MEDM_CD) AS	USER_ENT_MEDM_CD
+			, TO_CHAR(A.USER_ENT_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_ENT_DT
+			, TO_CHAR(A.USER_APRV_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_APRV_DT
+			, TO_CHAR(A.DRMT_STAT_CHAN_DT,'YYYY-mm-dd HH24:MI:SS') AS DRMT_STAT_CHAN_DT
+			, TO_CHAR(A.USER_WTHD_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_WTHD_DT
+			, TO_CHAR(A.LAST_LOGIN_DT,'YYYY-mm-dd HH24:MI:SS') AS LAST_LOGIN_DT
+			, (SELECT STRING_AGG(CAST(AUTH_ID AS VARCHAR), ',') as AUTH_ID FROM KCURE_COM_USER_AUTH WHERE USER_ID = A.USER_ID GROUP BY USER_ID) AS AUTH_ID
+			<!-- , C.STAT_CHAN_RSN_CONT -->
+			FROM PORTAL.KCURE_COM_USER A LEFT OUTER JOIN KCURE_SVC_PRTI B
+			ON A.PRTI_ID = B.PRTI_ID
+			<!-- LEFT OUTER JOIN (SELECT USER_ID, STAT_CHAN_RSN_CONT FROM KCURE_COM_USER_STAT_HST WHERE AFCHG_STCD = '99') C ON A.USER_ID = C.USER_ID -->
+
+		)A
+		WHERE A.USER_STCD IN
+      	<foreach collection="userStcdList" item="item" index="index" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.AUTH_ID LIKE CONCAT('%' , #{searchKeyword}, '%')
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND UPPER(A.USER_ID) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND UPPER(A.USER_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword2}), '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.INST_TPCD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 !=''">
+			AND A.PRTI_ID = #{searchKeyword4}
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+       		<if test="userStcd == '01,02' or userStcd == '03'"> <!-- 승인, 승인대기, 반려 -->
+	        	AND TO_CHAR(A.USER_ENT_DT::DATE, 'YYYYMMDD') >= REPLACE(#{searchKeywordFrom},'-','') 
+       		</if>
+       		<if test="userStcd == '04'"> <!-- 휴면 -->
+       			AND TO_CHAR(A.DRMT_STAT_CHAN_DT::DATE, 'YYYYMMDD') >= REPLACE(#{searchKeywordFrom},'-','')
+       		</if>
+       		<if test="userStcd == '99'"> <!-- 탈퇴 -->
+       			AND TO_CHAR(A.USER_WTHD_DT::DATE, 'YYYYMMDD') >= REPLACE(#{searchKeywordFrom},'-','')
+       		</if>
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		<if test="userStcd == '01,02' or userStcd == '03'"> <!-- 승인, 승인대기, 반려 -->
+        		AND TO_CHAR(A.USER_ENT_DT::DATE, 'YYYYMMDD') &lt;= REPLACE(#{searchKeywordTo},'-','')
+       		</if>
+       		<if test="userStcd == '04'"> <!-- 휴면 -->
+       			AND TO_CHAR(A.DRMT_STAT_CHAN_DT::DATE, 'YYYY-MM-DD') &lt;= REPLACE(#{searchKeywordTo},'-','')
+       		</if>
+       		<if test="userStcd == '99'"> <!-- 탈퇴 -->
+       			AND TO_CHAR(A.USER_WTHD_DT::DATE, 'YYYY-MM-DD') &lt;= REPLACE(#{searchKeywordTo},'-','')
+       		</if>
+        </if>
+		ORDER BY A.USER_ID ASC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectUserListTotCnt" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		FROM
+		(
+			SELECT A.USER_ID	, A.USER_NM
+			, A.USER_STCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'USER_STCD' AND DETL_CD = A.USER_STCD) AS USER_STCD_NM
+			, A.PRTI_ID
+			, B.PRTI_NM
+			, B.INST_TPCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'INST_TPCD' AND DETL_CD = B.INST_TPCD) AS	INST_TPCD_NM
+			, A.USER_MBPH_NO
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'USER_ENT_MEDM_CD' AND DETL_CD = A.USER_ENT_MEDM_CD) AS	USER_ENT_MEDM_CD
+			, TO_CHAR(A.USER_ENT_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_ENT_DT
+			, TO_CHAR(A.USER_APRV_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_APRV_DT
+			, TO_CHAR(A.DRMT_STAT_CHAN_DT,'YYYY-mm-dd HH24:MI:SS') AS DRMT_STAT_CHAN_DT
+			, TO_CHAR(A.USER_WTHD_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_WTHD_DT
+			, TO_CHAR(A.LAST_LOGIN_DT,'YYYY-mm-dd HH24:MI:SS') AS LAST_LOGIN_DT
+			, (SELECT STRING_AGG(CAST(AUTH_ID AS VARCHAR), ',') as AUTH_ID FROM KCURE_COM_USER_AUTH WHERE USER_ID = A.USER_ID GROUP BY USER_ID) AS AUTH_ID
+			<!-- , C.STAT_CHAN_RSN_CONT -->
+			FROM PORTAL.KCURE_COM_USER A LEFT OUTER JOIN KCURE_SVC_PRTI B
+			ON A.PRTI_ID = B.PRTI_ID
+			<!-- LEFT OUTER JOIN (SELECT USER_ID, STAT_CHAN_RSN_CONT FROM KCURE_COM_USER_STAT_HST WHERE AFCHG_STCD = '99') C ON A.USER_ID = C.USER_ID -->
+		)A
+		WHERE A.USER_STCD IN
+   		<foreach collection="userStcdList" item="item" index="index" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.AUTH_ID LIKE CONCAT('%' , #{searchKeyword}, '%')
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND UPPER(A.USER_ID) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND UPPER(A.USER_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword2}), '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.INST_TPCD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 !=''">
+			AND A.PRTI_ID = #{searchKeyword4}
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+       		<if test="userStcd == '01,02' or userStcd == '03'"> <!-- 승인, 승인대기, 반려 -->
+	        	AND TO_CHAR(A.USER_ENT_DT::DATE, 'YYYYMMDD') >= REPLACE(#{searchKeywordFrom},'-','') 
+       		</if>
+       		<if test="userStcd == '04'"> <!-- 휴면 -->
+       			AND TO_CHAR(A.DRMT_STAT_CHAN_DT::DATE, 'YYYYMMDD') >= REPLACE(#{searchKeywordFrom},'-','')
+       		</if>
+       		<if test="userStcd == '99'"> <!-- 탈퇴 -->
+       			AND TO_CHAR(A.USER_WTHD_DT::DATE, 'YYYYMMDD') >= REPLACE(#{searchKeywordFrom},'-','')
+       		</if>
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		<if test="userStcd == '01,02' or userStcd == '03'"> <!-- 승인, 승인대기, 반려 -->
+        		AND TO_CHAR(A.USER_ENT_DT::DATE, 'YYYYMMDD') &lt;= REPLACE(#{searchKeywordTo},'-','')
+       		</if>
+       		<if test="userStcd == '04'"> <!-- 휴면 -->
+       			AND TO_CHAR(A.DRMT_STAT_CHAN_DT::DATE, 'YYYY-MM-DD') &lt;= REPLACE(#{searchKeywordTo},'-','')
+       		</if>
+       		<if test="userStcd == '99'"> <!-- 탈퇴 -->
+       			AND TO_CHAR(A.USER_WTHD_DT::DATE, 'YYYY-MM-DD') &lt;= REPLACE(#{searchKeywordTo},'-','')
+       		</if>
+        </if>
+	</select>
+
+	<select id="selectUsrHstList" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO"  resultType="egovMap">
+		SELECT A.CLS_NM   --- 구분
+	      , A.STAT_CHAN_RSN_CONT  --- 사유
+	      , CASE WHEN  A.AUTH_ID != 'AU007' THEN A.AUTH_NM || A.GRNT_DEL_NM
+	            ELSE '' END AUTH_NM -- 권한
+	      , A.FRST_REGP_ID  --- 처리자
+	      , TO_CHAR(A.FRST_RGST_DT,'YYYY-mm-dd HH24:MI:SS') AS FRST_RGST_DT --- 처리일시
+	   FROM
+	   (SELECT A.USER_STAT_HST_DT
+	         , A.AUTH_ID
+	      	 , CASE WHEN A.AUTH_ID = 'AU000' THEN '승인'
+	             WHEN A.AUTH_ID = 'AU007' THEN '반려'
+	         ELSE '권한' END  CLS_NM
+	         , A.STAT_CHAN_RSN_CONT
+	         , (SELECT B.AUTH_NM FROM KCURE_COM_AUTH B WHERE B.AUTH_ID = A.AUTH_ID) AUTH_NM
+	         , CASE WHEN GRNT_YN = 'Y' THEN '부여'
+	               WHEN DEL_YN = 'Y' THEN '삭제' END GRNT_DEL_NM
+	         , A.FRST_REGP_ID
+	         , A.FRST_RGST_DT
+	   FROM KCURE_COM_USER_STAT_HST A
+	   WHERE USER_ID = #{userId}
+	   ORDER BY A.USER_STAT_HST_DT DESC
+	   )A
+	   LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectUsrHstListTotCnt" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO"  resultType="int">
+		SELECT COUNT(1) AS totcnt
+		FROM KCURE_COM_USER_STAT_HST A
+		WHERE USER_ID = #{userId}
+	</select>
+
+	<select id="selectUsrAuthList" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO" resultType="egovMap">
+		SELECT  B.AUTH_NM
+		FROM KCURE_COM_USER_AUTH A
+		LEFT JOIN KCURE_COM_AUTH B
+		ON A.AUTH_ID = B.AUTH_ID
+		WHERE A.USER_ID = #{userId}
+	</select>
+
+	<update id="updateUsr" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO">
+		UPDATE KCURE_COM_USER
+		SET LAST_MODP_ID = #{lastModpId}
+			, LAST_MODF_DT = now()
+			<if test="userStcd != null and userStcd !=''">
+				<if test="userStcd == '03'">
+				, USER_APRV_DT = now()
+				</if>
+				<if test="userStcd == '04'">
+				, DRMT_STAT_CHAN_DT = now()
+				</if>
+				<if test="userStcd == '99'">
+				, USER_WTHD_DT = now()
+				</if>
+			</if>
+			<if test="userStcd != null and userStcd !=''">
+			, USER_STCD = #{userStcd}
+			</if>
+			<if test="loginPswd != null and loginPswd !=''">
+		 	, LOGIN_PSWD = #{loginPswd}
+		 	</if>
+		 	<if test="pswdSltVl != null and pswdSltVl!=''">
+		 	,PSWD_SLT_VL = #{pswdSltVl}
+		 	</if>
+		WHERE USER_ID = #{userId}
+	</update>
+
+	<insert id="insertUsrHst" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO">
+		INSERT INTO KCURE_COM_USER_STAT_HST(
+			USER_STAT_HST_DT, USER_ID, AUTH_ID, STAT_CHAN_RSN_CONT, GRNT_YN, DEL_YN, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)VALUES (
+			now()
+			, #{userId}
+			, #{authId}
+			, #{statChanRsnCont}
+			, #{gmtYn}
+			, #{delYn}
+			, #{frstRegpId}
+			, now()
+			, #{lastModpId}
+			, now()
+		)
+	</insert>
+
+	<select id="selectCdCbo" parameterType="String" resultType="egovMap">
+		SELECT DETL_CD, DETL_CD_NM
+		FROM KCURE_COM_CD
+		WHERE GRP_CD = #{searchKeyword}
+		AND CD_USE_YN ='Y'
+		ORDER BY CD_OPUT_ORD
+	</select>
+
+    <resultMap id="bfntHstList" type="kcure.portal.sys.usr.stt.service.impl.UsrVO">
+        <result property="userId" column="USER_ID"/>
+        <result property="userNm" column="USER_NM"/>
+        <result property="bfntSndDt" column="BFNT_SND_DT"/>
+		<result property="bfntCscd" column="BFNT_CSCD"/>
+		<result property="bfntMtcd" column="BFNT_MTCD"/>
+		<result property="bfntCont" column="BFNT_CONT"/>
+    </resultMap>
+
+	<select id="selectBfntHstList" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO" resultMap="bfntHstList">
+		SELECT A.USER_ID
+			, TO_CHAR(A.BFNT_SND_DT,'yyyy-MM-dd HH24:MI:SS') AS BFNT_SND_DT
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'BFNT_CSCD' AND DETL_CD = A.BFNT_CSCD) AS	BFNT_CSCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'BFNT_MTCD' AND DETL_CD = A.BFNT_MTCD) AS	BFNT_MTCD
+			, A.BFNT_CONT
+			, B.USER_NM
+		FROM PORTAL.KCURE_COM_BFNT_HST A
+		INNER JOIN KCURE_COM_USER B
+		ON A.USER_ID = B.USER_ID
+		WHERE 1=1
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND UPPER(A.USER_ID) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND UPPER(B.USER_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword2}), '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.BFNT_MTCD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 !=''">
+			AND A.BFNT_CSCD = #{searchKeyword4}
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+	        AND TO_CHAR(A.BFNT_SND_DT, 'yyyy-MM-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(A.BFNT_SND_DT, 'yyyy-MM-dd') &lt;= #{searchKeywordTo}
+        </if>
+	</select>
+
+	<select id="selectBfntHstListTotCnt" parameterType="kcure.portal.sys.usr.stt.service.impl.UsrVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_COM_BFNT_HST A
+		INNER JOIN KCURE_COM_USER B
+		ON A.USER_ID = B.USER_ID
+		WHERE 1=1
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND UPPER(A.USER_ID) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND UPPER(B.USER_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword2}), '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.BFNT_MTCD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 !=''">
+			AND A.BFNT_CSCD = #{searchKeyword4}
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+	        AND TO_CHAR(A.BFNT_SND_DT, 'yyyy-MM-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(A.BFNT_SND_DT, 'yyyy-MM-dd') &lt;= #{searchKeywordTo}
+        </if>
+	</select>
+
+	<select id="selectUserChanRsn" resultType="kcure.portal.sys.usr.stt.service.impl.UsrVO">
+		SELECT  USER_ID,AUTH_ID,STAT_CHAN_RSN_CONT
+		FROM KCURE_COM_USER_STAT_HST
+		WHERE USER_ID = #{userId}
+		AND AUTH_ID = 'AU007'
+		ORDER BY USER_STAT_HST_DT DESC
+		LIMIT 1
+	</select>
+</mapper>

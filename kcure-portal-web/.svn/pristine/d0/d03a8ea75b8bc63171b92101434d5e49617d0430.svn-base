@@ -1,0 +1,79 @@
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+ 
+<tiles-definitions>
+	<definition name="base" template="/WEB-INF/tiles/layout.jsp" preparer="kcure.portal.sys.cmm.config.MenuPreparer" >
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp" />
+		<put-attribute name="subtop" value="/WEB-INF/tiles/subtop.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp" />
+	</definition>
+	
+	<!-- 메인 layout -->
+	<!-- 
+	<definition name="kcure/portal/main" extends="base">
+		<put-attribute name="subtop" value="" />
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/main.jsp" />
+	</definition>
+	 -->
+	 <definition name="kcure/portal/main" extends="base">
+		<put-attribute name="subtop" value="" />
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/main.jsp" />
+	</definition>
+	
+	<!-- 로그인 관련 layout S-->
+	<definition name="kcure/portal/uat/uia/*" extends="base">
+		<put-attribute name="subtop" value="" />
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/uat/uia/{1}.jsp" />
+	</definition>
+	
+	<!-- onpass layout -->
+	<definition name="kcure/portal/uat/uia/onepass/*" template="/WEB-INF/jsp/kcure/portal/uat/uia/onepass/{1}.jsp" />
+	
+	<definition name="kcure/portal/uat/uia/*/*" extends="base">
+		<put-attribute name="subtop" value="" />
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/uat/uia/{1}/{2}.jsp" />
+	</definition>
+	<!-- 로그인 관련 layout E-->
+	
+	<!-- CheckPlus 인증 layout -->
+	<definition name="kcure/portal/uat/uca/*Popup" template="/WEB-INF/jsp/kcure/portal/uat/uca/{1}Popup.jsp" />
+
+	<!-- ajax 페이지 호출 blank 페이지.-->
+	<definition name="kcure/portal/*/*/*_blankPage" template="/WEB-INF/jsp/kcure/portal/{1}/{2}/{3}.jsp" />
+	
+
+	<!-- 에러페이지 호출 -->
+	<definition name="kcure/portal/com/error/*" template="/WEB-INF/jsp/kcure/portal/com/error/{1}.jsp" />
+	
+	<!-- popup layout S -->
+	<definition name="popLayout" template="/WEB-INF/tiles/blankLayout.jsp">
+		<put-attribute name="content" value="" />
+	</definition>
+	
+	<definition name="kcure/portal/*/*/*/*Popup" extends="popLayout">
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/{1}/{2}/{3}/{4}Popup.jsp" />
+	</definition>
+	
+	<definition name="kcure/portal/*/*/*Popup" extends="popLayout">
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/{1}/{2}/{3}Popup.jsp" />
+	</definition>
+	
+	<definition name="kcure/portal/*/*Popup" extends="popLayout">
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/{1}/{2}Popup.jsp" />
+	</definition>
+	<!-- popup layout S -->
+	
+	<!-- 기본레이아웃  -->
+	<definition name="kcure/portal/*/*/*/*" extends="base">
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/{1}/{2}/{3}/{4}.jsp" />
+	</definition>
+	
+	<definition name="kcure/portal/*/*/*" extends="base">
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<definition name="kcure/portal/*/*" extends="base">
+		<put-attribute name="content" value="/WEB-INF/jsp/kcure/portal/{1}/{2}.jsp" />
+	</definition>
+</tiles-definitions>

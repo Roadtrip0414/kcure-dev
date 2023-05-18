@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Umt">
+    <resultMap id="userList" type="kcure.portal.uss.umt.service.impl.UmtVO">
+		<result property="userId" column="USER_ID"/>
+		<result property="userNm" column="USER_NM"/>
+		<result property="loginPswd" column="LOGIN_PSWD"/>
+		<result property="pin" column="PIN"/>
+		<result property="authId" column="AUTH_ID"/>
+		<result property="userStcd" column="USER_STCD"/>
+		<result property="afflPrtInstId" column="AFFL_PRT_INST_ID"/>
+		<result property="mbphNo" column="MBPH_NO"/>
+		<result property="userEmailAddr" column="USER_EMAIL_ADDR"/>
+		<result property="userEntMedmCd" column="USER_ENT_MEDM_CD"/>
+		<result property="userEntDt" column="USER_ENT_DT"/>
+		<result property="userAprvDt" column="USER_APRV_DT"/>
+		<result property="drmtStatChanDt" column="DRMT_STAT_CHAN_DT"/>
+		<result property="userWthdDt" column="USER_WTHD_DT"/>
+		<result property="lastLoginDt" column="LAST_LOGIN_DT"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="lastModpId" column="LAST_MODP_ID"/>
+		<result property="lastModfDt" column="LAST_MODF_DT"/>
+    </resultMap>
+
+    <select id="selectUserList" parameterType="kcure.portal.uss.umt.service.impl.UmtVO" resultMap="userList">
+            SELECT
+				USER_ID
+				, USER_NM
+				, LOGIN_PSWD
+				, PIN
+				, AUTH_ID
+				, USER_STCD
+				, AFFL_PRT_INST_ID
+				, MBPH_NO
+				, USER_EMAIL_ADDR
+				, USER_ENT_MEDM_CD
+				, USER_ENT_DT
+				, USER_APRV_DT
+				, DRMT_STAT_CHAN_DT
+				, USER_WTHD_DT
+				, LAST_LOGIN_DT
+				, FRST_REGP_ID
+				, FRST_RGST_DT
+				, LAST_MODP_ID
+				, LAST_MODF_DT
+              FROM KCURE_COM_USER
+             WHERE 1=1
+            <if test="searchKeyword != null and searchKeyword !=''">AND
+                USER_ID LIKE CONCAT('%' , #{searchKeyword}, '%') OR
+                USER_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>
+            ORDER BY USER_NM DESC
+            LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectUserListTotCnt" parameterType="kcure.portal.uss.umt.service.impl.UmtVO" resultType="int">
+            SELECT COUNT(*) totcnt
+            FROM KCURE_COM_USER
+            WHERE 1=1
+            <if test="searchKeyword != null and searchKeyword !=''">AND
+                USER_ID LIKE CONCAT('%' , #{searchKeyword}, '%') OR
+                USER_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>
+    </select>
+</mapper>

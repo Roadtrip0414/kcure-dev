@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Daz">
+
+	<select id="selectSvcPrtiSpCdIs02" parameterType="kcure.portal.sys.rsr.daz.service.impl.RsrDazSearchVO" resultType="egovMap">
+		SELECT	PRTI_ID, PRTI_NM, CTPV_SPCD,
+				COALESCE((SELECT COUNT(*) FROM KCURE_SVC_PRTI_DSZ WHERE PRTI_ID = P.PRTI_ID), 0) DSZ_CNT
+		FROM	KCURE_SVC_PRTI P
+		WHERE	INST_CLS_SPCD = '02'
+		<if test="prtiNm != null and prtiNm != ''">
+				AND PRTI_NM LIKE '%' || #{prtiNm} || '%'
+		</if>
+		<if test="prtiId != null and prtiId != ''">
+				AND PRTI_ID LIKE '%' || #{prtiId} || '%'
+		</if>
+	</select>
+
+	<select id="selectSvcPrtiSpCdIs02TotCnt" parameterType="kcure.portal.sys.rsr.daz.service.impl.RsrDazSearchVO" resultType="int">
+		SELECT	COUNT(*) totCnt
+		FROM	KCURE_SVC_PRTI P
+		WHERE	INST_CLS_SPCD = '02'
+				AND DSZ_YN = 'Y'
+		<if test="prtiNm != null and prtiNm != ''">
+				AND PRTI_NM LIKE '%' || #{prtiNm} || '%'
+		</if>
+		<if test="prtiId != null and prtiId != ''">
+				AND PRTI_ID LIKE '%' || #{prtiId} || '%'
+		</if>
+	</select>
+
+	<update id="updateSvcPrtiCtpvSpcd" parameterType="egovMap">
+		UPDATE	KCURE_SVC_PRTI
+		SET		CTPV_SPCD = #{ctpvSpcd}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+		WHERE	PRTI_ID = #{prtiId}
+	</update>
+
+
+	<select id="selectSvcPrtiDszList" parameterType="comDefaultVO" resultType="egovMap">
+		SELECT	PRTI_ID, SEAT_SEQ, SEAT_NO, USE_YN, FRST_REGP_ID, LAST_MODP_ID, LAST_MODF_DT,
+				TO_CHAR(FRST_RGST_DT, 'YYYY-MM-DD HH24:MI:SS') FRST_RGST_DT,
+				COALESCE((SELECT COUNT(*) FROM KCURE_SVC_PRTI_DSZ WHERE PRTI_ID = D.PRTI_ID), 0) DSZ_CNT
+		FROM	KCURE_SVC_PRTI_DSZ D
+		WHERE	PRTI_ID = #{searchKeyword}
+		ORDER BY SEAT_SEQ
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<!-- 총건수 조회 -->
+	<select id="selectSvcPrtiDszListTotCnt" parameterType="comDefaultVO" resultType="int">
+		SELECT	COUNT(1) AS totCnt
+		FROM	KCURE_SVC_PRTI_DSZ
+		WHERE	PRTI_ID = #{searchKeyword}
+	</select>
+
+
+	<insert id="insertSvcPrtiDsz" parameterType="kcure.portal.sys.rsr.daz.service.impl.SvcPrtiDszVO">
+		INSERT INTO KCURE_SVC_PRTI_DSZ
+		(
+			PRTI_ID
+			, SEAT_SEQ
+			, SEAT_NO
+			, USE_YN
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		)
+		SELECT	#{prtiId}
+				, (SELECT COALESCE(MAX(SEAT_SEQ), 0) + 1 FROM KCURE_SVC_PRTI_DSZ WHERE PRTI_ID = #{prtiId})
+				, #{seatNo}
+				, #{useYn}
+				, #{frstRegpId}
+				, NOW()
+				, #{lastModpId}
+				, NOW()
+		ON CONFLICT (PRTI_ID, SEAT_SEQ)
+		DO UPDATE
+		SET		SEAT_NO = #{seatNo}
+				, USE_YN = #{useYn}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+	</insert>
+
+	<update id="updateSvcPrtiDsz" parameterType="kcure.portal.sys.rsr.daz.service.impl.SvcPrtiDszVO">
+		UPDATE	KCURE_SVC_PRTI_DSZ
+		SET		SEAT_NO = #{seatNo}
+				, USE_YN = #{useYn}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+		WHERE	PRTI_ID = #{prtiId} AND SEAT_SEQ = #{seatSeq}
+	</update>
+
+	<delete id="deleteSvcPrtiDsz" parameterType="kcure.portal.sys.rsr.daz.service.impl.SvcPrtiDszVO">
+		DELETE
+		FROM	KCURE_SVC_PRTI_DSZ
+		WHERE	PRTI_ID = #{prtiId} AND SEAT_SEQ = #{seatSeq}
+	</delete>
+</mapper>

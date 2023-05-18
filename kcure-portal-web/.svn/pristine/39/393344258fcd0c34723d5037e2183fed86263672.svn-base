@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Test">
+    
+    <select id="selectUserOne" parameterType="kcure.portal.uss.umt.service.impl.UmtVO" resultType="kcure.portal.uss.umt.service.impl.UmtVO">
+            SELECT
+				USER_ID AS userId
+				, USER_NM AS userNm			
+				, USER_EMAIL_ADDR AS userEmailAddr
+				, USER_ENT_MEDM_CD AS userEntMedmCd
+				, USER_ENT_DT AS userEntDt
+				, USER_APRV_DT AS userAprvDt
+				, DRMT_STAT_CHAN_DT AS drmtStatChanDt
+				, USER_WTHD_DT AS userWthdDt
+				, LAST_LOGIN_DT AS lastLoginDt
+				, FRST_REGP_ID AS frstRegpId
+				, FRST_RGST_DT AS frstRgstDt
+				, LAST_MODP_ID AS lastModpId
+				, LAST_MODF_DT AS lastModfDt
+              FROM KCURE_COM_USER
+             WHERE 1=1
+            <if test="id != null and id !=''">
+               AND  USER_ID = #{id}
+            </if>
+    </select>
+    
+    
+     <select id="selectUserList"  resultType="kcure.portal.uss.umt.service.impl.UmtVO">
+            SELECT
+				USER_ID AS userId
+				, USER_NM AS userNm			
+				, USER_EMAIL_ADDR AS userEmailAddr
+				, USER_ENT_MEDM_CD AS userEntMedmCd
+				, USER_ENT_DT AS userEntDt
+				, USER_APRV_DT AS userAprvDt
+				, DRMT_STAT_CHAN_DT AS drmtStatChanDt
+				, USER_WTHD_DT AS userWthdDt
+				, LAST_LOGIN_DT AS lastLoginDt
+				, FRST_REGP_ID AS frstRegpId
+				, FRST_RGST_DT AS frstRgstDt
+				, LAST_MODP_ID AS lastModpId
+				, LAST_MODF_DT AS lastModfDt
+            FROM KCURE_COM_USER         
+            ORDER BY USER_NM DESC
+    </select>
+
+  
+</mapper>

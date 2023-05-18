@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="uatUiaPwd">
+
+	<select id="selectPswdRsetTknIdDupl" parameterType="egovMap" resultType="egovMap">
+		SELECT PSWD_RSET_TKN_ID
+		      ,PSWD_RSET_EDDT
+		      ,USER_ID
+		      ,USE_YN
+		  FROM KCURE_COM_PSWD_RSET
+		 WHERE PSWD_RSET_TKN_ID = #{pswdRsetTknId}
+	</select>
+	
+	<insert id="insertPswdRset" parameterType="egovMap">
+		INSERT INTO KCURE_COM_PSWD_RSET
+		      (
+		       PSWD_RSET_TKN_ID
+		      ,PSWD_RSET_EDDT
+		      ,USER_ID
+		      ,USE_YN
+		      ,FRST_REGP_ID
+		      ,FRST_RGST_DT
+		      ,LAST_MODP_ID
+		      ,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		       #{pswdRsetTknId}
+		      ,(NOW() + ('30 Minute'::INTERVAL))
+		      ,#{userId}
+		      ,'Y'
+		      ,#{userId}
+		      ,NOW()
+		      ,#{userId}
+		      ,NOW()
+		      )
+	</insert>
+
+	<select id="selectPswdRset" parameterType="egovMap" resultType="egovMap">
+		SELECT PSWD_RSET_TKN_ID
+		      ,TO_CHAR(PSWD_RSET_EDDT, 'YYYYMMDDHH24MISS') AS PSWD_RSET_EDDT
+		      ,USER_ID
+		      ,USE_YN
+		  FROM KCURE_COM_PSWD_RSET
+		 WHERE PSWD_RSET_TKN_ID = #{pswdRsetTknId}
+		   AND USE_YN = 'Y'
+	</select>
+	
+	<update id="updatePswdRset" parameterType="egovMap">
+		UPDATE KCURE_COM_PSWD_RSET
+		   SET USE_YN = 'N'
+		      ,LAST_MODP_ID = #{userId}
+		      ,LAST_MODF_DT = NOW()
+		 WHERE PSWD_RSET_TKN_ID = #{pswdRsetTknId}
+	</update>
+	
+	<update id="updateUsrPswdRset" parameterType="egovMap">
+		UPDATE KCURE_COM_USER
+		   SET LOGIN_PSWD = #{enpassword}
+		      ,PSWD_SLT_VL = #{pswdSltVl}
+		      ,LAST_MODP_ID = #{userId}
+		      ,LAST_MODF_DT = NOW()
+		 WHERE USER_ID = #{userId}
+	</update>
+</mapper>

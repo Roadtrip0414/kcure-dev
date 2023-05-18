@@ -1,0 +1,46 @@
+[{
+		  "country": "Lithuania",
+		  "research": 501.9,
+		  "marketing": 250,
+		  "sales": 199
+		}, {
+		  "country": "Czech Republic",
+		  "research": 301.9,
+		  "marketing": 222,
+		  "sales": 251
+		}, {
+		  "country": "Ireland",
+		  "research": 201.1,
+		  "marketing": 170,
+		  "sales": 199
+		}, {
+		  "country": "Germany",
+		  "research": 165.8,
+		  "marketing": 122,
+		  "sales": 90
+		}, {
+		  "country": "Australia",
+		  "research": 139.9,
+		  "marketing": 99,
+		  "sales": 252
+		}, {
+		  "country": "Austria",
+		  "research": 128.3,
+		  "marketing": 85,
+		  "sales": 84
+		}, {
+		  "country": "UK",
+		  "research": 99,
+		  "marketing": 93,
+		  "sales": 142
+		}, {
+		  "country": "Belgium",
+		  "research": 60,
+		  "marketing": 50,
+		  "sales": 55
+		}, {
+		  "country": "The Netherlands",
+		  "research": 50,
+		  "marketing": 42,
+		  "sales": 25
+}]

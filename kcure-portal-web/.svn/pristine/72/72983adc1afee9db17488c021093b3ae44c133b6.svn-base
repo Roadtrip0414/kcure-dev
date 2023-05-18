@@ -1,0 +1,640 @@
+<!-- 상단 공통 시작 -->
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes"><meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta property="og:image" content="">
+	<link rel="stylesheet" href="../../css/slick.css">
+	<link rel="stylesheet" href="../../css/kc_common.css">
+	<link rel="stylesheet" href="../../css/kc_style.css">
+	<link rel="stylesheet" href="../../css/kc_media.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+	<script src="../../js/jquery-3.6.0.min.js"></script>
+	<script src="../../js/slick.min.js"></script>
+	<script src="../../js/kc.js"></script>
+	<title>K-CURE ADMIN</title>
+</head>
+<body class="">
+	<header class="">
+		<div class="top">
+			<a href="javascript:void(0)">로그인</a>
+			<a href="javascript:void(0)" class="all_menu">전체메뉴</a>
+			<div class="body_size">
+				<p>글자크기</p>
+				<a href="javascript:void(0)" class="up"></a>
+				<a href="javascript:void(0)" class="down"></a>
+			</div>
+		</div>
+		<div class="middle">
+			<div class="left">
+				<a href="javascript:void(0)" class="logo"></a>
+			</div>
+			<nav>
+				<ul>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 소개</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 시각화</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 신청</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">이용자 지원</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">K-CURE</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<ul>
+							<li class="search">
+								<input type="text">
+								<a href="javascript:void(0)" class="btn">
+									<img src="../../images/m_search_icon.svg" alt="검색버튼">
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<div class="right">
+				<!-- 로그인전 div class="user"을 날림 | 부모 div class="right"는 있어야함 -->
+				<div class="user">
+					<p class="name">서울대병원 홍길동</p>
+					<div class="mark">
+						<p>심의<br>연구</p>
+						<span class="count">99</span>
+					</div>
+					<div class="drop">
+						<div class="item">
+							<ul>
+								<li><a href="javascript:void(0)">회원정보</a></li>
+								<li><a href="javascript:void(0)">나의연구</a></li>
+								<li><a href="javascript:void(0)">심의활동</a></li>
+							</ul>
+							<ul>
+								<li>
+									<!-- class="alarm" 알림이 있을시 클래스 추가 -->
+									<a href="javascript:void(0)" class="alarm">알림<span class="count">99</span></a>
+								</li>
+								<li><a href="javascript:void(0)">관리자모드로 전환</a></li>
+								<li><a href="javascript:void(0)">로그아웃</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div class="bk_hide"></div>
+	<div class="header_top">
+		<div class="location_wrap">
+			<a href="javascript:void(0)">홈</a>
+			<a href="javascript:void(0)">마이페이지</a>
+			<a href="javascript:void(0)">나의연구</a>
+			<a href="javascript:void(0)">활용</a>
+		</div>
+		<h1 class="title">권한별메뉴관리</h1>
+	</div>
+	<!-- 상단 공통 끝 -->
+	
+	<div class="wrap">
+		<div class="sub_visual_wrap">
+			<div class="data_request">
+				<ul>
+					<li>나의연구</li>
+				</ul>
+			</div>
+		</div>
+		<div class="sub_nav_wrap">
+			<!-- class="on"시 색변경 및 보더 생김 -->
+			<a href="javascript:void(0)" class="">신청(4)</a>
+			<a href="javascript:void(0)" class="on">활용(2)</a>
+			<a href="javascript:void(0)" class="">반입(2)</a>
+			<a href="javascript:void(0)" class="">반출(2)</a>
+			<a href="javascript:void(0)" class="">보관/연장(2)</a>
+			<a href="javascript:void(0)" class="">종료(2)</a>
+		</div>
+		<div class="n_my_research_wiew_wrap">
+			<div class="con">
+				<div class="sub_pag_title">
+					<p>데이터 활용 신청 연구정보</p>
+				</div>
+				<div class="n_gap_box">
+					<div class="use_center_info type_01">
+						<div class="top">
+							<div class="item">
+								<ul>
+									<li>연구명</li>
+									<li>암센터 연구 결과에 따른 두가지 행동패턴</li>
+								</ul>
+								<ul>
+									<li>연구기간</li>
+									<li>2023.10.10 ~ 2023.10.10</li>
+								</ul>
+								<ul>
+									<li>책임연구자</li>
+									<li>김민석</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="n_table_info gray">
+						<div class="title">
+							<h3>데이터 활용 신청</h3>
+							<p class="must_txt">* 표시된 항목은 필수 입력 항목입니다.</p>
+						</div>
+						<!-- 테이블 th의 텍스트가 가운데 정렬일 때 class명 type_02 추가 -->
+						<div class="n_l_table type_02">
+							<table>
+								<tbody>
+									<tr>
+										<th>형태<span class="must">*</span></th>
+										<td>
+											<div class="re_radio_box_s">
+												<label class="re_radio_btn_m">
+													<input type="radio" name="kind">
+													<span class="n_radio_mark"></span><span class="txt">폐쇄형 (안심활용센터)</span>
+												</label>
+												<label class="re_radio_btn_m">
+													<input type="radio" name="kind">
+													<span class="n_radio_mark"></span><span class="txt">원격형</span>
+												</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th>센터위치<span class="must">*</span></th>
+										<td>
+											<div class="item">
+												<select class="n_sel_l">
+													<option>충청권</option>
+												</select>
+												<select class="n_sel_l">
+													<option>충남대학교</option>
+												</select>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th>분석자</th>
+										<td>
+											<div class="check_m_item">
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김바바</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+												<label class="re_checkbox_m">
+													<input type="checkbox" name="radio">
+													<span><span class="check_img"></span>김소이</span>
+												</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th>날짜선택<span class="must">*</span></th>
+										<td>
+											<div class="calendar_wrap">
+												<!-- a테그로 수정 -->
+												<a href="javascript:void(0)" class="date_select">
+													<ul>
+														<li>2023.01.26(금)</li>
+														<li>~</li>
+														<li>2023.02.09(화)</li>
+													</ul>
+													<span>27, 28, 6, 7 제외</span>
+												</a>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="apply_btn">
+						<a href="javascript:void(0)" class="n_l_btn db_b">신청하기</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer>
+		<div class="con">
+			<div class="info">
+				<img src="../../images/logo_w.svg" alt="케이큐어 로고">
+				<div class="item">
+					<div class="link">
+						<a href="javascript:void(0)">이용약관</a>
+						<a href="javascript:void(0)">개인정보처리방침</a>
+						<a href="javascript:void(0)">고객의소리</a>
+					</div>
+					<p>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원 (남대문로4가 45, 서울상공회의소)<br>COPYRIGHT©By KHIS. All rights Reserved</p>
+				</div>
+			</div>
+			<div class="site">관련사이트</div>
+		</div>
+		<!-- 로딩바 class="on"시 생성 -->
+		<div class="loading_box">
+			<div class="loading_con">
+				<div class="loading"></div>
+				<div class="loading_text"></div>
+			</div>
+			<div class="loading_info">잠시만 기다려 주세요.</div>
+		</div>
+	</footer>
+
+	<!-- class="on"시 날짜선택 팝업 -->
+	<div class="kc_layer_popup on">
+		<div class="kc_popup_box connect_pw">
+			<a href="javascript:void(0)" class="kc_close btn"></a>
+			<div class="title">
+				<p>날짜선택</p>
+			</div>
+			<div class="popup_con">
+				<div class="calendar_wrap">
+					<div class="date_select">
+						<ul>
+							<li>2023.01.26(금)</li>
+							<li>~</li>
+							<li>2023.02.09(화)</li>
+						</ul>
+						<span>27, 28, 6, 7 제외</span>
+					</div>
+					<div class="date_list">
+						<div class="box">
+							<div class="date left">
+								<div class="date_top">
+									<a href="javascript:void(0)" class="prev"></a>
+									<p>2023년 1월</p>
+									<a href="javascript:void(0)" class="next"></a>
+								</div>
+								<ul>
+									<li><a href="javascript:void(0)" class="">일</a></li>
+									<li><a href="javascript:void(0)" class="">월</a></li>
+									<li><a href="javascript:void(0)" class="">화</a></li>
+									<li><a href="javascript:void(0)" class="">수</a></li>
+									<li><a href="javascript:void(0)" class="">목</a></li>
+									<li><a href="javascript:void(0)" class="">금</a></li>
+									<li><a href="javascript:void(0)" class="">토</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+									<li><a href="javascript:void(0)" class="start">1</a></li>
+									<li><a href="javascript:void(0)" class="line">2</a></li>
+									<li><a href="javascript:void(0)" class="line">3</a></li>
+									<li><a href="javascript:void(0)" class="end">4</a></li>
+									<li><a href="javascript:void(0)" class="">5</a></li>
+									<li><a href="javascript:void(0)" class="">6</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">7</a></li>
+									<li><a href="javascript:void(0)" class="">8</a></li>
+									<li><a href="javascript:void(0)" class="">9</a></li>
+									<li><a href="javascript:void(0)" class="">10</a></li>
+									<li><a href="javascript:void(0)" class="except">11</a></li>
+									<li><a href="javascript:void(0)" class="except">12</a></li>
+									<li><a href="javascript:void(0)" class="">13</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">14</a></li>
+									<li><a href="javascript:void(0)" class="">15</a></li>
+									<li><a href="javascript:void(0)" class="">16</a></li>
+									<li><a href="javascript:void(0)" class="">17</a></li>
+									<li><a href="javascript:void(0)" class="">18</a></li>
+									<li><a href="javascript:void(0)" class="">19</a></li>
+									<li><a href="javascript:void(0)" class="">20</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">21</a></li>
+									<li><a href="javascript:void(0)" class="">22</a></li>
+									<li><a href="javascript:void(0)" class="">23</a></li>
+									<li><a href="javascript:void(0)" class="">24</a></li>
+									<li><a href="javascript:void(0)" class="">25</a></li>
+									<li><a href="javascript:void(0)" class="">26</a></li>
+									<li><a href="javascript:void(0)" class="">27</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">28</a></li>
+									<li><a href="javascript:void(0)" class="">29</a></li>
+									<li><a href="javascript:void(0)" class="">30</a></li>
+									<li><a href="javascript:void(0)" class="">31</a></li>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+								</ul>
+							</div>
+							<div class="date right">
+								<div class="date_top">
+									<a href="javascript:void(0)" class="prev"></a>
+									<p>2023년 1월</p>
+									<a href="javascript:void(0)" class="next"></a>
+								</div>
+								<ul>
+									<li><a href="javascript:void(0)" class="">일</a></li>
+									<li><a href="javascript:void(0)" class="">월</a></li>
+									<li><a href="javascript:void(0)" class="">화</a></li>
+									<li><a href="javascript:void(0)" class="">수</a></li>
+									<li><a href="javascript:void(0)" class="">목</a></li>
+									<li><a href="javascript:void(0)" class="">금</a></li>
+									<li><a href="javascript:void(0)" class="">토</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class=""></a></li>
+									<li><a href="javascript:void(0)" class="">1</a></li>
+									<li><a href="javascript:void(0)" class="">2</a></li>
+									<li><a href="javascript:void(0)" class="">3</a></li>
+									<li><a href="javascript:void(0)" class="">4</a></li>
+									<li><a href="javascript:void(0)" class="">5</a></li>
+									<li><a href="javascript:void(0)" class="">6</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">7</a></li>
+									<li><a href="javascript:void(0)" class="">8</a></li>
+									<li><a href="javascript:void(0)" class="">9</a></li>
+									<li><a href="javascript:void(0)" class="">10</a></li>
+									<li><a href="javascript:void(0)" class="except">11</a></li>
+									<li><a href="javascript:void(0)" class="except">12</a></li>
+									<li><a href="javascript:void(0)" class="">13</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">14</a></li>
+									<li><a href="javascript:void(0)" class="">15</a></li>
+									<li><a href="javascript:void(0)" class="">16</a></li>
+									<li><a href="javascript:void(0)" class="">17</a></li>
+									<li><a href="javascript:void(0)" class="">18</a></li>
+									<li><a href="javascript:void(0)" class="">19</a></li>
+									<li><a href="javascript:void(0)" class="">20</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">21</a></li>
+									<li><a href="javascript:void(0)" class="">22</a></li>
+									<li><a href="javascript:void(0)" class="">23</a></li>
+									<li><a href="javascript:void(0)" class="">24</a></li>
+									<li><a href="javascript:void(0)" class="">25</a></li>
+									<li><a href="javascript:void(0)" class="">26</a></li>
+									<li><a href="javascript:void(0)" class="">27</a></li>
+								</ul>
+								<!--class="off" 빈공간 | class="start" 시작점 | class="line" 배경 라인 | class="except" 제외 날짜 | class="end" 끝나는점 -->
+								<ul>
+									<li><a href="javascript:void(0)" class="">28</a></li>
+									<li><a href="javascript:void(0)" class="">29</a></li>
+									<li><a href="javascript:void(0)" class="">30</a></li>
+									<li><a href="javascript:void(0)" class="">31</a></li>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+									<li><a href="javascript:void(0)" class="off"></a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="l_btn">
+				<a href="javascript:void(0)" class="bc_blue kc_close">선택완료</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

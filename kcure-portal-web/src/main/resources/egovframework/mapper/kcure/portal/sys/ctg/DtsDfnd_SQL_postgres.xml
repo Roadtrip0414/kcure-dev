@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DtsDfnd">
+
+    <resultMap id="dtsDfndList" type="kcure.portal.sys.ctg.dts.service.impl.CtgDtsVO">
+		<result property="prtiId" column="PRTI_ID"/>
+		<result property="dtsId" column="DTS_ID"/>
+		<result property="dtsKnm" column="DTS_KNM"/>
+		<result property="useYn" column="USE_YN"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="lastModpId" column="LAST_MODP_ID"/>
+    </resultMap>
+
+	<select id="selectDtsDfndList" parameterType="comDefaultVO" resultMap="dtsDfndList">
+		SELECT	PRTI_ID
+				, DTS_ID
+				, DTS_KNM
+				, USE_YN
+				, FRST_REGP_ID
+				, TO_CHAR(FRST_RGST_DT, 'YYYY-MM-DD') FRST_RGST_DT
+				, LAST_MODP_ID
+		FROM	PORTAL.KCURE_COM_DTS_DFND
+		WHERE	1 = 1
+		<if test="prtiId != null and prtiId != ''">
+				AND PRTI_ID = #{prtiId}
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+				AND (DTS_ID = #{searchKeyword} OR DTS_KNM LIKE '%' || #{searchKeyword} || '%')
+		</if>
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<!-- 총건수 조회 -->
+	<select id="selectDtsDfndListTotCnt" parameterType="comDefaultVO" resultType="int">
+		SELECT	COUNT(1) AS totCnt
+		FROM	PORTAL.KCURE_COM_DTS_DFND
+		WHERE	1 = 1
+		<if test="prtiId != null and prtiId != ''">
+				AND PRTI_ID = #{prtiId}
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+				AND (DTS_ID = #{searchKeyword} OR DTS_KNM LIKE '%' || #{searchKeyword} || '%')
+		</if>
+	</select>
+
+	<select id="selectPrtiDtsList" parameterType="comDefaultVO" resultMap="dtsDfndList">
+		SELECT	PRTI_ID, DTS_ID, DTS_KNM
+		FROM	KCURE_COM_DTS_DFND DTS
+		ORDER BY DTS_KNM
+	</select>
+
+	<insert id="insertDtsDfnd" parameterType="kcure.portal.sys.ctg.dts.service.impl.CtgDtsVO">
+		INSERT INTO PORTAL.KCURE_COM_DTS_DFND
+		(
+			PRTI_ID
+			, DTS_ID
+			, DTS_KNM
+			, USE_YN
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{prtiId}
+			, #{dtsId}
+			, #{dtsKnm}
+			, #{useYn}
+			, #{frstRegpId}
+			, NOW()
+			, #{lastModpId}
+			, NOW()
+		)
+		ON CONFLICT (PRTI_ID, DTS_ID)
+		DO UPDATE
+		SET		DTS_KNM = #{dtsKnm}
+				, USE_YN = #{useYn}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+	</insert>
+
+	<update id="updateDtsDfnd" parameterType="kcure.portal.sys.ctg.dts.service.impl.CtgDtsVO">
+		UPDATE	PORTAL.KCURE_COM_DTS_DFND
+		SET		DTS_KNM = #{dtsKnm}
+				, USE_YN = #{useYn}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+		WHERE	PRTI_ID = #{prtiId} AND DTS_ID = #{dtsId}
+	</update>
+
+	<delete id="deleteDtsDfnd" parameterType="kcure.portal.sys.ctg.dts.service.impl.CtgDtsVO">
+		DELETE
+		FROM	PORTAL.KCURE_COM_DTS_DFND
+		WHERE	PRTI_ID = #{prtiId} AND DTS_ID = #{dtsId}
+	</delete>
+</mapper>

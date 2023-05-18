@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 신청 완료 메일</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0;font-family: 'Noto Sans KR', sans-serif;">
+    <div style="max-width: 650px; margin: 0 auto;  border: 2px solid #c7c7c7; border-top: 4px solid #1831AC;">
+        <div style="padding: 30px;display:inline-grid">
+            <a href="{serverUrl}" style="height: 100%; display:inline-block; padding-bottom: 30px; width: 220px;">
+                <img src="{serverUrl}/images/n_k_cure_logo_c.svg" alt="로고" style="width:130px">
+            </a>
+            <p style="font-size:32px;font-weight:600;color:#003177;line-height:40px">데이터신청 완료 안내 메일입니다.</p>
+            <p style="margin: 0; color: #999; line-height: 27px;">
+                안녕하세요, K-CURE입니다.<br><span style="color:#183CA3;font-weight:600"> "{userNm} 님"</span> 이 신청한 데이터 신청이 완료 되었습니다. 신청 정보는 다음과 같습니다.<br>회원 성명 : <span style="color: #183CA3;">{userNm}</span><br>회원 로그인 이메일 : <span style="color: #183CA3;">{dataAplpId}</span>
+            </p>
+            <p style="margin:0; text-align: center; color:#183CA3; font-size: 26px; padding-top: 60px; font-weight: 700;">데이터 신청내역</p>
+            <table style="padding: 0; border: none; border-spacing: 0px; border-collapse:collapse; margin: 24px auto 60px; border-bottom: 1px solid #b9b9b9; width: 90%;">
+                <tbody style="border-top: 1.5px solid black; white-space: normal;">
+                    <tr>
+                        <th style="color: #202020; width: 25%; font-weight:600; padding: 15px; border-right: 1px solid #B9B9B9; text-align: left; background: #f5f7fb;">연구명</th>
+                        <td style="padding-left: 20px;">{rsrSbjNm}</td>
+                    </tr>
+                    <tr style="border-top: 1px solid #B9B9B9;">
+                        <th style="color: #202020; width: 25%; font-weight:600; padding: 15px; border-right: 1px solid #B9B9B9; text-align: left; background: #f5f7fb;">IRB연구기간</th>
+                        <td style="padding-left: 20px;">{rsrDt}</td>
+                    </tr>
+                    <tr style="border-top: 1px solid #B9B9B9;">
+                        <th style="color: #202020; width: 25%; font-weight:600; padding: 15px; border-right: 1px solid #B9B9B9; text-align: left; background: #f5f7fb;">데이터유형</th>
+                        <td style="padding-left: 20px;">{dataTpcdNm}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="{serverUrl}" style="margin:0 auto;padding:10px 30px;color:#fff;background: #183CA3;;font-size:17px;font-weight:500;text-decoration: none;border-radius:5px">K-CURE 바로가기</a>
+            <p style="font-size: 14px; color: #616161; font-weight: 400; line-height: 21px">
+            본 메일은 발신 전용 메일입니다. <br>
+            추가문의 사항은 K-CURE 내 문의게시판을 통해 문의주시기 바랍니다.
+          </p>
+        </div>
+       <div style="font-size: 11px; color: #636363; background-color: #f5f5f5; padding: 10px 30px 20px; display: flex; border-top: 1px solid #D8D8D8;">
+            <img src="{serverUrl}/images/logo_gray.svg" alt="하단로고" style="width:110px">
+            <p style="margin-top: 20px; padding-left: 30px;">
+                (04512) 서울특별시 중구 칠패로 36 8층 한국보건의료정보원 (봉래동1가, 연세봉래빌딩)<br><span style="padding-top: 5px; display: inline-block;">COPYRIGHT &copy; 2023 K-CURE ALL RIGHTS RESERVED</span>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

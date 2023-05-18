@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KcureInterceptor">
+
+	<!-- 시스템 로그 목록 조회 -->
+	<select id="checkUriMenuId" parameterType="kcure.portal.cmn.interceptor.service.impl.KcureInterceptorVO" resultType="java.lang.String" >
+			<![CDATA[
+			SELECT PATH.MENU_ID
+			FROM (
+					SELECT A.MENU_URI_ADDR URL, B.AUTH_ID AUTHORITY,A.MENU_ID,
+						CASE  WHEN POSITION(A.MENU_URI_PATT_CONT IN C.URI) >0  THEN 'Y' ELSE 'N' END  CHECK_URI
+					FROM KCURE_COM_MENU A
+						,KCURE_COM_MENU_AUTH B
+						,(SELECT #{targetUri} AS URI) C
+					WHERE A.MENU_ID = B.MENU_ID
+					AND A.MENU_USE_YN = 'Y'
+					AND A.MENU_URI_PATT_CONT IS NOT NULL 
+					AND A.MENU_URI_PATT_CONT !=''
+					AND B.AUTH_ID IN (
+			]]>
+					<if test="loginId != null and loginId != ''">
+						<![CDATA[	
+						SELECT AUTH_ID
+						FROM KCURE_COM_USER_AUTH
+						WHERE USER_ID = #{loginId}
+						UNION ALL
+						]]>
+					</if>
+			<![CDATA[
+						SELECT 'AU007'
+					)
+				) PATH
+			WHERE PATH.CHECK_URI = 'Y'
+			LIMIT 1
+			]]>
+	</select>
+	
+	
+	<insert id="insertTargetUri" parameterType="java.lang.String">
+			insert into kcure_check_url values(#{col1})
+	</insert>
+	
+	
+	
+	
+	<update id="addVstrCnt">
+		WITH UPSERT AS 
+		(
+			UPDATE KCURE_SVC_VST_RCRD SET 
+				VSTR_CNT = VSTR_CNT +1
+				,ACML_VSTR_CNT = ACML_VSTR_CNT +1
+				, LAST_MODF_DT = NOW()
+				, LAST_MODP_ID = 'SYSTEM'
+			WHERE
+				VST_RCRD_YMD = TO_CHAR(NOW(),'YYYYMMDD')
+			RETURNING *
+		)
+		INSERT INTO KCURE_SVC_VST_RCRD
+		(
+			VST_RCRD_YMD
+			,VSTR_CNT
+			,LOGIN_CNT
+			,ACML_VSTR_CNT
+			,ACML_LOGIN_CNT
+			,FRST_REGP_ID
+			,FRST_RGST_DT
+			,LAST_MODP_ID
+			,LAST_MODF_DT
+		)
+		SELECT 
+			TO_CHAR(NOW(),'YYYYMMDD')
+			,1
+			,0
+			,(SELECT COALESCE((SELECT ACML_VSTR_CNT FROM KCURE_SVC_VST_RCRD
+			ORDER BY VST_RCRD_YMD DESC
+			LIMIT 1)+1, 1))
+			,(SELECT COALESCE((SELECT ACML_LOGIN_CNT FROM KCURE_SVC_VST_RCRD
+			ORDER BY VST_RCRD_YMD DESC
+			LIMIT 1), 0))
+			,'SYSTEM'
+			,NOW()
+			,'SYSTEM'
+			,NOW()
+		WHERE NOT EXISTS(SELECT * FROM UPSERT);
+		
+	</update>
+	
+	<update id="addLoginCnt">
+		WITH UPSERT AS 
+		(
+			UPDATE KCURE_SVC_VST_RCRD SET 
+				LOGIN_CNT = LOGIN_CNT +1
+				,ACML_LOGIN_CNT = ACML_LOGIN_CNT +1
+				, LAST_MODF_DT = NOW()
+				, LAST_MODP_ID = 'SYSTEM'
+			WHERE
+				VST_RCRD_YMD = TO_CHAR(NOW(),'YYYYMMDD')
+			RETURNING *
+		)
+		INSERT INTO KCURE_SVC_VST_RCRD
+		(
+			VST_RCRD_YMD
+			,VSTR_CNT
+			,LOGIN_CNT
+			,ACML_VSTR_CNT
+			,ACML_LOGIN_CNT
+			,FRST_REGP_ID
+			,FRST_RGST_DT
+			,LAST_MODP_ID
+			,LAST_MODF_DT
+		)
+		SELECT 
+			TO_CHAR(NOW(),'YYYYMMDD')
+			,0
+			,1
+			,(SELECT COALESCE((SELECT ACML_VSTR_CNT FROM KCURE_SVC_VST_RCRD
+			ORDER BY VST_RCRD_YMD DESC
+			LIMIT 1), 0))
+			,(SELECT COALESCE((SELECT ACML_LOGIN_CNT FROM KCURE_SVC_VST_RCRD
+			ORDER BY VST_RCRD_YMD DESC
+			LIMIT 1)+1, 1))
+			,'SYSTEM'
+			,NOW()
+			,'SYSTEM'
+			,NOW()
+		WHERE NOT EXISTS(SELECT * FROM UPSERT);
+		
+	</update>
+	
+
+</mapper>

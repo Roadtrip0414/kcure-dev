@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sysRsrDau">
+	<select id="selectRsrDauAdmAuthCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		  FROM KCURE_COM_USER_AUTH
+		 WHERE AUTH_ID = 'AU001'	--사무국권한
+		   AND USER_ID = #{userId}
+	</select>
+	
+    <select id="selectRsrDauSiDoList" parameterType="egovMap" resultType="kcure.portal.cmn.tags.service.impl.ComCdDetailVo">
+		SELECT A.DETL_CD
+		      ,A.DETL_CD_NM
+		  FROM KCURE_COM_CD A
+		 WHERE A.GRP_CD = 'SI_DO_STCD'
+		   AND A.CD_USE_YN = 'Y'
+		   AND EXISTS (
+			           SELECT '1'
+			             FROM KCURE_SVC_PRTI CC
+			            WHERE CC.DSZ_YN = 'Y'
+			              AND CC.USE_YN = 'Y'
+			              AND CC.CTPV_SPCD = A.DETL_CD
+			            <if test="limitPrtiId != null and limitPrtiId !=''">
+			              AND CC.PRTI_ID = #{limitPrtiId}
+			            </if>
+		              )
+		 ORDER BY A.CD_OPUT_ORD
+	</select>
+	
+	<select id="selectRsrDauPrtiIdList" parameterType="egovMap" resultType="egovMap">
+		SELECT PRTI_ID
+		      ,PRTI_NM
+			  ,INST_CLS_SPCD
+			  ,INST_TPCD
+			  ,WHOL_SEAT_CNT
+			  ,RSV_SEAT_CNT
+			  ,USE_YN
+			  ,HOST_CD
+			  ,CTPV_SPCD
+		  FROM KCURE_SVC_PRTI
+		 WHERE DSZ_YN = 'Y'
+		   AND USE_YN = 'Y'
+		 <if test="srchSiDoCd != null and srchSiDoCd !=''">
+		   AND CTPV_SPCD = #{srchSiDoCd}
+		 </if>
+		 <if test="limitPrtiId != null and limitPrtiId !=''">
+		   AND PRTI_ID = #{limitPrtiId}
+		 </if>
+		 ORDER BY PRTI_NM
+	</select>
+	
+	<select id="selectRsrDauListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) AS totCnt
+		  FROM KCURE_SVC_DTU A
+			   INNER JOIN KCURE_COM_USER B
+					   ON A.FRST_REGP_ID = B.USER_ID
+			   INNER JOIN KCURE_SVC_DATA_APLC C
+					   ON A.DATA_APLC_NO = C.DATA_APLC_NO
+			   INNER JOIN KCURE_SVC_PRTI D
+					   ON A.DSZ_INST_ID = D.PRTI_ID AND DSZ_YN = 'Y'
+			   INNER JOIN KCURE_SVC_DATA_APLC_SMRY S
+					   ON A.DATA_APLC_NO = S.DATA_APLC_NO
+		 WHERE 1 = 1
+		 <choose>
+		     <when test='searchCondition != null and searchCondition.equals("rsrSbjNm")'>
+		       AND C.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		     </when>
+		     <when test='searchCondition != null and searchCondition.equals("aplpNm")'>
+		       AND EXISTS (
+		                   SELECT '1'
+		                     FROM KCURE_SVC_DTU_ACID SA
+		                          INNER JOIN KCURE_COM_USER SB
+        		                          ON SA.DATA_APLP_ID = SB.USER_ID
+		                    WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO
+		                      AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+		                      AND SB.USER_NM LIKE '%' || #{searchKeyword} || '%'
+		                  )
+		     </when>
+		     <otherwise></otherwise>
+		 </choose>
+		 <if test="searchKeywordFrom != null and searchKeywordFrom !=''">
+		   AND TO_CHAR(A.FRST_RGST_DT, 'YYYY-MM-DD') <![CDATA[>=]]> #{searchKeywordFrom}
+		 </if>
+		 <if test="searchKeywordTo != null and searchKeywordTo !=''">
+		   AND TO_CHAR(A.FRST_RGST_DT, 'YYYY-MM-DD') <![CDATA[<=]]> #{searchKeywordTo}
+		 </if>
+		 <if test="srchSiDoCd != null and srchSiDoCd !=''">
+		   AND D.CTPV_SPCD = #{srchSiDoCd}
+		 </if>
+		 <if test="srchPrtiId != null and srchPrtiId !=''">
+		   AND D.PRTI_ID = #{srchPrtiId}
+		 </if>
+		 <if test="srchAenvSpcd != null and srchAenvSpcd !=''">
+		   AND A.AENV_SPCD = #{srchAenvSpcd}
+		 </if>
+		 <if test="srchDtuAplcProgStcd != null and srchDtuAplcProgStcd !=''">
+		   AND A.DTU_APLC_PROG_STCD = #{srchDtuAplcProgStcd}
+		 </if>
+		 <if test="limitPrtiId != null and limitPrtiId !=''">
+		   AND D.PRTI_ID = #{limitPrtiId}
+		 </if>
+	</select>
+	
+	<select id="selectRsrDauList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.*
+		  FROM (
+		        SELECT A.DATA_APLC_NO
+		              ,A.DTU_APLC_NO
+		              ,A.AENV_SPCD
+		              ,A.DSZ_INST_ID
+		              ,A.DSZ_DSGN_SDT
+		              ,A.DSZ_DSGN_EDT
+		              ,A.DTU_APLC_PROG_STCD
+		              ,A.RJC_RSN_CONT
+		              ,TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD') AS FRST_RGST_DT
+		              ,B.USER_NM AS FRST_REGP_NM
+		              ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'FORM_CD' AND DETL_CD = A.AENV_SPCD) AS AENV_SPNM
+		              ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.DTU_APLC_PROG_STCD) AS DTU_APLC_PROG_NM
+		              ,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_SDT_FMT
+		              ,TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_EDT_FMT
+		              ,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_DT_TERM
+		              ,C.RSR_SBJ_NM
+		              ,C.DATA_TPCD 
+		              ,(
+		              	SELECT	DETL_CD_NM
+		              	FROM	KCURE_COM_CD
+		              	WHERE	GRP_CD = 'DATA_TPCD'
+		              			AND DETL_CD = C.DATA_TPCD
+		              ) DATA_TPNM
+		              ,D.PRTI_NM
+		              ,(
+		                SELECT ARRAY_TO_STRING(ARRAY_AGG(SB.USER_NM),',')
+		                  FROM KCURE_SVC_DTU_ACID SA
+		                       INNER JOIN KCURE_COM_USER SB
+        		                       ON SA.DATA_APLP_ID = SB.USER_ID
+		                 WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO
+		                   AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+		               ) AS DTU_ACID_NM
+		              ,S.VRT_ANLS_DVCE_CONT
+					  ,(
+						SELECT STRING_AGG(DETL_CD_NM, ',')
+						FROM   KCURE_COM_CD
+						WHERE  GRP_CD = 'VRT_ANLS_DVCE_SPCD'
+						       AND DETL_CD IN (SELECT UNNEST(STRING_TO_ARRAY(S.VRT_ANLS_DVCE_CONT, ',')))
+		               ) AS VRT_ANLS_DVCE_CONT_NM
+		          FROM KCURE_SVC_DTU A
+		               INNER JOIN KCURE_COM_USER B
+		                       ON A.FRST_REGP_ID = B.USER_ID
+		               INNER JOIN KCURE_SVC_DATA_APLC C
+		                       ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		               INNER JOIN KCURE_SVC_PRTI D
+		                       ON A.DSZ_INST_ID = D.PRTI_ID AND DSZ_YN = 'Y'
+					   INNER JOIN KCURE_SVC_DATA_APLC_SMRY S
+							   ON A.DATA_APLC_NO = S.DATA_APLC_NO
+		         WHERE 1 = 1
+		         <choose>
+		             <when test='searchCondition != null and searchCondition.equals("rsrSbjNm")'>
+		               AND C.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		             </when>
+		             <when test='searchCondition != null and searchCondition.equals("aplpNm")'>
+		               AND EXISTS (
+		                           SELECT '1'
+		                             FROM KCURE_SVC_DTU_ACID SA
+		                                  INNER JOIN KCURE_COM_USER SB
+        		                                  ON SA.DATA_APLP_ID = SB.USER_ID
+		                            WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO
+		                              AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+		                              AND SB.USER_NM LIKE '%' || #{searchKeyword} || '%'
+		                          )
+		             </when>
+		             <otherwise></otherwise>
+		         </choose>
+		         <if test="searchKeywordFrom != null and searchKeywordFrom !=''">
+		           AND TO_CHAR(A.FRST_RGST_DT, 'YYYY-MM-DD') <![CDATA[>=]]> #{searchKeywordFrom}
+		         </if>
+		         <if test="searchKeywordTo != null and searchKeywordTo !=''">
+		           AND TO_CHAR(A.FRST_RGST_DT, 'YYYY-MM-DD') <![CDATA[<=]]> #{searchKeywordTo}
+		         </if>
+		         <if test="srchSiDoCd != null and srchSiDoCd !=''">
+		           AND D.CTPV_SPCD = #{srchSiDoCd}
+		         </if>
+		         <if test="srchPrtiId != null and srchPrtiId !=''">
+		           AND D.PRTI_ID = #{srchPrtiId}
+		         </if>
+		         <if test="srchAenvSpcd != null and srchAenvSpcd !=''">
+		           AND A.AENV_SPCD = #{srchAenvSpcd}
+		         </if>
+		         <if test="srchDtuAplcProgStcd != null and srchDtuAplcProgStcd !=''">
+		           AND A.DTU_APLC_PROG_STCD = #{srchDtuAplcProgStcd}
+		         </if>
+		         <if test="limitPrtiId != null and limitPrtiId !=''">
+		           AND D.PRTI_ID = #{limitPrtiId}
+		         </if>
+		         ORDER BY A.FRST_RGST_DT DESC
+		       ) A
+		 LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+	
+	<select id="selectRsrDauDtu" parameterType="egovMap" resultType="egovMap">
+		 SELECT A.DATA_APLC_NO
+		       ,A.DTU_APLC_NO
+		       ,A.AENV_SPCD
+		       ,A.DSZ_INST_ID
+		       ,A.DSZ_DSGN_SDT
+		       ,A.DSZ_DSGN_EDT
+		       ,A.DTU_APLC_PROG_STCD
+		       ,A.RJC_RSN_CONT
+		       ,TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD') AS FRST_RGST_DT
+		       ,B.USER_NM AS FRST_REGP_NM
+		       ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'FORM_CD' AND DETL_CD = A.AENV_SPCD) AS CENTER_PRT_FRM_NM
+		       ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.DTU_APLC_PROG_STCD) AS DTU_APLC_PROG_NM
+		       ,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_SDT_FMT
+		       ,TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_EDT_FMT
+		       ,C.RSR_SBJ_NM
+		       ,(
+		         SELECT ATTF_NM
+		           FROM KCURE_SVC_ATTF SA
+		          WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO
+		            AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+		            AND SA.ATTF_SPCD = '04'  --04 신청자반입파일
+		          LIMIT 1
+		        ) AS ATTF_NM
+		       ,(
+		         SELECT ATTF_STR_NM
+		           FROM KCURE_SVC_ATTF SA
+		          WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO
+		            AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+		            AND SA.ATTF_SPCD = '04'  --04 신청자반입파일
+		          LIMIT 1
+		        ) AS ATTF_STR_NM
+		       ,(
+		         SELECT ATTF_PTH_NM
+		           FROM KCURE_SVC_ATTF SA
+		          WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO
+		            AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+		            AND SA.ATTF_SPCD = '04'  --04 신청자반입파일
+		          LIMIT 1
+		        ) AS ATTF_PTH_NM
+		  FROM KCURE_SVC_DTU A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.FRST_REGP_ID = B.USER_ID
+		       INNER JOIN KCURE_SVC_DATA_APLC C
+		               ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		 WHERE 1 = 1
+		   AND A.DATA_APLC_NO = #{dataAplcNo}
+		   AND A.DTU_APLC_NO = #{dtuAplcNo}
+	</select>
+	
+	<select id="selectRsrDauAcidList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+		      ,A.DTU_APLC_NO
+		      ,A.DATA_APLP_ID
+		      ,B.USER_NM
+		      ,B.USER_MBPH_NO
+		  FROM KCURE_SVC_DTU_ACID A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DATA_APLP_ID = B.USER_ID
+		 WHERE 1 = 1
+		   AND A.DATA_APLC_NO = #{dataAplcNo}
+		   AND A.DTU_APLC_NO = #{dtuAplcNo}
+		 ORDER BY B.USER_NM
+	</select>
+	
+	<select id="selectRsrDauDszRsvList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DSZ_INST_ID
+		      ,A.RSV_SEAT_NO
+		      ,A.DTU_RSV_YMD
+		      ,A.DATA_APLC_NO
+		      ,A.DTU_APLC_NO
+		      ,A.DATA_APLP_ID
+		      ,B.USER_NM
+		      ,TO_CHAR(TO_DATE(A.DTU_RSV_YMD,'YYYYMMDD'), 'YYYY.MM.DD') AS RSV_DT_FMT
+		  FROM KCURE_SVC_DSZ_RSV A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DATA_APLP_ID = B.USER_ID
+		 WHERE 1 = 1
+		   AND A.DSZ_INST_ID = #{dszInstId}
+		   AND A.DATA_APLC_NO = #{dataAplcNo}
+		   AND A.DTU_APLC_NO = #{dtuAplcNo}
+		 ORDER BY A.DATA_APLP_ID, A.DTU_RSV_YMD, A.RSV_SEAT_NO
+	</select>
+	
+	<select id="selectRsrDauDsgnYmdList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+		      ,A.DTU_APLC_NO
+		      ,A.YMD_SEQ
+		      ,A.CAL_DSGN_YMD
+		      ,A.HLD_YN
+		      ,A.EXCP_YMD_YN
+		      ,TO_CHAR(TO_DATE(A.CAL_DSGN_YMD,'YYYYMMDD'), 'YYYY.MM.DD') AS CAL_DSGN_YMD_FMT
+		      ,TO_CHAR(TO_DATE(A.CAL_DSGN_YMD,'YYYYMMDD'), 'MM/DD') AS CAL_DSGN_MD_FMT
+		  FROM KCURE_SVC_DSZ_DSGN_YMD A
+		 WHERE A.DATA_APLC_NO = #{dataAplcNo}
+		   AND A.DTU_APLC_NO = #{dtuAplcNo}
+		 ORDER BY A.CAL_DSGN_YMD
+	</select>
+	
+	<select id="selectRsrDauPrtiSeatList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+		      ,A.DTU_APLC_NO
+		      ,A.CAL_DSGN_YMD
+		      ,A.HLD_YN
+		      ,A.EXCP_YMD_YN
+		      ,A.PRTI_ID
+		      ,A.SEAT_SEQ
+		      ,A.SEAT_NO
+		      ,TO_CHAR(TO_DATE(A.CAL_DSGN_YMD,'YYYYMMDD'), 'YYYY.MM.DD') AS CAL_DSGN_YMD_FMT
+		      ,(CASE WHEN B.DTU_RSV_YMD IS NULL THEN 'N'
+		        ELSE 'Y' END) AS RSV_YN
+		  FROM (
+		        SELECT A.DATA_APLC_NO
+		              ,A.DTU_APLC_NO
+		              ,A.CAL_DSGN_YMD
+		              ,A.HLD_YN
+		              ,A.EXCP_YMD_YN
+		              ,B.PRTI_ID
+		              ,B.SEAT_SEQ
+		              ,B.SEAT_NO
+		          FROM KCURE_SVC_DSZ_DSGN_YMD A
+		               JOIN KCURE_SVC_PRTI_DSZ B
+		        	     ON B.PRTI_ID = #{dszInstId} AND B.USE_YN = 'Y'
+		         WHERE A.DATA_APLC_NO = #{dataAplcNo}
+		           AND A.DTU_APLC_NO = #{dtuAplcNo}
+		       ) A
+		       LEFT OUTER JOIN KCURE_SVC_DSZ_RSV B
+		               ON A.PRTI_ID = B.DSZ_INST_ID AND A.SEAT_NO = B.RSV_SEAT_NO AND A.CAL_DSGN_YMD = B.DTU_RSV_YMD
+		 WHERE 1 = 1
+		 ORDER BY A.SEAT_NO, A.CAL_DSGN_YMD, A.SEAT_SEQ
+	</select>
+	
+	<insert id="insertRsrDauDszRsv" parameterType="egovMap">
+		INSERT INTO KCURE_SVC_DSZ_RSV
+		       (
+		        DSZ_INST_ID
+		       ,RSV_SEAT_NO
+		       ,DTU_RSV_YMD
+		       ,DATA_APLC_NO
+		       ,DTU_APLC_NO
+		       ,DATA_APLP_ID
+		       ,API_YN
+		       ,API_RCV_DT
+		       ,SEAT_RSV_ID
+		       ,FRST_REGP_ID
+		       ,FRST_RGST_DT
+		       ,LAST_MODP_ID
+		       ,LAST_MODF_DT
+		       )
+		SELECT	#{dszInstId}
+		       ,#{rsvSeatNo}
+		       ,#{dtuRsvYmd}
+		       ,#{dataAplcNo}
+		       ,#{dtuAplcNo}
+		       ,UNNEST(STRING_TO_ARRAY(#{dataAplpIdList}, ','))
+		       ,'N'
+		       ,null
+		       ,null
+		       ,#{frstRegpId}
+		       ,NOW()
+		       ,#{frstRegpId}
+		       ,NOW()
+	</insert>
+	
+	<update id="updateRsrDauDtu" parameterType="egovMap">
+		UPDATE KCURE_SVC_DTU
+		   SET DTU_APLC_PROG_STCD = #{dtuAplcProgStcd}
+		      ,RJC_RSN_CONT = #{rjcRsnCont}
+		      ,LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		 WHERE DATA_APLC_NO = #{dataAplcNo}
+		   AND DTU_APLC_NO = #{dtuAplcNo}
+	</update>
+	
+	<insert id="insertDtapStatHst" parameterType="egovMap">
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+			DATA_APLC_NO
+			, DTAP_STAT_SEQ
+			, DTAP_STAT_SPCD
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		)
+		VALUES (
+			#{dataAplcNo}
+			, (SELECT COALESCE(MAX(DTAP_STAT_SEQ), 0) + 1 FROM KCURE_SVC_DTAP_STAT_HST WHERE DATA_APLC_NO = #{dataAplcNo})
+			, (
+				SELECT	DTAP_STAT_SPCD
+				FROM	KCURE_SVC_STAT_MST
+				WHERE	CD_CLCD = #{cdClcd}
+						AND DETL_CD = #{detlCd}
+			  )
+			, #{userId}
+			, NOW()
+			, #{userId}
+			, NOW()
+		)
+	</insert>	
+</mapper>

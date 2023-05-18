@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mypUsrWth">
+	<update id="updateMypUsrWth" parameterType="egovMap">
+		UPDATE KCURE_COM_USER
+		   SET LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		      ,USER_STCD = '99'
+		      ,USER_WTHD_DT = NOW()
+		      ,LOGIN_PSWD = ''
+		      ,PIN = ''
+		      ,PSWD_SLT_VL = ''
+		 WHERE USER_ID = #{userId}
+    </update>
+</mapper>

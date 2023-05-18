@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1142" height="392" viewBox="0 0 1142 392">
+  <g id="그룹_3596" data-name="그룹 3596" transform="translate(-13333 6323.328)">
+    <g id="그룹_3595" data-name="그룹 3595" transform="translate(13362.304 -6019.567)">
+      <rect id="사각형_1777" data-name="사각형 1777" width="47" height="144" rx="23.5" transform="translate(143.696 0.239) rotate(90)" fill="#02105f"/>
+      <text id="자료제공기관" transform="translate(71.696 31.239)" fill="#fff" font-size="17" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-46.92" y="0">자료제공기관</tspan></text>
+    </g>
+    <g id="사각형_1760" data-name="사각형 1760" transform="translate(13333 -6138.328) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2">
+      <rect width="166" height="201" rx="20" stroke="none"/>
+      <rect x="1" y="1" width="164" height="199" rx="19" fill="none"/>
+    </g>
+    <g id="사각형_1778" data-name="사각형 1778" transform="translate(13333 -5931.328) rotate(-90)" fill="none" stroke="#0f249a" stroke-width="2" stroke-dasharray="2 4">
+      <rect width="138" height="1140" rx="20" stroke="none"/>
+      <rect x="1" y="1" width="136" height="1138" rx="19" fill="none"/>
+    </g>
+    <g id="사각형_1764" data-name="사각형 1764" transform="translate(13553 -6138.328) rotate(-90)" fill="#eaedf8" stroke="#02105f" stroke-width="2">
+      <rect width="166" height="306" rx="20" stroke="none"/>
+      <rect x="1" y="1" width="164" height="304" rx="19" fill="none"/>
+    </g>
+    <g id="사각형_1769" data-name="사각형 1769" transform="translate(13877 -6136.328) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2">
+      <rect width="168" height="596" rx="20" stroke="none"/>
+      <rect x="1" y="1" width="166" height="594" rx="19" fill="none"/>
+    </g>
+    <rect id="사각형_1761" data-name="사각형 1761" width="48" height="175" rx="24" transform="translate(13521 -6323.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1765" data-name="사각형 1765" width="48" height="115" rx="24" transform="translate(13687 -6323.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1772" data-name="사각형 1772" width="48" height="163" rx="24" transform="translate(14059 -6323.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1762" data-name="사각형 1762" width="28" height="27" rx="13.5" transform="translate(13379 -6257.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1766" data-name="사각형 1766" width="28" height="28" rx="14" transform="translate(13600 -6257.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1779" data-name="사각형 1779" width="27" height="27" rx="13.5" transform="translate(13607 -6050.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1783" data-name="사각형 1783" width="27" height="27" rx="13.5" transform="translate(14102 -6050.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1780" data-name="사각형 1780" width="27" height="27" rx="13.5" transform="translate(13726 -6050.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1784" data-name="사각형 1784" width="27" height="28" rx="13.5" transform="translate(14222 -6050.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1773" data-name="사각형 1773" width="28" height="28" rx="14" transform="translate(13924 -6251.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1763" data-name="사각형 1763" width="28" height="28" rx="14" transform="translate(13460 -6257.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1767" data-name="사각형 1767" width="28" height="27" rx="13.5" transform="translate(13690 -6256.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1770" data-name="사각형 1770" width="28" height="28" rx="14" transform="translate(14015 -6251.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1768" data-name="사각형 1768" width="28" height="27" rx="13.5" transform="translate(13782 -6257.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1771" data-name="사각형 1771" width="28" height="27" rx="13.5" transform="translate(14104 -6251.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1774" data-name="사각형 1774" width="28" height="27" rx="13.5" transform="translate(14213 -6251.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1775" data-name="사각형 1775" width="28" height="27" rx="13.5" transform="translate(14312 -6251.328) rotate(90)" fill="#02105f"/>
+    <rect id="사각형_1776" data-name="사각형 1776" width="28" height="27" rx="13.5" transform="translate(14402 -6251.328) rotate(90)" fill="#02105f"/>
+    <text id="국가_암_데이터_센터" data-name="국가 암 데이터 센터" transform="translate(13434 -6291.328)" fill="#fff" font-size="17" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-68.349" y="0">국가 암 데이터 센터</tspan></text>
+    <text id="보건복지부" transform="translate(13630 -6291.328)" fill="#fff" font-size="17" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-39.1" y="0">보건복지부</tspan></text>
+    <text id="국가암데이터센터" transform="translate(13974 -6292.328)" fill="#fff" font-size="16" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-58.88" y="0">국가암데이터센터</tspan></text>
+    <text id="내부결합_필요성_판단" data-name="내부결합
+필요성
+판단" transform="translate(13352 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">내부결합</tspan><tspan x="0" y="21">필요성</tspan><tspan x="0" y="42">판단</tspan></text>
+    <text id="결합키_생성_제출_요청" data-name="결합키
+생성・제출
+요청" transform="translate(13572 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키</tspan><tspan x="0" y="21">생성・제출</tspan><tspan x="0" y="42">요청</tspan></text>
+    <text id="결합키_고유일련번호_생성" data-name="결합키
+고유일련번호
+생성" transform="translate(13580 -5996.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키</tspan><tspan x="0" y="21">고유일련번호</tspan><tspan fill="#0f249a" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="42">생성</tspan></tspan></text>
+    <text id="결합_대상_정보_가명처리" data-name="결합 대상 정보
+가명처리" transform="translate(14075 -5996.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합 대상 정보</tspan><tspan x="0" y="21">가명처리</tspan></text>
+    <text id="결합키_고유일련번호_제출" data-name="결합키
+고유일련번호
+제출" transform="translate(13699 -5996.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키</tspan><tspan x="0" y="21">고유일련번호</tspan><tspan fill="#0f249a" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="42">제출</tspan></tspan></text>
+    <text id="가명정보_고유일렬번호_전송" data-name="가명정보,
+고유일렬번호 전송" transform="translate(14194 -5996.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">가명정보,</tspan><tspan x="0" y="21">고유일렬번호 전송</tspan></text>
+    <text id="_결합키_생성_항목_:_주민등록번호" data-name=" * 결합키 생성 항목 :
+     주민등록번호" transform="translate(13818 -5998.328)" fill="#707070" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0" xml:space="preserve"> * 결합키 생성 항목 :</tspan><tspan x="0" y="21" xml:space="preserve">     주민등록번호</tspan></text>
+    <text id="결합키_생성_제출_요청-2" data-name="결합키
+생성・제출
+요청" transform="translate(13896 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키</tspan><tspan x="0" y="21">생성・제출</tspan><tspan x="0" y="42">요청</tspan></text>
+    <text id="고유일련번호_연계표_작성요청" data-name="고유일련번호
+연계표
+작성요청" transform="translate(13432 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Black, Noto Sans KR" font-weight="800"><tspan x="0" y="0">고유일련번호</tspan><tspan y="0" font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"></tspan><tspan font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"><tspan x="0" y="21">연계표</tspan><tspan x="0" y="42">작성요청</tspan></tspan></text>
+    <text id="결합키_고유_일렬번호_수신" data-name="결합키 고유
+일렬번호
+수신" transform="translate(13663 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키 고유</tspan><tspan x="0" y="21">일렬번호</tspan><tspan x="0" y="42">수신</tspan></text>
+    <text id="결합키_고유_일렬번호_수신-2" data-name="결합키 고유
+일렬번호
+수신" transform="translate(13987 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키 고유</tspan><tspan x="0" y="21">일렬번호</tspan><tspan x="0" y="42">수신</tspan></text>
+    <text id="_반복결합의_경우_공유일렬번호_연계표_고정일련번호를_의미함" data-name="* 반복결합의 경우, 공유일렬번호 연계표 ・고정일련번호를 의미함" transform="translate(14096 -6278.328)" fill="#707070" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">* 반복결합의 경우, 공유일렬번호 연계표 ・고정일련번호를 의미함</tspan></text>
+    <text id="고유일련번호_연계표_생성_전송" data-name="고유일련번호
+연계표 생성・
+전송" transform="translate(13755 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">고유일련번호</tspan><tspan y="0" font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"></tspan><tspan font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"><tspan x="0" y="21">연계표 생성・</tspan><tspan x="0" y="42">전송</tspan></tspan></text>
+    <text id="고유일련번호_연계표_생성_전송-2" data-name="고유일련번호
+연계표 생성・
+전송" transform="translate(14081 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">고유일련번호</tspan><tspan y="0" font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"></tspan><tspan font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"><tspan x="0" y="21">연계표 생성・</tspan><tspan x="0" y="42">전송</tspan></tspan></text>
+    <text id="가명정보_고유일렬번호_수신" data-name="가명정보,
+고유일렬번호
+수신" transform="translate(14186 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">가명정보,</tspan><tspan x="0" y="21">고유일렬번호</tspan><tspan x="0" y="42">수신</tspan></text>
+    <text id="가명정보_내부결합" data-name="가명정보
+내부결합" transform="translate(14285 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">가명정보</tspan><tspan x="0" y="21">내부결합</tspan></text>
+    <text id="고유일련번호_연계표_파기" data-name="고유일련번호
+연계표 파기" transform="translate(14375 -6202.328)" fill="#111" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">고유일련번호</tspan><tspan font-family="NotoSansKR-Regular, Noto Sans KR" font-weight="400"><tspan x="0" y="21">연계표 파기</tspan></tspan></text>
+    <text id="_1" data-name="1" transform="translate(13366 -6237.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">1</tspan></text>
+    <text id="_3" data-name="3" transform="translate(13587 -6237.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">3</tspan></text>
+    <text id="_4" data-name="4" transform="translate(13594 -6031.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">4</tspan></text>
+    <text id="_11" data-name="11" transform="translate(14089 -6031.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-8.246" y="0">11</tspan></text>
+    <text id="_5" data-name="5" transform="translate(13713 -6031.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">5</tspan></text>
+    <text id="_12" data-name="12" transform="translate(14208 -6031.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-8.246" y="0">12</tspan></text>
+    <text id="_8" data-name="8" transform="translate(13911 -6232.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">8</tspan></text>
+    <text id="_2" data-name="2" transform="translate(13447 -6237.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">2</tspan></text>
+    <text id="_6" data-name="6" transform="translate(13677 -6236.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">6</tspan></text>
+    <text id="_9" data-name="9" transform="translate(14002 -6232.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">9</tspan></text>
+    <text id="_7" data-name="7" transform="translate(13769 -6237.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-4.123" y="0">7</tspan></text>
+    <text id="_10" data-name="10" transform="translate(14091 -6232.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-8.246" y="0">10</tspan></text>
+    <text id="_13" data-name="13" transform="translate(14199 -6232.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-8.246" y="0">13</tspan></text>
+    <text id="_14" data-name="14" transform="translate(14299 -6232.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-8.246" y="0">14</tspan></text>
+    <text id="_15" data-name="15" transform="translate(14388 -6232.328)" fill="#fff" font-size="14" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-8.246" y="0">15</tspan></text>
+    <path id="패스_3743" data-name="패스 3743" d="M0,0,4.67,4.67,9.34,0" transform="translate(13628.37 -6237.981) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3766" data-name="패스 3766" d="M0,0,4.67,4.67,9.34,0" transform="translate(13402.95 -6237.037) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3746" data-name="패스 3746" d="M0,0,4.67,4.67,9.34,0" transform="translate(13952.6 -6232.839) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3744" data-name="패스 3744" d="M0,0,4.67,4.67,9.34,0" transform="translate(13719.116 -6237.981) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3745" data-name="패스 3745" d="M0,0,4.67,4.67,9.34,0" transform="translate(14043.346 -6232.839) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3747" data-name="패스 3747" d="M0,0,4.67,4.67,9.34,0" transform="translate(14142.6 -6232.839) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3748" data-name="패스 3748" d="M0,0,4.67,4.67,9.34,0" transform="translate(14246.69 -6232.839) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3749" data-name="패스 3749" d="M0,0,4.67,4.67,9.34,0" transform="translate(14341.106 -6232.839) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3750" data-name="패스 3750" d="M13358-6152v58.974" transform="translate(234.95 13.329)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3760" data-name="패스 3760" d="M13358-6152v58.974" transform="translate(729.745 14.329)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3753" data-name="패스 3753" d="M13358-6152v58.974" transform="translate(354.055 13.329)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3761" data-name="패스 3761" d="M13358-6152v58.974" transform="translate(848.85 14.329)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3751" data-name="패스 3751" d="M13343-6124.582l7.873,7.873,7.873-7.873" transform="translate(242.077 37.011)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3762" data-name="패스 3762" d="M13343-6124.582l7.873,7.873,7.873-7.873" transform="translate(736.872 38.011)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3752" data-name="패스 3752" d="M13343-6124.582l7.873,7.873,7.873-7.873" transform="translate(361.182 37.011)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3763" data-name="패스 3763" d="M13343-6124.582l7.873,7.873,7.873-7.873" transform="translate(855.977 38.011)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <rect id="사각형_1781" data-name="사각형 1781" width="160" height="27" transform="translate(13577 -6127.328)" fill="#fff"/>
+    <rect id="사각형_1782" data-name="사각형 1782" width="159.751" height="27.413" transform="translate(14071.676 -6127.328)" fill="#fff"/>
+    <text id="결합키_생성방법_사전협의" data-name="결합키 생성방법 사전협의" transform="translate(13587 -6107.328)" fill="#111" font-size="13" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키 생성방법 사전협의</tspan></text>
+    <text id="결합키_생성방법_사전협의-2" data-name="결합키 생성방법 사전협의" transform="translate(14082.074 -6108.602)" fill="#111" font-size="12" font-family="NotoSansKR-Regular, Noto Sans KR"><tspan x="0" y="0">결합키 생성방법 사전협의</tspan></text>
+    <path id="패스_3758" data-name="패스 3758" d="M0,0V58.974" transform="translate(13607.129 -6036.582) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3765" data-name="패스 3765" d="M0,0V58.974" transform="translate(14101.452 -6036.582) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3759" data-name="패스 3759" d="M0,0,7.873,7.873,15.746,0" transform="translate(13658.229 -6028.709) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+    <path id="패스_3764" data-name="패스 3764" d="M0,0,7.873,7.873,15.746,0" transform="translate(14152.553 -6028.709) rotate(-90)" fill="none" stroke="#02105f" stroke-width="2"/>
+  </g>
+</svg>

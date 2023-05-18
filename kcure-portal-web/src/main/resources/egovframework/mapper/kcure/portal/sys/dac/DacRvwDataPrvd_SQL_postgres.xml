@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DacRvwDataPrvd">
+
+    <select id="selectDataPrvd" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwDataPrvdVo">
+    		SELECT A.DATA_APLC_NO, B.PRTI_ID,C.USER_NM, C.USER_ID,C.RVW_PRNC_PST_NM, REGEXP_REPLACE(COALESCE(C.RVW_PST_PN, ''), '(.{3})(.*)(.{4})', '\1-\2-\3') RVW_PST_PN,D.PRTI_NM
+				,CASE WHEN A.DATA_TPCD = '02' AND E.RVW_STP_STCD IS NULL THEN 'RC01'
+				 	  WHEN E.RVW_STP_STCD IS NOT NULL THEN E.RVW_STP_STCD
+				      ELSE 'RD01' END AS RVW_STP_STCD 
+				,CASE WHEN A.DATA_TPCD = '02' AND E.RVW_STP_STCD IS NULL THEN 'RC01'
+				 	  WHEN E.RVW_STP_STCD IS NOT NULL THEN E.RVW_STP_STCD
+			     	 ELSE 'RD01'
+			      END AS TARGET_RVW_STP_STCD
+			FROM KCURE_SVC_DATA_APLC_RVW  A
+				,KCURE_SVC_DATA_PRVD_INST B 	
+				LEFT OUTER JOIN KCURE_COM_USER C ON B.PRTI_ID = C.PRTI_ID AND C.RVW_PRNC_YN = 'Y'
+				LEFT OUTER JOIN KCURE_SVC_PRTI D ON B.PRTI_ID = D.PRTI_ID
+				LEFT OUTER JOIN KCURE_SVC_DATA_PRVD_STAT E ON B.DATA_APLC_NO = E.DATA_APLC_NO AND B.PRTI_ID = E.PRTI_ID
+			WHERE 1=1 
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			AND A.DATA_APLC_NO = B.DATA_APLC_NO
+    </select>
+    
+    
+    
+    <insert id="insertDataPrvd" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwDataPrvdVo">
+   		WITH UPQRY AS (
+               UPDATE KCURE_SVC_DATA_PRVD_STAT
+                 SET RVW_STP_STCD = #{rvwStpStcd}
+                    ,LAST_MODP_ID = #{userId}
+                    ,LAST_MODF_DT = now()
+                WHERE DATA_APLC_NO = #{dataAplcNo}
+                AND PRTI_ID = #{prtiId}
+               RETURNING *
+             )
+    	INSERT INTO KCURE_SVC_DATA_PRVD_STAT(
+    		DATA_APLC_NO, PRTI_ID, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT,RVW_STP_STCD
+    	)
+		SELECT 
+			#{dataAplcNo}, #{prtiId},#{userId}, now(), #{userId},now(),#{rvwStpStcd}
+		 WHERE NOT EXISTS (SELECT * FROM UPQRY)
+    </insert>
+    
+    
+    
+    <select id="getChcekDataPrvdStat" resultType="java.lang.String">
+    	SELECT CASE 
+    			WHEN COUNT(BT.*) > 0 THEN 'N'
+				ELSE 'Y'
+			END AS CHECK_YN
+		FROM (				
+				SELECT CASE 
+						WHEN B.RVW_STP_STCD = #{rvwStpStcd} THEN 'Y'
+				   		ELSE 'N'
+					   END AS CHECK_YN
+				FROM KCURE_SVC_DATA_PRVD_INST A
+					LEFT OUTER JOIN KCURE_SVC_DATA_PRVD_STAT B ON B.PRTI_ID = A.PRTI_ID AND B.DATA_APLC_NO = A.DATA_APLC_NO
+				WHERE A.DATA_APLC_NO = #{dataAplcNo}
+				 
+			) BT
+			WHERE BT.CHECK_YN = 'N'
+    </select>
+    
+    
+    <update id="updateDataPrvd">
+	    UPDATE KCURE_SVC_DATA_APLC_RVW SET
+	    	RVW_STP_STCD = #{rvwStpStcd},
+	    	LAST_MODP_ID = #{userId}, 
+	    	LAST_MODF_DT = now()
+	    WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND RVW_STP_SPCD = #{rvwStpSpcd}
+    </update>
+    
+    
+    
+    <update id="updateAplcProgStcd">
+    	UPDATE KCURE_SVC_DATA_APLC SET
+			APLC_PROG_STCD = '05'
+			,LAST_MODP_ID = #{userId}
+			,LAST_MODF_DT = now()
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+    </update>
+    
+    
+     <update id="updateDataPrvdStat">
+	    UPDATE KCURE_SVC_DATA_PRVD_STAT SET
+	    	RVW_STP_STCD = #{rvwStpStcd},
+	    	LAST_MODP_ID = #{userId}, 
+	    	LAST_MODF_DT = now()
+	    WHERE DATA_APLC_NO = #{dataAplcNo}
+    </update>
+    
+    <!-- 	심의완료 코드 , 데이터 활용일자 ,데이터 보관일자,데이터임의보관일자 -->
+     <update id="updateDataAplcInfo">
+	    UPDATE KCURE_SVC_DATA_APLC SET
+	    	(APLC_PROG_STCD,DTU_SDT,DTU_EDT,DATA_KEP_SDT,DATA_KEP_EDT,DATA_RNDM_KEP_SDT,DATA_RNDM_KEP_EDT,RSR_ASMT_NO,LAST_MODP_ID,LAST_MODF_DT)
+	    	= (
+					SELECT
+					'05' AS APLC_PROG_STCD
+					,DSZ_APDT AS DTU_SDT 
+					, TO_CHAR( (DSZ_APDT::DATE + (DTAP_USE_DCNT||' DAY')::INTERVAL) , 'YYYYMMDD') AS DTU_EDT
+					,DSZ_APDT AS DATA_KEP_SDT 
+					, TO_CHAR( (DSZ_APDT::DATE + (DTAP_USE_DCNT||' DAY')::INTERVAL) , 'YYYYMMDD') AS DATA_KEP_EDT
+					,TO_CHAR( (DSZ_APDT::DATE + (DTAP_USE_DCNT||' DAY')::INTERVAL+'1 DAY'::INTERVAL) , 'YYYYMMDD') AS DATA_RNDM_KEP_SDT
+					,TO_CHAR( (DSZ_APDT::DATE + (DTAP_USE_DCNT||' DAY')::INTERVAL+'1 DAY'::INTERVAL + ( (SELECT DATA_RNDM_KEP_DCNT FROM KCURE_COM_KEP_EXTD )||' DAY')::INTERVAL) , 'YYYYMMDD') AS DATA_RNDM_KEP_EDT
+					,( SELECT  'KC'||#{dataTpcd}||TO_CHAR(NOW(),'YYYY')|| LPAD( (COUNT(*)+1)::TEXT,3,'0') FROM KCURE_SVC_DATA_APLC WHERE RSR_ASMT_NO LIKE 'KC'||#{dataTpcd}||TO_CHAR(NOW(),'YYYY')||'%') AS RSR_ASMT_NO
+					,#{userId}
+					,now()
+				FROM KCURE_SVC_DATA_APLC_SMRY 
+				WHERE DATA_APLC_NO = #{dataAplcNo}		    	
+				)
+	    WHERE DATA_APLC_NO = #{dataAplcNo}
+    </update>
+
+
+	<insert id="insertExtd">
+		INSERT INTO PORTAL.KCURE_SVC_EXTD(
+			RSR_ASMT_NO
+			, EXTD_APLC_NO
+			, DATA_APLC_NO
+			, EXTD_STCD
+			, EXTD_APLC_YMD
+			, DTU_SDT
+			, DTU_EDT
+			, DATA_KEP_SDT
+			, DATA_KEP_EDT
+			, DATA_RNDM_KEP_SDT
+			, DATA_RNDM_KEP_EDT
+			, EXTD_PROG_STCD
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT			
+			,RSR_SDT
+			,RSR_EDT
+			,BFR_RSR_SDT
+			,BFR_RSR_EDT
+			,BFR_DTU_SDT
+			,BFR_DTU_EDT
+			,BFR_DATA_KEP_SDT
+			,BFR_DATA_KEP_EDT			
+			)
+			SELECT RSR_ASMT_NO
+				,(SELECT 'EXTD-'|| TO_CHAR(NOW(), 'YYYYMMDD')||'-' || LPAD(( COUNT(*) +1)::TEXT,3,'0') FROM KCURE_SVC_EXTD WHERE EXTD_APLC_NO LIKE 'EXTD-'|| TO_CHAR(NOW(), 'YYYYMMDD')||'%')
+				,DATA_APLC_NO
+				,'999'
+				,TO_CHAR(NOW(), 'YYYYMMDD')
+				,DTU_SDT
+				,DTU_EDT
+				, DATA_KEP_SDT
+				, DATA_KEP_EDT
+				, DATA_RNDM_KEP_SDT
+				, DATA_RNDM_KEP_EDT
+				,'U02'
+				, #{userId}
+				, NOW()
+				, #{userId}
+				, NOW()
+				,RSR_SDT
+				,RSR_EDT
+				,RSR_SDT
+				,RSR_EDT
+				,DTU_SDT
+				,DTU_EDT
+				,DATA_KEP_SDT
+				,DATA_KEP_EDT
+			FROM KCURE_SVC_DATA_APLC
+			WHERE DATA_APLC_NO = #{dataAplcNo}
+	</insert>
+
+</mapper>

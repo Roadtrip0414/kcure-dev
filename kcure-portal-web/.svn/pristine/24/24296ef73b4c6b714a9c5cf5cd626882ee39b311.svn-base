@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sysClbTbl">
+    <resultMap id="tblColList" type="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+        <result property="tblEnm" column="TBL_ENM"/>
+		<result property="tblKnm" column="TBL_KNM"/>
+		<result property="tblOrd" column="TBL_ORD"/>
+		<result property="crcnNm" column="CRCN_NM"/>
+		<result property="lclsNm" column="LCLS_NM"/>
+		<result property="mclsNm" column="MCLS_NM"/>
+		<result property="ldngDtrnCont" column="LDNG_DTRN_CONT"/>
+		<result property="collBldtColKnm" column="COLL_BLDT_COL_KNM"/>
+		<result property="collBldtColEnm" column="COLL_BLDT_COL_ENM"/>
+		<result property="dtsLclsCd" column="DTS_LCLS_CD"/>
+		<result property="dtsLclsNm" column="DTS_LCLS_NM"/>
+		<result property="colEnm" column="COL_ENM"/>
+		<result property="colKnm" column="COL_KNM"/>
+		<result property="colOrd" column="COL_ORD"/>
+		<result property="dataTpCont" column="DATA_TP_CONT"/>
+		<result property="pkOrd" column="PK_ORD"/>
+		<result property="domnNm" column="DOMN_NM"/>
+		<result property="colExplCont" column="COL_EXPL_CONT"/>
+		<result property="colVlCont" column="COL_VL_CONT"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="oldTblEnm" column="OLD_TBL_ENM"/>
+		<result property="oldColEnm" column="OLD_COL_ENM"/>
+		<result property="treeOrdId" column="TREE_ORD_ID"/>
+		<result property="treeChildId" column="TREE_CHILD_ID"/>
+		<result property="treeVwNm" column="TREE_VW_NM"/>
+    </resultMap>
+    
+    <select id="selectSrchCrcnNmList" parameterType="String" resultType="egovMap">
+		SELECT CRCN_NM
+		  FROM KCURE_COM_TBL_DFND
+		 WHERE 1 = 1
+		 GROUP BY CRCN_NM
+		 ORDER BY CRCN_NM COLLATE "ko_KR.utf8"
+	</select>
+
+    <select id="selectClsTblList" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO" resultMap="tblColList">
+		SELECT A.TBL_ENM
+		      ,A.TBL_KNM
+		      ,A.TBL_ORD
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS CRCN_NM
+		      ,A.LCLS_NM
+		      ,A.MCLS_NM
+		      ,A.LDNG_DTRN_CONT
+		      ,A.COLL_BLDT_COL_KNM
+		      ,A.COLL_BLDT_COL_ENM
+		      ,A.FRST_REGP_ID
+		      ,TO_CHAR(A.FRST_RGST_DT, 'YYYY-MM-DD') AS FRST_RGST_DT
+		      ,A.TBL_ENM AS OLD_TBL_ENM
+		      ,A.DTS_LCLS_CD
+		  FROM KCURE_COM_TBL_DFND A
+		 WHERE 1 = 1
+		 <if test="srchDtsLclsCd != null and srchDtsLclsCd !=''">
+		   AND A.DTS_LCLS_CD = #{srchDtsLclsCd}
+		 </if>
+		 ORDER BY (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) COLLATE "ko_KR.utf8"
+		         ,A.TBL_ORD
+    </select>
+	
+    <insert id="insertClsTbl" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+		INSERT INTO KCURE_COM_TBL_DFND
+		      (
+		       TBL_ENM
+		      ,TBL_KNM
+		      ,TBL_ORD
+		      ,CRCN_NM
+		      ,LCLS_NM
+		      ,MCLS_NM
+		      ,LDNG_DTRN_CONT
+		      ,COLL_BLDT_COL_KNM
+		      ,COLL_BLDT_COL_ENM
+		      ,FRST_REGP_ID
+		      ,FRST_RGST_DT
+		      ,LAST_MODP_ID
+		      ,LAST_MODF_DT
+		      ,DTS_LCLS_CD
+		      )
+		VALUES
+		      (
+		       #{tblEnm}
+		      ,#{tblKnm}
+		      ,#{tblOrd}
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = #{dtsLclsCd})
+		      ,#{lclsNm}
+		      ,#{mclsNm}
+		      ,#{ldngDtrnCont}
+		      ,#{collBldtColKnm}
+		      ,#{collBldtColEnm}
+		      ,#{frstRegpId}
+		      ,NOW()
+		      ,#{frstRegpId}
+		      ,NOW()
+		      ,#{dtsLclsCd}
+		      )
+    </insert>
+	
+    <update id="updateClsTbl" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+		UPDATE KCURE_COM_TBL_DFND
+		   SET TBL_KNM = #{tblKnm}
+		      ,TBL_ORD = #{tblOrd}
+		      ,CRCN_NM = (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = #{dtsLclsCd})
+		      ,LCLS_NM = #{lclsNm}
+		      ,MCLS_NM = #{mclsNm}
+		      ,LDNG_DTRN_CONT = #{ldngDtrnCont}
+		      ,COLL_BLDT_COL_KNM = #{collBldtColKnm}
+		      ,COLL_BLDT_COL_ENM = #{collBldtColEnm}
+		      ,LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		      ,DTS_LCLS_CD = #{dtsLclsCd}
+		 WHERE TBL_ENM = #{oldTblEnm}
+    </update>
+	
+    <delete id="deleteClsTbl" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+		DELETE FROM KCURE_COM_TBL_DFND
+		 WHERE TBL_ENM = #{oldTblEnm}
+    </delete>
+
+    <select id="selectClsTblColTreeList" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO" resultMap="tblColList">
+		WITH FRST_DEPTH AS (
+		                    SELECT (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS CRCN_NM
+		                          ,NULL AS LCLS_NM
+		                          ,NULL AS MCLS_NM
+		                          ,NULL AS TBL_KNM
+		                          ,NULL AS TBL_ENM
+		                          ,NULL AS COL_ENM
+		                          ,NULL AS COL_KNM
+		                          ,0 AS COL_ORD
+		                          ,(ROW_NUMBER() OVER(ORDER BY (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) COLLATE "ko_KR.utf8")) || '' AS ORD_ID
+		                          ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS TREE_VW_NM
+		                          ,A.DTS_LCLS_CD
+		                      FROM KCURE_COM_TBL_DFND A
+		                     GROUP BY A.DTS_LCLS_CD
+		                   )
+		    ,SCND_DEPTH AS (
+		                    SELECT (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS CRCN_NM
+		                          ,A.LCLS_NM
+		                          ,NULL AS MCLS_NM
+		                          ,NULL AS TBL_KNM
+		                          ,NULL AS TBL_ENM
+		                          ,NULL AS COL_ENM
+		                          ,NULL AS COL_KNM
+		                          ,0 AS COL_ORD
+		                          ,MIN(A.TBL_ORD) || '' AS ORD_ID
+		                          ,A.LCLS_NM AS TREE_VW_NM
+		                          ,A.DTS_LCLS_CD
+		                      FROM KCURE_COM_TBL_DFND A
+		                     GROUP BY A.DTS_LCLS_CD, A.LCLS_NM
+		     )
+		    ,THRD_DEPTH AS (
+		                    SELECT (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS CRCN_NM
+		                          ,A.LCLS_NM
+		                          ,A.MCLS_NM
+		                          ,A.TBL_KNM
+		                          ,A.TBL_ENM
+		                          ,NULL AS COL_ENM
+		                          ,NULL AS COL_KNM
+		                          ,0 AS COL_ORD
+		                          ,A.TBL_ORD || '' AS ORD_ID
+		                          ,A.MCLS_NM AS TREE_VW_NM
+		                          ,A.DTS_LCLS_CD
+		                      FROM KCURE_COM_TBL_DFND A
+		     )
+		    ,FRTH_DEPTH AS (
+		                    SELECT (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS CRCN_NM
+		                          ,A.LCLS_NM
+		                          ,A.MCLS_NM
+		                          ,A.TBL_KNM AS TBL_KNM
+		                          ,A.TBL_ENM AS TBL_ENM
+		                          ,B.COL_ENM AS COL_ENM
+		                          ,B.COL_KNM AS COL_KNM
+		                          ,B.COL_ORD AS COL_ORD
+		                          ,B.COL_ORD || '' AS ORD_ID
+		                          ,B.COL_KNM AS TREE_VW_NM
+		                          ,A.DTS_LCLS_CD
+		                      FROM KCURE_COM_TBL_DFND A
+		                           INNER JOIN KCURE_COM_COL_DFND B
+		                                   ON A.TBL_ENM = B.TBL_ENM
+		     )
+		SELECT CC.*
+		  FROM (
+		        SELECT A.*
+		              ,LPAD(A.ORD_ID, 3, '0') AS TREE_ORD_ID
+		              ,'' AS TREE_CHILD_ID
+		          FROM FRST_DEPTH A
+		         UNION ALL
+		        SELECT B.*
+		              ,LPAD(A.ORD_ID, 3, '0') || LPAD(B.ORD_ID, 3, '0') AS TREE_ORD_ID
+		              ,LPAD(A.ORD_ID, 3, '0') AS TREE_CHILD_ID
+		          FROM FRST_DEPTH A
+		               INNER JOIN SCND_DEPTH B
+		                       ON A.DTS_LCLS_CD = B.DTS_LCLS_CD
+		         UNION ALL
+		        SELECT C.*
+		              ,LPAD(A.ORD_ID, 3, '0') || LPAD(B.ORD_ID, 3, '0') || LPAD(C.ORD_ID, 3, '0') AS TREE_ORD_ID
+		              ,LPAD(A.ORD_ID, 3, '0') || LPAD(B.ORD_ID, 3, '0') AS TREE_CHILD_ID
+		          FROM FRST_DEPTH A
+		               INNER JOIN SCND_DEPTH B
+		                       ON A.DTS_LCLS_CD = B.DTS_LCLS_CD
+		               INNER JOIN THRD_DEPTH C
+		                       ON B.DTS_LCLS_CD = C.DTS_LCLS_CD
+		                          AND B.LCLS_NM = C.LCLS_NM
+		         UNION ALL
+		        SELECT D.*
+		              ,LPAD(A.ORD_ID, 3, '0') || LPAD(B.ORD_ID, 3, '0') || LPAD(C.ORD_ID, 3, '0') || LPAD(D.ORD_ID, 3, '0') AS TREE_ORD_ID
+		              ,LPAD(A.ORD_ID, 3, '0') || LPAD(B.ORD_ID, 3, '0') || LPAD(C.ORD_ID, 3, '0') AS TREE_CHILD_ID
+		          FROM FRST_DEPTH A
+		               INNER JOIN SCND_DEPTH B
+		                       ON A.DTS_LCLS_CD = B.DTS_LCLS_CD
+		               INNER JOIN THRD_DEPTH C
+		                       ON B.DTS_LCLS_CD = C.DTS_LCLS_CD
+		                          AND B.LCLS_NM = C.LCLS_NM
+		               INNER JOIN FRTH_DEPTH D
+		                       ON C.TBL_ENM = D.TBL_ENM
+		       ) CC
+		 WHERE 1 = 1
+		 <if test="srchDtsLclsCd != null and srchDtsLclsCd !=''">
+		   AND CC.DTS_LCLS_CD = #{srchDtsLclsCd}
+		 </if>
+		 ORDER BY CC.TREE_ORD_ID
+    </select>
+
+    <select id="selectClsColList" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO" resultMap="tblColList">
+		SELECT A.TBL_KNM
+		      ,A.TBL_ORD
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTS_LCLS_CD' AND DETL_CD = A.DTS_LCLS_CD) AS CRCN_NM
+		      ,A.LCLS_NM
+		      ,A.MCLS_NM
+		      ,A.DTS_LCLS_CD
+		      ,B.TBL_ENM
+		      ,B.COL_ENM
+		      ,B.COL_KNM
+		      ,B.COL_ORD
+		      ,B.DATA_TP_CONT
+		      ,B.PK_ORD
+		      ,B.DOMN_NM
+		      ,B.COL_EXPL_CONT
+		      ,B.COL_VL_CONT
+		      ,B.FRST_REGP_ID
+		      ,TO_CHAR(B.FRST_RGST_DT, 'YYYY-MM-DD') AS FRST_RGST_DT
+		      ,B.TBL_ENM AS OLD_TBL_ENM
+		      ,B.COL_ENM AS OLD_COL_ENM
+		  FROM KCURE_COM_TBL_DFND A
+		       INNER JOIN KCURE_COM_COL_DFND B
+		          ON A.TBL_ENM = B.TBL_ENM
+		 WHERE 1 = 1
+		 <if test="dtsLclsCd != null and dtsLclsCd !=''">
+		   AND A.DTS_LCLS_CD = #{dtsLclsCd}
+		 </if>
+		 <if test="lclsNm != null and lclsNm !=''">
+		   AND A.LCLS_NM = #{lclsNm}
+		 </if>
+		 <if test="mclsNm != null and mclsNm !=''">
+		   AND A.MCLS_NM = #{mclsNm}
+		 </if>
+		 <if test="tblEnm != null and tblEnm !=''">
+		   AND A.TBL_ENM = #{tblEnm}
+		 </if>
+		 <if test="colEnm != null and colEnm !=''">
+		   AND B.COL_ENM = #{colEnm}
+		 </if>
+		 ORDER BY A.CRCN_NM COLLATE "ko_KR.utf8"
+		         ,A.TBL_ORD
+		         ,B.COL_ORD
+		 LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectClsColListTotCnt" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		  FROM KCURE_COM_TBL_DFND A
+		       INNER JOIN KCURE_COM_COL_DFND B
+		          ON A.TBL_ENM = B.TBL_ENM
+		 WHERE 1 = 1
+		 <if test="dtsLclsCd != null and dtsLclsCd !=''">
+		   AND A.DTS_LCLS_CD = #{dtsLclsCd}
+		 </if>
+		 <if test="lclsNm != null and lclsNm !=''">
+		   AND A.LCLS_NM = #{lclsNm}
+		 </if>
+		 <if test="mclsNm != null and mclsNm !=''">
+		   AND A.MCLS_NM = #{mclsNm}
+		 </if>
+		 <if test="tblEnm != null and tblEnm !=''">
+		   AND A.TBL_ENM = #{tblEnm}
+		 </if>
+		 <if test="colEnm != null and colEnm !=''">
+		   AND B.COL_ENM = #{colEnm}
+		 </if>
+    </select>
+	
+    <insert id="insertClsCol" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+		INSERT INTO KCURE_COM_COL_DFND
+		      (
+		       TBL_ENM
+		      ,COL_ENM
+		      ,COL_KNM
+		      ,COL_ORD
+		      ,DATA_TP_CONT
+		      ,PK_ORD
+		      ,DOMN_NM
+		      ,COL_EXPL_CONT
+		      ,COL_VL_CONT
+		      ,FRST_REGP_ID
+		      ,FRST_RGST_DT
+		      ,LAST_MODP_ID
+		      ,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		       #{tblEnm}
+		      ,#{colEnm}
+		      ,#{colKnm}
+		      ,#{colOrd}
+		      ,#{dataTpCont}
+		      ,#{pkOrd}
+		      ,#{domnNm}
+		      ,#{colExplCont}
+		      ,#{colVlCont}
+		      ,#{frstRegpId}
+		      ,NOW()
+		      ,#{frstRegpId}
+		      ,NOW()
+		      )
+    </insert>
+	
+    <update id="updateClsCol" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+		UPDATE KCURE_COM_COL_DFND
+		   SET COL_KNM = #{colKnm}
+		      ,COL_ORD = #{colOrd}
+		      ,DATA_TP_CONT = #{dataTpCont}
+		      ,PK_ORD = #{pkOrd}
+		      ,DOMN_NM = #{domnNm}
+		      ,COL_EXPL_CONT = #{colExplCont}
+		      ,COL_VL_CONT = #{colVlCont}
+		      ,LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		 WHERE TBL_ENM = #{oldTblEnm}
+		   AND COL_ENM = #{oldColEnm}
+    </update>
+	
+    <delete id="deleteClsCol" parameterType="kcure.portal.sys.clb.tbl.service.impl.ClbTblVO">
+		DELETE FROM KCURE_COM_COL_DFND
+		 WHERE TBL_ENM = #{oldTblEnm}
+		   AND COL_ENM = #{oldColEnm}
+    </delete>
+    
+    <select id="selectDtsMclsCdList" parameterType="String" resultType="egovMap">
+		SELECT DETL_CD
+		      ,DETL_CD_NM
+		      ,UP_DETL_CD
+		  FROM KCURE_COM_CD
+		 WHERE GRP_CD = 'DTS_MCLS_CD'
+		   AND CD_USE_YN = 'Y'
+		 ORDER BY CD_OPUT_ORD
+	</select>
+</mapper>

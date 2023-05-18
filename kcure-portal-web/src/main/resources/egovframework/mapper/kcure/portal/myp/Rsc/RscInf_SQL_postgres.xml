@@ -1,0 +1,1886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mypRscInf">
+
+	<select id="selectRscInfNavCnt" parameterType="egovMap" resultType="egovMap">
+		SELECT (
+		        	SELECT COUNT(1) AS totcnt
+					FROM portal.kcure_svc_data_aplc A
+					LEFT OUTER JOIN portal.kcure_svc_dtu B
+					ON A.data_aplc_no = B.data_aplc_no
+					INNER JOIN
+					(SELECT A.data_aplc_no
+						   ,A.dtap_stat_seq
+						   ,A.dtap_stat_spcd
+						   ,B.cd_clcd
+						   ,B.data_tpcd
+						   ,B.dtap_stp_spcd
+						   ,B.detl_cd
+						   ,B.mp_srlb_nm
+						   ,B.mp_btnlb_nm
+						   ,B.mp_uri_addr
+						   ,B.cncl_btn_yn
+						   ,B.data_srlb_nm
+						   ,B.data_uri_addr
+					FROM
+					(SELECT data_aplc_no
+						 ,MAX(dtap_stat_seq) dtap_stat_seq
+						 ,MAX(dtap_stat_spcd) dtap_stat_spcd
+					FROM KCURE_SVC_DTAP_STAT_HST
+					GROUP BY data_aplc_no)A,
+					(SELECT dtap_stat_spcd
+					       ,cd_clcd
+						   ,data_tpcd
+						   ,dtap_stp_spcd
+						   ,detl_cd
+						   ,mp_srlb_nm
+						   ,mp_btnlb_nm
+						   ,mp_uri_addr
+						   ,cncl_btn_yn
+						   ,data_srlb_nm
+						   ,data_uri_addr
+					FROM KCURE_SVC_STAT_MST)B
+					WHERE A.dtap_stat_spcd = B.dtap_stat_spcd
+					) C ON A.data_aplc_no = C.data_aplc_no
+					INNER JOIN KCURE_COM_USER D
+					ON A.data_aplp_id = D.USER_ID
+					WHERE A.rsr_asmt_no = ''
+					AND B.rsr_asmt_no IS NULL
+					AND A.CNCL_YN = 'N'
+					AND (
+			               A.DATA_APLP_ID = #{userId}
+			               OR EXISTS (
+			                          SELECT '1'
+			                            FROM KCURE_SVC_RSP CC
+			                           WHERE CC.RSRP_ID = #{userId}
+			                             AND CC.DATA_APLC_NO = A.DATA_APLC_NO
+			                         )
+			        )
+		       ) AS APL_CNT
+		      ,(
+		        SELECT COUNT(1)
+		          FROM KCURE_SVC_DATA_APLC SA
+		          INNER JOIN (SELECT distinct A.DATA_APLC_NO
+							   			,A.RSRP_ID
+										,B.USER_NM
+								   FROM KCURE_SVC_RSP A
+								   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+								   WHERE A.RSRP_ID = #{userId}
+								  	) B
+		               ON SA.DATA_APLC_NO = B.DATA_APLC_NO
+		               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+		           	   ON SA.DATA_APLC_NO = C.DATA_APLC_NO
+				 WHERE (SA.RSR_ASMT_NO IS NOT NULL AND SA.RSR_ASMT_NO <![CDATA[<>]]> '')
+		           AND SA.APLC_PROG_STCD = '05'  --승인완료
+		           AND SA.RSR_EDT >= TO_CHAR(NOW(), 'YYYYMMDD')
+		       ) AS USE_CNT
+		      ,(
+		        SELECT COUNT(1)
+				FROM PORTAL.KCURE_SVC_DATA_APLC A
+				LEFT OUTER JOIN
+					(SELECT DATA_APLC_NO, RSR_ASMT_NO, COUNT(TKIN_DTAP_NO) TKIN_DTAP_CNT FROM  KCURE_SVC_TKIN GROUP BY DATA_APLC_NO, RSR_ASMT_NO)  B
+					ON A.DATA_APLC_NO = B.DATA_APLC_NO AND A.RSR_ASMT_NO = B.RSR_ASMT_NO
+				INNER JOIN (SELECT distinct A.DATA_APLC_NO
+							   			,A.RSRP_ID
+										,B.USER_NM
+								   FROM KCURE_SVC_RSP A
+								   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+								   WHERE A.RSRP_ID = #{userId}
+				  		) C
+		        ON A.DATA_APLC_NO = C.DATA_APLC_NO
+				WHERE (A.RSR_ASMT_NO IS NOT NULL AND A.RSR_ASMT_NO <![CDATA[<>]]> '')
+		       ) AS IN_CNT
+		      ,(
+		        SELECT COUNT(1)
+		          FROM KCURE_SVC_DATA_APLC SA
+		          INNER JOIN (SELECT distinct A.DATA_APLC_NO
+							   			,A.RSRP_ID
+										,B.USER_NM
+								   FROM KCURE_SVC_RSP A
+								   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+								   WHERE A.RSRP_ID = #{userId}
+								  	) B
+		               ON SA.DATA_APLC_NO = B.DATA_APLC_NO
+		               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+		           	   ON SA.DATA_APLC_NO = C.DATA_APLC_NO
+				 WHERE (SA.RSR_ASMT_NO IS NOT NULL AND SA.RSR_ASMT_NO <![CDATA[<>]]> '')
+		           AND SA.APLC_PROG_STCD = '05'  --승인완료
+		           AND SA.RSR_EDT >= TO_CHAR(NOW(), 'YYYYMMDD')
+		       ) AS OUT_CNT
+		      ,(
+		        SELECT COUNT(1)
+		          FROM KCURE_SVC_DATA_APLC SA
+		          INNER JOIN (SELECT distinct A.DATA_APLC_NO
+							   			,A.RSRP_ID
+										,B.USER_NM
+								   FROM KCURE_SVC_RSP A
+								   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+								   WHERE A.RSRP_ID = #{userId}
+								  	) B
+		               ON SA.DATA_APLC_NO = B.DATA_APLC_NO
+		               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+		           	   ON SA.DATA_APLC_NO = C.DATA_APLC_NO
+				 WHERE (SA.RSR_ASMT_NO IS NOT NULL AND SA.RSR_ASMT_NO <![CDATA[<>]]> '')
+		           AND SA.APLC_PROG_STCD = '05'  --승인완료
+		           AND SA.RSR_EDT >= TO_CHAR(NOW(), 'YYYYMMDD')
+		       ) AS EXTN_CNT
+		      ,(
+		        SELECT COUNT(1)
+		          FROM KCURE_SVC_DATA_APLC SA
+     		      INNER JOIN (SELECT distinct A.DATA_APLC_NO
+							   			,A.RSRP_ID
+										,B.USER_NM
+								   FROM KCURE_SVC_RSP A
+								   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+								   WHERE A.RSRP_ID = #{userId}
+				  	) B
+	               ON SA.DATA_APLC_NO = B.DATA_APLC_NO
+	               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+	           	   ON SA.DATA_APLC_NO = C.DATA_APLC_NO
+		         WHERE (RSR_ASMT_NO IS NOT NULL AND RSR_ASMT_NO <![CDATA[<>]]> '')
+		           AND SA.APLC_PROG_STCD = '05'  --승인완료
+		           AND SA.RSR_EDT <![CDATA[<]]> TO_CHAR(NOW(), 'YYYYMMDD')
+		       ) AS END_CNT
+	</select>
+
+    <select id="selectMypRscAplcListTotCnt" parameterType="egovMap" resultType="int">
+	<!-- 나의 연구 신청 목록 COUNT -->
+		SELECT COUNT(1) AS totcnt
+		FROM portal.kcure_svc_data_aplc A
+		LEFT OUTER JOIN portal.kcure_svc_dtu B
+		ON A.data_aplc_no = B.data_aplc_no
+		INNER JOIN
+		(SELECT A.data_aplc_no
+			   ,A.dtap_stat_seq
+			   ,A.dtap_stat_spcd
+			   ,B.cd_clcd
+			   ,B.data_tpcd
+			   ,B.dtap_stp_spcd
+			   ,B.detl_cd
+			   ,B.mp_srlb_nm
+			   ,B.mp_btnlb_nm
+			   ,B.mp_uri_addr
+			   ,B.cncl_btn_yn
+			   ,B.data_srlb_nm
+			   ,B.data_uri_addr
+		FROM
+		(SELECT data_aplc_no
+			 ,MAX(dtap_stat_seq) dtap_stat_seq
+			 ,MAX(dtap_stat_spcd) dtap_stat_spcd
+		FROM KCURE_SVC_DTAP_STAT_HST
+		GROUP BY data_aplc_no)A,
+		(SELECT dtap_stat_spcd
+		       ,cd_clcd
+			   ,data_tpcd
+			   ,dtap_stp_spcd
+			   ,detl_cd
+			   ,mp_srlb_nm
+			   ,mp_btnlb_nm
+			   ,mp_uri_addr
+			   ,cncl_btn_yn
+			   ,data_srlb_nm
+			   ,data_uri_addr
+		FROM KCURE_SVC_STAT_MST)B
+		WHERE A.dtap_stat_spcd = B.dtap_stat_spcd
+		) C ON A.data_aplc_no = C.data_aplc_no
+		INNER JOIN KCURE_COM_USER D
+		ON A.data_aplp_id = D.USER_ID
+		WHERE A.rsr_asmt_no = ''
+		AND B.rsr_asmt_no IS NULL
+		AND A.CNCL_YN = 'N'
+		AND (
+               A.DATA_APLP_ID = #{userId}
+               OR EXISTS (
+                          SELECT '1'
+                            FROM KCURE_SVC_RSP CC
+                           WHERE CC.RSRP_ID = #{userId}
+                             AND CC.DATA_APLC_NO = A.DATA_APLC_NO
+                         )
+        )
+    </select>
+
+    <select id="selectMypRscAplcList" parameterType="egovMap" resultType="egovMap">
+    <!-- 나의 연구 신청 목록 -->
+		SELECT A.data_aplc_no
+		       ,A.rsr_sbj_nm
+			   ,A.data_tpcd
+			   ,(SELECT D.detl_cd_nm FROM kcure_com_cd D WHERE A.data_tpcd = D.detl_cd AND grp_cd= 'DATA_TPCD')  data_tpcd_nm
+			   ,TO_CHAR(TO_DATE(A.data_aplc_ymd, 'yyyyMMdd'),'yyyy.MM.dd') AS DATA_APLC_YMD
+			   ,B.rsr_asmt_no
+			   ,C.dtap_stat_seq
+			   ,C.dtap_stat_spcd
+			   ,C.cd_clcd
+			   ,C.data_tpcd
+			   ,C.dtap_stp_spcd
+			   ,C.detl_cd
+			   ,C.mp_srlb_nm
+			   ,C.mp_btnlb_nm
+			   ,C.mp_uri_addr
+			   ,C.cncl_btn_yn
+			   ,C.data_srlb_nm
+			   ,C.data_uri_addr
+			   ,D.USER_NM AS DATA_APLP_NM
+		FROM portal.kcure_svc_data_aplc A
+		LEFT OUTER JOIN portal.kcure_svc_dtu B
+		ON A.data_aplc_no = B.data_aplc_no
+		INNER JOIN
+		(SELECT A.data_aplc_no
+			   ,A.dtap_stat_seq
+			   ,A.dtap_stat_spcd
+			   ,B.cd_clcd
+			   ,B.data_tpcd
+			   ,B.dtap_stp_spcd
+			   ,B.detl_cd
+			   ,B.mp_srlb_nm
+			   ,B.mp_btnlb_nm
+			   ,B.mp_uri_addr
+			   ,B.cncl_btn_yn
+			   ,B.data_srlb_nm
+			   ,B.data_uri_addr
+		FROM
+		(SELECT data_aplc_no
+			 ,MAX(dtap_stat_seq) dtap_stat_seq
+			 ,MAX(dtap_stat_spcd) dtap_stat_spcd
+		FROM KCURE_SVC_DTAP_STAT_HST
+		GROUP BY data_aplc_no)A,
+		(SELECT dtap_stat_spcd
+		       ,cd_clcd
+			   ,data_tpcd
+			   ,dtap_stp_spcd
+			   ,detl_cd
+			   ,mp_srlb_nm
+			   ,mp_btnlb_nm
+			   ,mp_uri_addr
+			   ,cncl_btn_yn
+			   ,data_srlb_nm
+			   ,data_uri_addr
+		FROM KCURE_SVC_STAT_MST)B
+		WHERE A.dtap_stat_spcd = B.dtap_stat_spcd
+		) C ON A.data_aplc_no = C.data_aplc_no
+		INNER JOIN KCURE_COM_USER D
+		ON A.data_aplp_id = D.USER_ID
+		WHERE A.rsr_asmt_no = ''
+		AND B.rsr_asmt_no IS NULL
+		AND A.CNCL_YN = 'N'
+		AND (
+               A.DATA_APLP_ID = #{userId}
+               OR EXISTS (
+                          SELECT '1'
+                            FROM KCURE_SVC_RSP CC
+                           WHERE CC.RSRP_ID = #{userId}
+                             AND CC.DATA_APLC_NO = A.DATA_APLC_NO
+                         )
+        )
+		ORDER BY A.FRST_RGST_DT DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectMypRscInfAplListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		  FROM KCURE_SVC_DATA_APLC A
+		       INNER JOIN (SELECT distinct A.DATA_APLC_NO
+					   			,A.RSRP_ID
+								,B.USER_NM
+						   FROM KCURE_SVC_RSP A
+						   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+						   WHERE A.RSRP_ID = #{userId}
+						  	) B
+               ON A.DATA_APLC_NO = B.DATA_APLC_NO
+               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+           	   ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		 WHERE A.RSR_ASMT_NO IS NOT NULL
+		 <choose>
+		     <when test='rsrEndYn != null and rsrEndYn.equals("Y")'>
+		         AND A.RSR_EDT <![CDATA[<]]> TO_CHAR(NOW(), 'YYYYMMDD')
+		     </when>
+		     <otherwise>
+		         AND A.RSR_EDT >= TO_CHAR(NOW(), 'YYYYMMDD')
+		     </otherwise>
+		 </choose>
+		 <if test="aplcProgStcd != null and aplcProgStcd !=''">
+		   AND A.APLC_PROG_STCD = #{aplcProgStcd}
+		 </if>
+    </select>
+
+    <select id="selectMypRscInfAplList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.*
+		      ,(SELECT COUNT(1) FROM KCURE_SVC_DTTO_APLC SA WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO) AS DTTO_APLC_CNT
+		      ,(SELECT COUNT(1) from KCURE_SVC_RSR_RSLT SA WHERE SA.DATA_APLC_NO = A.DATA_APLC_NO) AS RSR_RSLT_CNT
+		      ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_DT_TERM
+		  FROM (
+		        SELECT A.DATA_APLC_NO     	---- 신청번호
+		              ,A.DATA_APLC_YMD    	--- 데이신청일자
+		              ,A.DATA_APLP_ID     	--- 데이터신청자ID
+		              ,A.DATA_TPCD		  	--- 데이터유형코드 임상/공공/결합
+		              ,(SELECT D.DETL_CD_NM FROM KCURE_COM_CD D WHERE A.DATA_TPCD = D.DETL_CD AND GRP_CD= 'DATA_TPCD')  DATA_TPCD_NM  --- 데이터유형코드명
+		              ,A.PINF_CNU_AGR_YN  	--- 개인정보수집이용동의여부
+		              ,A.PINF_SP3P_AGR_YN  	--- 개인정보제3자제공동의여부
+		              ,A.PRTI_ID			--- 참여기관ID
+		              ,A.RSR_SBJ_NM			--- 연구주제명
+		              ,A.IRB_APRI_NM		--- IRB승인기관명
+		              ,A.IRB_NO				--- IRB번호
+		              ,A.CLNT_ACNT_NM		--- 폐쇠망분석센터명
+		              ,A.RSR_SPCD			--- 연구구분코드
+		              ,A.RSR_SDT 			--- 연구시작일자
+		              ,A.RSR_EDT			--- 연구종료일자
+		              ,A.RSR_PRPS_CONT		--- 연구목적내용
+		              ,A.RSR_SBJ_CONT		--- 연구주제내용
+		              ,A.KYW_CONT			--- 키워드내용
+		              ,A.APLC_STP_SPCD		--- 신청단계구분코드
+		              ,A.APLC_PROG_STCD		--- 신청진행상태코드
+		              ,A.ADD_RVW_APLP_ID	--- 추가심의신청자ID
+		              ,A.ADD_RVW_APLC_YMD   --- 추가심의신청일자
+		              ,A.DTTI_YN			--- 데이터반입여부
+		              ,A.DTTO_APLC_YN		--- 데이터반출신청여부
+		              ,A.DTTO_APRV_YN		--- 데이터반출승인여부
+		              ,A.DATA_APLC_APRV_NO	--- 데이터신청승인번호
+		              ,A.DTU_SDT			--- 데이터활용시작일자
+		              ,A.DTU_EDT			--- 데이터활용종료일자
+		              ,TO_CHAR(A.FRST_RGST_DT, 'YYYY/MM/DD') AS FRST_RGST_DT    --- 등록일자
+		              ,B.USER_NM AS DATA_APLP_NM    --- 신청자명
+		              ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'APLC_PROG_STCD' AND DETL_CD = A.APLC_PROG_STCD) AS APLC_PROG_NM    --- 신청진행상태 코드명
+		              ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_SDT_FMT			--- 연구시작일자
+		              ,TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_EDT_FMT			--- 연구종료일자
+		              ,TO_CHAR(TO_DATE(A.DTU_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DTU_SDT_FMT			--- 데이터활용시작일자
+		              ,TO_CHAR(TO_DATE(A.DTU_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DTU_EDT_FMT			--- 데이터활용종료일자
+		              ,A.RSR_ASMT_NO													--- 연구과제번호
+		              ,A.DATA_KEP_SDT													--- 보관시작일자
+		              ,A.DATA_KEP_EDT													--- 보관종료일자
+		              ,C.ACNT_SPCD						---- 분석센터구분코드
+		              ,D.DTTO_APLC_CNT
+		          FROM KCURE_SVC_DATA_APLC A
+		               INNER JOIN (SELECT distinct A.DATA_APLC_NO
+								   			,A.RSRP_ID
+											,B.USER_NM
+								   FROM KCURE_SVC_RSP A
+								   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+								   WHERE A.RSRP_ID = #{userId}
+								  ) B
+                       ON A.DATA_APLC_NO = B.DATA_APLC_NO
+		               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+		               		ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		               LEFT OUTER JOIN
+						(SELECT DATA_APLC_NO, RSR_ASMT_NO, COUNT(RSR_ASMT_NO) DTTO_APLC_CNT FROM  KCURE_SVC_DTTO_APLC GROUP BY DATA_APLC_NO, RSR_ASMT_NO)  D
+						ON A.DATA_APLC_NO = D.DATA_APLC_NO AND A.RSR_ASMT_NO = D.RSR_ASMT_NO
+		         WHERE 1 = 1
+		         <choose>
+		             <when test='rsrEndYn != null and rsrEndYn.equals("Y")'>
+		                 AND A.RSR_EDT <![CDATA[<]]> TO_CHAR(NOW(), 'YYYYMMDD')
+		             </when>
+		             <otherwise>
+		                 AND A.RSR_EDT >= TO_CHAR(NOW(), 'YYYYMMDD')
+		             </otherwise>
+		         </choose>
+		         <if test="aplcProgStcd != null and aplcProgStcd !=''">
+		           AND A.APLC_PROG_STCD = #{aplcProgStcd}
+		         </if>
+		           AND (
+		                A.DATA_APLP_ID = #{userId}
+		                OR EXISTS (
+		                           SELECT '1'
+		                             FROM KCURE_SVC_RSP CC
+		                            WHERE CC.RSRP_SPCD = '01' --책임연구원
+		                              AND CC.RSRP_ID = #{userId}
+		                              AND CC.DATA_APLC_NO = A.DATA_APLC_NO
+		                          )
+		               )
+		          AND A.RSR_ASMT_NO IS NOT NULL 					---  연구과제번호 생성 된 건들만
+		         ORDER BY A.FRST_RGST_DT DESC
+		       ) A
+		 LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectMypRscInfIn" parameterType="egovMap" resultType="egovMap">
+		SELECT
+			RJC_RSN_CONT
+		FROM KCURE_SVC_TKIN_PROG
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND TKIN_DTAP_NO = #{tkinDtapNo}
+			AND DATA_APLC_NO = #{dataAplcNo}
+			AND TKIN_DATA_PROG_STCD = 'U03'
+    </select>
+
+     <select id="selectMypRscInfInListTotCnt" parameterType="egovMap" resultType="int">
+    	SELECT
+    			COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_SVC_DATA_APLC A
+		LEFT OUTER JOIN
+			(SELECT DATA_APLC_NO, RSR_ASMT_NO, COUNT(TKIN_DTAP_NO) TKIN_DTAP_CNT FROM  KCURE_SVC_TKIN GROUP BY DATA_APLC_NO, RSR_ASMT_NO)  B
+			ON A.DATA_APLC_NO = B.DATA_APLC_NO AND A.RSR_ASMT_NO = B.RSR_ASMT_NO
+		INNER JOIN (SELECT distinct A.DATA_APLC_NO
+					   			,A.RSRP_ID
+								,B.USER_NM
+						   FROM KCURE_SVC_RSP A
+						   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+						   WHERE A.RSRP_ID = #{userId}
+		  		) C
+        ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		WHERE (A.RSR_ASMT_NO IS NOT NULL AND A.RSR_ASMT_NO <![CDATA[<>]]> '')
+    </select>
+
+    <select id="selectMypRscInfInDetail" parameterType="egovMap" resultType="egovMap">
+    	SELECT
+    			A.DATA_APLC_NO  -- 데이터신청번호
+		       ,A.RSR_SBJ_NM   --  연구주제명
+			   ,A.DATA_TPCD    -- 데이터유형코드
+			   ,(SELECT D.DETL_CD_NM FROM KCURE_COM_CD D WHERE A.DATA_TPCD = D.DETL_CD AND GRP_CD= 'DATA_TPCD')  DATA_TPCD_NM  -- 데이터유형코드
+			   ,A.DATA_APLC_YMD  --- 데이신청일자
+			   ,A.RSR_ASMT_NO    ---연구과제번호
+			   ,A.RSR_SDT       ---- 연구시작일자
+			   ,A.RSR_EDT       --- 연구종료일자
+			   ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_DT_TERM
+			   ,A.DATA_APLP_ID  ---- 데이터신청자ID
+			   ,A.DTU_SDT		--- 데이터활용시작일자
+			   ,A.DTU_EDT		---- 데이터활용종료일자
+			   ,TO_CHAR(TO_DATE(A.DTU_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.DTU_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_DT_TERM
+			   ,CASE WHEN B.TKIN_DTAP_CNT IS NULL THEN 0 ELSE B.TKIN_DTAP_CNT END TKIN_DTAP_CNT --데이터활용신청목록보기 꺽세표시여부
+			   ,C.USER_NM AS DATA_APLP_NM    --- 신청자명
+			   ,CASE WHEN A.DTU_EDT <![CDATA[<]]> TO_CHAR(NOW(), 'YYYYMMDD') THEN 'N' ELSE 'Y' END TKIN_DTAP_YN --N이면 반입신청버튼을 클릭시 ALERT발생시키기(가능하지 않다는 내용)
+			   ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY/MM/DD') AS RSR_SDT_FMT
+		      ,TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY/MM/DD') AS RSR_EDT_FMT
+		      ,(
+		        SELECT SB.USER_NM
+		          FROM KCURE_SVC_RSP SA
+		               INNER JOIN KCURE_COM_USER SB
+		                       ON SA.RSRP_ID = SB.USER_ID
+		         WHERE SA.RSRP_SPCD = '01' --책임연구원
+		           AND SA.DATA_APLC_NO = A.DATA_APLC_NO
+		       ) AS RSRP_NM   -- 책임연구자명
+		FROM PORTAL.KCURE_SVC_DATA_APLC A
+		LEFT OUTER JOIN
+			(SELECT DATA_APLC_NO, RSR_ASMT_NO, COUNT(TKIN_DTAP_NO) TKIN_DTAP_CNT FROM  KCURE_SVC_TKIN GROUP BY DATA_APLC_NO, RSR_ASMT_NO)  B
+			ON A.DATA_APLC_NO = B.DATA_APLC_NO AND A.RSR_ASMT_NO = B.RSR_ASMT_NO
+		INNER JOIN KCURE_COM_USER C
+			ON A.DATA_APLP_ID = C.USER_ID
+		WHERE
+			DATA_APLP_ID  = #{userId}   --- 로그인한 사용자의 ID
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			AND A.RSR_ASMT_NO !=''
+    </select>
+
+    <select id="selectMypRscInfTkInDetailInfo" parameterType="egovMap" resultType="egovMap">
+    	SELECT A.RSR_ASMT_NO	--- 연구과제번호
+		       ,A.TKIN_DTAP_NO	--- 반입데이터신청번호
+			   ,A.DATA_APLC_NO  -- 데이터신청번호
+			   ,A.TKIN_DATA_NM_CONT
+			   ,A.TKIN_DATA_PRPS_CONT
+			   ,A.TKIN_DTAP_YMD -- 신청일자
+			   ,A.FRST_REGP_ID	--- 등록자ID
+			   ,A.TKIN_DATA_PROG_STCD  --- 상태코드
+			   ,B.ATTF_SEQ
+			   ,B.ATTF_NM
+			   ,B.ATTF_STR_NM
+			   ,B.ATTF_PTH_NM
+		FROM KCURE_SVC_TKIN A
+		INNER JOIN (
+				SELECT
+					A.RSR_ASMT_NO, A.TKIN_DTAP_NO, A.DATA_APLC_NO, A.ATTF_SEQ, B.ATTF_NM, B.ATTF_STR_NM, B.ATTF_PTH_NM
+				FROM KCURE_SVC_TKIN_PROG A, KCURE_SVC_ATTF B
+				WHERE
+					A.DATA_APLC_NO = B.DATA_APLC_NO
+					AND A.ATTF_SEQ = B.ATTF_SEQ
+					AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+					AND A.DATA_APLC_NO = #{dataAplcNo}
+					AND TKIN_DTAP_NO = #{tkinDtapNo}
+					AND TKIN_FILE_STTM_YN = 'Y'
+				) B ON A.RSR_ASMT_NO = B.RSR_ASMT_NO AND A.TKIN_DTAP_NO = B.TKIN_DTAP_NO AND A.DATA_APLC_NO = B.DATA_APLC_NO
+		WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND   A.DATA_APLC_NO = #{dataAplcNo}
+			AND   A.TKIN_DTAP_NO = #{tkinDtapNo}
+    </select>
+
+    <select id="selectMypRscInfTkInFileList" parameterType="egovMap" resultType="egovMap">
+    	SELECT
+    		A.RSR_ASMT_NO
+    		,A.TKIN_DTAP_NO
+    		,A.DATA_APLC_NO
+    		,A.TKIN_DATA_PROG_STCD
+			,A.RJC_RSN_CONT
+    		,A.ATTF_SEQ
+    		,B.ATTF_NM
+    		,B.ATTF_STR_NM
+    		,B.ATTF_PTH_NM
+		FROM KCURE_SVC_TKIN_PROG A, KCURE_SVC_ATTF B
+		WHERE
+			A.DATA_APLC_NO = B.DATA_APLC_NO
+			AND A.ATTF_SEQ = B.ATTF_SEQ
+			AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			AND A.TKIN_DTAP_NO = #{tkinDtapNo}
+			AND A.TKIN_FILE_STTM_YN = 'N'
+    </select>
+
+    <select id="selectMypRscInfInList" parameterType="egovMap" resultType="egovMap">
+    	SELECT
+    			A.DATA_APLC_NO  -- 데이터신청번호
+		       ,A.RSR_SBJ_NM   --  연구주제명
+			   ,A.DATA_TPCD    -- 데이터유형코드
+			   ,(SELECT D.DETL_CD_NM FROM KCURE_COM_CD D WHERE A.DATA_TPCD = D.DETL_CD AND GRP_CD= 'DATA_TPCD')  DATA_TPCD_NM  -- 데이터유형코드
+			   ,A.DATA_APLC_YMD  --- 데이신청일자
+			   ,A.RSR_ASMT_NO    ---연구과제번호
+			   ,A.RSR_SDT       ---- 연구시작일자
+			   ,A.RSR_EDT       --- 연구종료일자
+			   ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_DT_TERM
+			   ,A.DATA_APLP_ID  ---- 데이터신청자ID
+			   ,A.DTU_SDT		--- 데이터활용시작일자
+			   ,A.DTU_EDT		---- 데이터활용종료일자
+			   ,TO_CHAR(TO_DATE(A.DTU_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.DTU_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_DT_TERM
+			   ,CASE WHEN B.TKIN_DTAP_CNT IS NULL THEN 0 ELSE B.TKIN_DTAP_CNT END TKIN_DTAP_CNT --데이터활용신청목록보기 꺽세표시여부
+			   ,C.USER_NM AS DATA_APLP_NM    --- 신청자명
+			   ,CASE WHEN A.DTU_EDT <![CDATA[<]]> TO_CHAR(NOW(), 'YYYYMMDD') THEN 'N' ELSE 'Y' END TKIN_DTAP_YN --N이면 반입신청버튼을 클릭시 ALERT발생시키기(가능하지 않다는 내용)
+		FROM PORTAL.KCURE_SVC_DATA_APLC A
+		LEFT OUTER JOIN
+			(SELECT DATA_APLC_NO, RSR_ASMT_NO, COUNT(TKIN_DTAP_NO) TKIN_DTAP_CNT FROM  KCURE_SVC_TKIN GROUP BY DATA_APLC_NO, RSR_ASMT_NO)  B
+			ON A.DATA_APLC_NO = B.DATA_APLC_NO AND A.RSR_ASMT_NO = B.RSR_ASMT_NO
+		INNER JOIN (SELECT distinct A.DATA_APLC_NO
+					   			,A.RSRP_ID
+								,B.USER_NM
+						   FROM KCURE_SVC_RSP A
+						   INNER JOIN KCURE_COM_USER B ON A.RSRP_ID = B.USER_ID
+						   WHERE A.RSRP_ID = #{userId}
+		  		) C
+        ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		WHERE (A.RSR_ASMT_NO IS NOT NULL AND A.RSR_ASMT_NO <![CDATA[<>]]> '')
+		ORDER BY A.RSR_SDT DESC
+
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+     <select id="selectMypRscInfAplc" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+		      ,A.DATA_APLC_YMD
+		      ,A.DATA_APLP_ID
+		      ,A.DATA_TPCD				--- 데이터유형코드 임상/공공/결합
+		      ,A.RSR_ASMT_NO			--- 연구과제번호
+		      ,A.PINF_CNU_AGR_YN
+		      ,A.PINF_SP3P_AGR_YN
+		      ,A.PRTI_ID
+		      ,A.RSR_SBJ_NM
+		      ,A.IRB_APRI_NM
+		      ,A.IRB_NO
+		      ,A.CLNT_ACNT_NM
+		      ,A.RSR_SPCD
+		      ,A.RSR_SDT
+		      ,A.RSR_EDT
+		      ,A.RSR_PRPS_CONT
+		      ,A.RSR_SBJ_CONT
+		      ,A.KYW_CONT
+		      ,A.APLC_STP_SPCD
+		      ,A.APLC_PROG_STCD
+		      ,A.ADD_RVW_APLP_ID
+		      ,A.ADD_RVW_APLC_YMD
+		      ,A.DTTI_YN
+		      ,A.DTTO_APLC_YN
+		      ,A.DTTO_APRV_YN
+		      ,A.DATA_APLC_APRV_NO
+		      ,A.DTU_SDT			--- 데이터활용시작일자
+		      ,A.DTU_EDT			--- 데이터활용종료일자
+		      ,TO_CHAR(A.FRST_RGST_DT, 'YYYY/MM/DD') AS FRST_RGST_DT
+		      ,B.USER_NM AS DATA_APLP_NM
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'APLC_PROG_STCD' AND DETL_CD = A.APLC_PROG_STCD) AS APLC_PROG_NM
+		      ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY/MM/DD') AS RSR_SDT_FMT
+		      ,TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY/MM/DD') AS RSR_EDT_FMT
+		      ,TO_CHAR(TO_DATE(A.DTU_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.DTU_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_DT_TERM
+		      ,(
+		        SELECT SB.USER_NM
+		          FROM KCURE_SVC_RSP SA
+		               INNER JOIN KCURE_COM_USER SB
+		                       ON SA.RSRP_ID = SB.USER_ID
+		         WHERE SA.RSRP_SPCD = '01' --책임연구원
+		           AND SA.DATA_APLC_NO = A.DATA_APLC_NO
+		       ) AS RSRP_NM   -- 책임연구자명
+		       ,C.AENV_SPCD     ---- 분석환경 구분 코드
+		  FROM KCURE_SVC_DATA_APLC A
+		       INNER JOIN KCURE_COM_USER B
+		       ON A.DATA_APLP_ID = B.USER_ID
+		       INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+		       ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		 WHERE 1 = 1
+		   AND A.DATA_APLC_NO = #{dataAplcNo}
+    </select>
+
+    <select id="selectMypRscInfUseListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT	COUNT(1)
+		FROM	KCURE_SVC_DTU A
+				INNER JOIN KCURE_COM_USER B
+				ON A.FRST_REGP_ID = B.USER_ID
+		WHERE	A.RSR_ASMT_NO = #{rsrAsmtNo}
+				AND A.DATA_APLC_NO = #{dataAplcNo}
+    </select>
+
+    <select id="selectMypRscInfUseList" parameterType="egovMap" resultType="egovMap">
+		SELECT	A.DATA_APLC_NO --- 데이터신청번호
+				,A.DTU_APLC_NO --- 데이터활용신청번호
+				,A.RSR_ASMT_NO --- 연구과제번호
+				,A.AENV_SPCD --- 분석환경 구분코드 기존 : CENTER_PRT_FRM_CD
+				,A.DSZ_INST_ID --- 안심활용센터기관ID 기존 : PRTI_ID
+				,A.DSZ_DSGN_SDT --- 안심활용센터지정시작일자
+				,A.DSZ_DSGN_EDT --- 안심활용센터지정종료일자
+				,A.DTU_APLC_PROG_STCD --- 데이터활용신청진행상태코드
+				,A.RJC_RSN_CONT --- 반려사유내용
+				,TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD') AS FRST_RGST_DT --- 등록일
+				,B.USER_NM AS FRST_REGP_NM
+				,(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'AENV_SPCD' AND DETL_CD = A.AENV_SPCD
+				) AS AENV_SPCD_NM --- 분석환경 구분코드 명
+				,(
+					SELECT	PRTI_NM
+					FROM	KCURE_SVC_PRTI
+					WHERE	DSZ_YN = 'Y' AND PRTI_ID = A.DSZ_INST_ID
+				) AS DSZ_INST_ID_NM --- 안심활용센터 명
+				,(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.DTU_APLC_PROG_STCD
+				) AS DTU_APLC_PROG_NM --- 데이터활용신청진행상태코드명
+				,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_SDT_FMT
+				,TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_EDT_FMT
+				,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ '	||TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DSZ_DSGN_DT_TERM
+				,(
+					SELECT	SB.USER_NM
+					FROM	KCURE_SVC_DTU_ACID SA
+							INNER JOIN KCURE_COM_USER SB
+							ON SA.DATA_APLP_ID = SB.USER_ID
+					WHERE	SA.RSR_ASMT_NO = A.RSR_ASMT_NO
+							AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+							AND SA.DATA_APLC_NO = A.DATA_APLC_NO
+					LIMIT 1
+				) AS DTU_ACID_NM
+				,(
+					SELECT	COUNT(1)
+					FROM	KCURE_SVC_DTU_ACID SA
+					WHERE	SA.RSR_ASMT_NO = A.RSR_ASMT_NO
+							AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+							AND SA.DATA_APLC_NO = A.DATA_APLC_NO
+				) AS DTU_ACID_CNT
+				,(
+					SELECT	COUNT(1)
+					FROM	KCURE_SVC_DSZ_RSV SA
+					WHERE	SA.RSR_ASMT_NO = A.RSR_ASMT_NO
+							AND SA.DTU_APLC_NO = A.DTU_APLC_NO
+							AND SA.DATA_APLC_NO = A.DATA_APLC_NO
+				) AS DSZ_RSV_CNT
+		FROM	KCURE_SVC_DTU A
+				INNER JOIN KCURE_COM_USER B
+				ON A.FRST_REGP_ID = B.USER_ID
+		WHERE	A.RSR_ASMT_NO = #{rsrAsmtNo}
+				AND A.DATA_APLC_NO = #{dataAplcNo}
+		ORDER BY A.FRST_RGST_DT DESC
+		<if test='allListYn == "N"'>
+			LIMIT 5
+		</if>
+    </select>
+
+    <select id="selectMypRscInfTkinListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM KCURE_SVC_TKIN A
+		INNER JOIN KCURE_COM_USER B ON A.FRST_REGP_ID = B.USER_ID
+		WHERE A.RSR_ASMT_NO = #{rsrAsmtNo} --- 연구과제번호 파라미터
+				AND   A.DATA_APLC_NO = #{dataAplcNo} -- 데이터신청번호 파라미터
+    </select>
+
+    <select id="selectMypRscInfTkinList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.RSR_ASMT_NO	--- 연구과제번호
+		       ,A.TKIN_DTAP_NO	--- 반입데이터신청번호
+			   ,A.DATA_APLC_NO  -- 데이터신청번호
+			   ,A.TKIN_DATA_NM_CONT --반입데이터명
+			   ,TO_CHAR(A.TKIN_DTAP_YMD::date, 'YYYY.MM.DD') AS TKIN_DTAP_YMD -- 신청일자
+			   ,A.FRST_REGP_ID	--- 등록자ID
+			   ,A.TKIN_DATA_PROG_STCD  --- 상태코드
+			   ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.TKIN_DATA_PROG_STCD) AS TKIN_DATA_PROG_NM
+			   ,B.USER_NM AS DATA_APLP_NM  --- 신청자명
+		FROM KCURE_SVC_TKIN A
+		INNER JOIN KCURE_COM_USER B ON A.FRST_REGP_ID = B.USER_ID
+		WHERE A.RSR_ASMT_NO = #{rsrAsmtNo} --- 연구과제번호 파라미터
+				AND   A.DATA_APLC_NO = #{dataAplcNo} -- 데이터신청번호 파라미터
+		ORDER BY A.FRST_RGST_DT DESC
+
+		<if test='allListYn == "N"'>
+			LIMIT 5
+		</if>
+    </select>
+
+    <select id="selectMypRscInfUse" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO		--- 데이터신청번호
+		      ,A.DTU_APLC_NO 		--- 데이터활용신청번호
+		      ,A.RSR_ASMT_NO  		--- 연구과제번호
+		      ,A.AENV_SPCD     		--- 분석환경 구분코드 기존 : center_prt_frm_cd
+		      ,A.DSZ_INST_ID		--- 안심활용센터기관ID  기존 : prti_id
+		      ,A.DSZ_DSGN_SDT		--- 안심활용센터지정시작일자
+		      ,A.DSZ_DSGN_EDT		--- 안심활용센터지정종료일자
+		      ,A.DTU_APLC_PROG_STCD	--- 데이터활용신청진행상태코드
+		      ,A.RJC_RSN_CONT		--- 반려사유내용
+		      ,TO_CHAR(A.FRST_RGST_DT, 'YYYY/MM/DD') AS FRST_RGST_DT  	--- 등록일
+		      ,B.USER_NM AS FRST_REGP_NM
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'AENV_SPCD' AND DETL_CD = A.AENV_SPCD) AS AENV_SPCD_NM 		--- 분석환경 구분코드 명
+		      ,(SELECT PRTI_NM FROM KCURE_SVC_PRTI WHERE DSZ_YN = 'Y' AND PRTI_ID = A.DSZ_INST_ID) AS DSZ_INST_ID_NM			--- 안심활용센터 명
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.DTU_APLC_PROG_STCD) AS DTU_APLC_PROG_NM    --- 데이터활용신청진행상태코드명
+		      ,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY/MM/DD') AS DSZ_DSGN_SDT_FMT
+		      ,TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY/MM/DD') AS DSZ_DSGN_EDT_FMT
+		      ,TO_CHAR(TO_DATE(A.DSZ_DSGN_SDT,'YYYYMMDD'), 'YYYY/MM/DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.DSZ_DSGN_EDT,'YYYYMMDD'), 'YYYY/MM/DD') AS DSZ_DSGN_DT_TERM
+		      ,C.DETL_CD --- 히스토리 테이블에 있는 최종 상태 코드
+		      ,C.MP_SRLB_NM  --- 히스토리 테이블에 있는 최종 상태 코드명
+		      ,(
+		        SELECT SB.USER_NM
+		          FROM KCURE_SVC_DTU_ACID SA
+		               INNER JOIN KCURE_COM_USER SB
+		                       ON SA.DATA_APLP_ID = SB.USER_ID
+		         WHERE SA.RSR_ASMT_NO 	= A.RSR_ASMT_NO
+		         AND SA.DTU_APLC_NO 	= A.DTU_APLC_NO
+		         AND SA.DATA_APLC_NO 	= A.DATA_APLC_NO
+		         LIMIT 1
+		       ) AS DTU_ACID_NM
+		      ,(
+		        SELECT COUNT(1)
+		          FROM KCURE_SVC_DTU_ACID SA
+		         WHERE SA.RSR_ASMT_NO 	= A.RSR_ASMT_NO
+		         AND SA.DTU_APLC_NO 	= A.DTU_APLC_NO
+		         AND SA.DATA_APLC_NO 	= A.DATA_APLC_NO
+		       ) AS DTU_ACID_CNT
+		      ,(
+		        SELECT COUNT(1)
+		          FROM KCURE_SVC_DSZ_RSV SA
+		         WHERE SA.RSR_ASMT_NO 	= A.RSR_ASMT_NO
+		         AND SA.DTU_APLC_NO 	= A.DTU_APLC_NO
+		         AND SA.DATA_APLC_NO 	= A.DATA_APLC_NO
+		       ) AS DSZ_RSV_CNT
+		  FROM KCURE_SVC_DTU A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.FRST_REGP_ID = B.USER_ID
+		       INNER JOIN (SELECT A.DATA_APLC_NO
+								 ,A.DTAP_STAT_SEQ
+								 ,A.DTAP_STAT_SPCD
+								 ,B.CD_CLCD
+								 ,B.DATA_TPCD
+								 ,B.DTAP_STP_SPCD
+								 ,B.DETL_CD
+								 ,B.MP_SRLB_NM
+						FROM KCURE_SVC_DTAP_STAT_HST A
+						     INNER JOIN KCURE_SVC_STAT_MST B
+							 ON A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+						WHERE A.DATA_APLC_NO = #{dataAplcNo}
+						AND A.DTAP_STAT_SEQ IN (SELECT MAX(DTAP_STAT_SEQ)
+											  FROM KCURE_SVC_DTAP_STAT_HST
+											  WHERE DATA_APLC_NO = #{dataAplcNo})) C
+			ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		 WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+		 AND A.DATA_APLC_NO =  #{dataAplcNo}
+		 AND A.DTU_APLC_NO = #{dtuAplcNo}
+    </select>
+
+	<select id="selectMypRscInfUseAcidList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.RSR_ASMT_NO  		--- 연구과제번호
+		       ,A.DATA_APLC_NO
+		      ,A.DTU_APLC_NO
+		      ,A.DATA_APLP_ID
+		      ,B.USER_NM
+		      ,B.USER_MBPH_NO    ---- 사용자이동전화번호
+		  FROM KCURE_SVC_DTU_ACID A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DATA_APLP_ID = B.USER_ID
+		 WHERE 1 = 1
+		   AND A.RSR_ASMT_NO  = #{rsrAsmtNo}
+		   AND A.DATA_APLC_NO = #{dataAplcNo}
+		   AND A.DTU_APLC_NO = #{dtuAplcNo}
+		 ORDER BY B.USER_NM
+	</select>
+
+	<select id="selectMypRscInfUseDszRsvList" parameterType="egovMap" resultType="egovMap">
+		<!-- SELECT A.PRTI_ID
+		      ,A.RSV_SEAT_NO
+		      ,A.RSV_DT
+		      ,A.DATA_APLC_NO
+		      ,A.DTU_APLC_NO
+		      ,A.DATA_APLP_ID
+		      ,B.USER_NM
+		      ,TO_CHAR(TO_DATE(A.RSV_DT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSV_DT_FMT
+		  FROM KCURE_SVC_DSZ_RSV A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DATA_APLP_ID = B.USER_ID
+		 WHERE 1 = 1
+		   AND A.PRTI_ID = #{prtiId}
+		   AND A.DATA_APLC_NO = #{dataAplcNo}
+		   AND A.DTU_APLC_NO = #{dtuAplcNo}
+		 ORDER BY A.DATA_APLP_ID, A.RSV_DT, A.RSV_SEAT_NO -->
+
+		 SELECT A.DSZ_INST_ID
+		 		,A.RSV_SEAT_NO
+		 		,A.DTU_RSV_YMD			---- 데이터활용예약일자
+		 		,A.RSR_ASMT_NO  		--- 연구과제번호
+		 		,A.DATA_APLC_NO
+		      	,A.DTU_APLC_NO
+		      	,A.DATA_APLP_ID
+		 	   ,B.USER_NM
+		       ,TO_CHAR(TO_DATE(A.DTU_RSV_YMD,'YYYYMMDD'), 'YYYY.MM.DD') AS RSV_DT_FMT
+		  FROM KCURE_SVC_DSZ_RSV A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DATA_APLP_ID = B.USER_ID
+		 WHERE 1 = 1
+		 AND A.DSZ_INST_ID = #{dszInstId}
+		 AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+		 AND A.DATA_APLC_NO = #{dataAplcNo}
+		 AND A.DTU_APLC_NO = #{dtuAplcNo}
+		 ORDER BY A.DATA_APLP_ID, A.DTU_RSV_YMD, A.RSV_SEAT_NO
+	</select>
+
+    <select id="selectMypRscInfRspList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.RSRP_ID			----연구자ID
+		      ,B.USER_NM AS RSRP_NM  ---사용자명
+		  FROM KCURE_SVC_RSP A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.RSRP_ID = B.USER_ID
+		 WHERE A.DATA_APLC_NO = #{dataAplcNo}
+		 GROUP BY A.RSRP_ID, B.USER_NM
+		 ORDER BY B.USER_NM
+    </select>
+
+    <select id="selectMypRscInfDszSiDoList" parameterType="kcure.portal.cmn.tags.service.impl.ComCdDetailVo" resultType="kcure.portal.cmn.tags.service.impl.ComCdDetailVo">
+		SELECT A.DETL_CD
+		      ,A.DETL_CD_NM
+		  FROM KCURE_COM_CD A
+		 WHERE A.GRP_CD = 'SI_DO_STCD'
+		   AND A.CD_USE_YN = 'Y'
+		   AND EXISTS (
+			           SELECT '1'
+			             FROM KCURE_SVC_PRTI CC
+			            WHERE CC.DSZ_YN = 'Y'
+			              AND CC.USE_YN = 'Y'
+			              AND CC.CTPV_SPCD = A.DETL_CD
+		              )
+		 ORDER BY A.CD_OPUT_ORD
+	</select>
+
+    <select id="selectMypRscInfDszPrtiIdList" parameterType="egovMap" resultType="egovMap">
+		SELECT PRTI_ID
+		      ,PRTI_NM
+			  ,INST_CLS_SPCD
+			  ,INST_TPCD
+			  ,WHOL_SEAT_CNT
+			  ,RSV_SEAT_CNT
+			  ,USE_YN
+			  ,HOST_CD
+			  ,CTPV_SPCD
+		  FROM KCURE_SVC_PRTI
+		 WHERE DSZ_YN = 'Y'
+		   AND USE_YN = 'Y'
+		 <if test="ctpvSpcd != null and ctpvSpcd !=''">
+		   AND CTPV_SPCD = #{ctpvSpcd}
+		 </if>
+		 <if test="prtiId != null and prtiId !=''">
+		   AND PRTI_ID = #{prtiId}
+		 </if>
+		 ORDER BY PRTI_NM
+    </select>
+
+    <select id="selectMypRscInfCalExceptList" parameterType="egovMap" resultType="egovMap">
+    	SELECT 
+    		U1.CAL_DSGN_YMD
+    	FROM
+		(SELECT A.CAL_DSGN_YMD
+		  FROM (
+		        -- KCURE에서 예약된 좌석
+		        SELECT A.CAL_DSGN_YMD
+		          FROM KCURE_SVC_DSZ_DSGN_YMD A
+		               INNER JOIN KCURE_SVC_DTU B
+		        	             ON  A.RSR_ASMT_NO = B.RSR_ASMT_NO
+		        	             AND A.DATA_APLC_NO = B.DATA_APLC_NO
+		        			     AND A.DTU_APLC_NO = B.DTU_APLC_NO
+		               INNER JOIN KCURE_SVC_DTU_ACID C
+		        	             ON  C.RSR_ASMT_NO = B.RSR_ASMT_NO
+		        	             AND C.DATA_APLC_NO = B.DATA_APLC_NO
+		        			     AND C.DTU_APLC_NO = B.DTU_APLC_NO
+		         WHERE A.CAL_DSGN_YMD BETWEEN #{calDsgnYmdSdt} AND #{calDsgnYmdEdt}
+		           AND B.DTU_APLC_PROG_STCD != 'U03'		--반려는 제외
+		           AND A.HLD_YN = 'N'
+		           AND A.EXCP_YMD_YN = 'N'
+		        -- API로 예약된 좌석
+		        UNION ALL
+		        SELECT A.DTU_RSV_YMD AS CAL_DSGN_YMD
+		          FROM KCURE_SVC_DSZ_RSV A
+		         WHERE A.DTU_RSV_YMD BETWEEN #{calDsgnYmdSdt} AND #{calDsgnYmdEdt}
+		           AND A.DSZ_INST_ID =  #{dszInstId}
+		           AND A.API_YN = 'Y'		
+		       ) A
+		 GROUP BY A.CAL_DSGN_YMD
+		HAVING COUNT(1) > ((SELECT COALESCE(WHOL_SEAT_CNT, 0) FROM KCURE_SVC_PRTI WHERE PRTI_ID = #{dszInstId}) - #{calDsgnYmdCnt})
+		 ORDER BY A.CAL_DSGN_YMD) U1
+	    
+	    UNION ALL  
+		        
+	   SELECT 
+	   	   U2.CAL_DSGN_YMD 
+	    FROM(
+	    		-- 기신청 예약정보 (동일날짜 예약신청 방지처리)
+				SELECT A.CAL_DSGN_YMD AS CAL_DSGN_YMD
+				FROM KCURE_SVC_DSZ_DSGN_YMD A 
+				INNER JOIN  KCURE_SVC_DTU B
+				ON A.RSR_ASMT_NO = B.RSR_ASMT_NO AND A.DTU_APLC_NO = B.DTU_APLC_NO
+				WHERE A.RSR_ASMT_NO = #{rsrAsmtNo} AND B.DTU_APLC_PROG_STCD != 'U03') U2
+    </select>
+
+    <select id="selectMypRscInfUseDtuAplcNoMax" parameterType="egovMap" resultType="string">
+		SELECT LPAD((CASE WHEN MAX(DTU_APLC_NO) IS NULL THEN 1
+				     ELSE (CAST(SPLIT_PART(MAX(DTU_APLC_NO)::VARCHAR, '-', -1) AS INTEGER) + 1) END)||'', 3, '0') AS DTU_APLC_NO
+		  FROM KCURE_SVC_DTU
+		 WHERE DTU_APLC_NO LIKE #{dtuAplcNo} || '%'
+    </select>
+
+    <insert id="insertMypRscInfTkin" parameterType="kcure.portal.myp.rsc.inf.service.impl.TkinVO">
+    	<selectKey keyProperty="tkinDtapNo" resultType="String" order="BEFORE">
+			SELECT 'TKIN-'||to_char(now(), 'YYYYMMDD')||'-'|| (
+				SELECT LPAD( (
+						SELECT CAST((count(*)+1)  AS TEXT)
+						FROM KCURE_SVC_TKIN
+						WHERE TKIN_DTAP_NO like 'TKIN-'||to_char(now(), 'YYYYMMDD')||'%'
+					 	),3,'0')
+			)
+		</selectKey>
+
+    	INSERT INTO KCURE_SVC_TKIN
+		      (
+		       RSR_ASMT_NO
+		      ,TKIN_DTAP_NO
+		      ,DATA_APLC_NO
+		      ,TKIN_DTAP_YMD
+		      ,TKIN_DATA_PROG_STCD
+		      ,TKIN_DATA_NM_CONT
+		      ,TKIN_DATA_PRPS_CONT
+		      ,FRST_REGP_ID
+		      ,FRST_RGST_DT
+		      ,LAST_MODP_ID
+		      ,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		       #{rsrAsmtNo}
+		      ,#{tkinDtapNo}
+		      ,#{dataAplcNo}
+		      ,TO_CHAR(NOW(), 'YYYYMMDD')
+		      ,#{tkinDataProgStcd}
+		      ,#{tkinDataNmCont}
+		      ,#{tkinDataPrpsCont}
+		      ,#{userId}
+		      ,NOW()
+		      ,#{userId}
+		      ,NOW()
+		      )
+    </insert>
+
+    <insert id="insertMypRscInfTkinProg" parameterType="egovMap">
+    	INSERT INTO KCURE_SVC_TKIN_PROG
+		      (
+		       RSR_ASMT_NO
+		      ,TKIN_DTAP_NO
+		      ,ATTF_SEQ
+		      ,DATA_APLC_NO
+		      ,TKIN_DATA_PROG_STCD
+		      ,TKIN_FILE_STTM_YN
+		      ,FRST_REGP_ID
+		      ,FRST_RGST_DT
+		      ,LAST_MODP_ID
+		      ,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		       #{rsrAsmtNo}
+		      ,#{tkinDtapNo}
+		      ,#{attfSeq}
+		      ,#{dataAplcNo}
+		      ,#{tkinDataProgStcd}
+		      ,#{tkinFileSttmYn}
+		      ,#{userId}
+		      ,NOW()
+		      ,#{userId}
+		      ,NOW()
+		      )
+    </insert>
+
+    <insert id="insertDtapStatHst" parameterType="egovMap" >
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+				DATA_APLC_NO
+				,DTAP_STAT_SEQ
+				,DTAP_STAT_SPCD
+				,FRST_REGP_ID
+				,FRST_RGST_DT
+				,LAST_MODP_ID
+				,LAST_MODF_DT
+			)VALUES(
+				#{dataAplcNo}
+				,(SELECT COUNT(1) + 1 FROM KCURE_SVC_DTAP_STAT_HST)
+				,#{datpStatSpcd}
+				,#{userId}
+				,now()
+				,#{userId}
+				,now()
+			)
+	</insert>
+
+    <insert id="insertMypRscInfUseDtu" parameterType="egovMap">
+    	<!-- INSERT INTO KCURE_SVC_DTU
+		      (
+		       DATA_APLC_NO
+		      ,DTU_APLC_NO
+		      ,CENTER_PRT_FRM_CD
+		      ,PRTI_ID
+		      ,DSZ_DSGN_SDT
+		      ,DSZ_DSGN_EDT
+		      ,DTU_APLC_PROG_STCD
+		      ,RJC_RSN_CONT
+		      ,FRST_REGP_ID
+		      ,FRST_RGST_DT
+		      ,LAST_MODP_ID
+		      ,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		       #{dataAplcNo}
+		      ,#{dtuAplcNo}
+		      ,#{centerPrtFrmCd}
+		      ,#{prtiId}
+		      ,#{dszDsgnSdt}
+		      ,#{dszDsgnEdt}
+		      ,#{dtuAplcProgStcd}
+		      ,''
+		      ,#{frstRegpId}
+		      ,NOW()
+		      ,#{frstRegpId}
+		      ,NOW()
+		      ) -->
+		    INSERT INTO portal.KCURE_SVC_DTU
+				(RSR_ASMT_NO
+				,DTU_APLC_NO
+				,DATA_APLC_NO
+				,AENV_SPCD				---- 분석환경 구분코드
+				,DSZ_INST_ID			---- 안심활용센터기관ID
+				,DSZ_DSGN_SDT			---- 안심활용센터지정시작일자
+				,DSZ_DSGN_EDT			---- 안심활용센터지정종료일자
+				,DTU_APLC_PROG_STCD		---- 데이터활용신청진행상태코드 U01:신청, U02:승인, U03:반려
+				,VRT_ANLS_DVCE_CONT    ---- 가상화분석도구코드
+				,RJC_RSN_CONT			---- 반려사유내용
+				,FRST_REGP_ID
+				,FRST_RGST_DT
+				,LAST_MODP_ID
+				,LAST_MODF_DT)
+			VALUES
+			      ( #{rsrAsmtNo}
+			      ,#{dtuAplcNo}
+			      ,#{dataAplcNo}
+			      ,#{aenvSpcd}
+			      ,#{dszInstId}
+			      ,#{dszDsgnSdt}
+			      ,#{dszDsgnEdt}
+			      ,#{dtuAplcProgStcd}
+			      ,#{vrtDvceCd}
+			      ,''
+			      ,#{frstRegpId}
+			      ,NOW()
+			      ,#{frstRegpId}
+			      ,NOW()
+			      )
+    </insert>
+
+    <insert id="insertMypRscInfUseDtuAcid" parameterType="egovMap">
+    	INSERT INTO KCURE_SVC_DTU_ACID
+		      (
+		       	RSR_ASMT_NO
+		       	,DATA_APLC_NO
+		      	,DTU_APLC_NO
+		      	,DATA_APLP_ID
+		      	,FRST_REGP_ID
+		      	,FRST_RGST_DT
+		      	,LAST_MODP_ID
+		      	,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		      	#{rsrAsmtNo}
+		       	,#{dataAplcNo}
+		      	,#{dtuAplcNo}
+		      	,#{dataAplcId}
+		      	,#{frstRegpId}
+		      	,NOW()
+		      	,#{frstRegpId}
+		      	,NOW()
+		      )
+    </insert>
+
+    <insert id="insertMypRscInfUseDsgnYmd" parameterType="egovMap">
+    	INSERT INTO KCURE_SVC_DSZ_DSGN_YMD
+		      (
+		       	RSR_ASMT_NO
+		       	,DATA_APLC_NO
+		      	,DTU_APLC_NO
+		      	,YMD_SEQ
+		      	,CAL_DSGN_YMD
+		      	,HLD_YN
+		      	,EXCP_YMD_YN
+		      	,FRST_REGP_ID
+		      	,FRST_RGST_DT
+		      	,LAST_MODP_ID
+		      	,LAST_MODF_DT
+		      )
+		VALUES
+		      (
+		       	#{rsrAsmtNo}
+		       	,#{dataAplcNo}
+		      	,#{dtuAplcNo}
+		      	,#{ymdSeq}
+		      	,#{calDsgnYmd}
+		      	,#{hldYn}
+		      	,#{excpYmdYn}
+		      	,#{frstRegpId}
+		      	,NOW()
+		      	,#{frstRegpId}
+		      	,NOW()
+		      )
+    </insert>
+
+    <select id="selectMypRscInfOutListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1)
+		  FROM KCURE_SVC_DTTO_APLC A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DTTO_APLC_ID = B.USER_ID
+		 WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+    </select>
+
+    <select id="selectMypRscInfOutList" parameterType="egovMap" resultType="egovMap">
+    	 SELECT
+		 	  A.DATA_APLC_NO
+			  ,A.RSR_ASMT_NO
+		      ,TO_CHAR(A.DTTO_APLC_DT, 'YYYY.MM.DD HH24:MI:SS') AS DTTO_APLC_DT
+		      ,A.DTTO_APLC_ID
+		      ,A.DTTO_APLC_PROG_STCD
+		      ,B.USER_NM AS DTTO_APLC_NM
+		      ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.DTTO_APLC_PROG_STCD) AS DTTO_APLC_PROG_NM
+			  ,(
+		         SELECT SB.ATTF_NM
+				  FROM KCURE_SVC_DTTO_PROG SA
+				  INNER JOIN KCURE_SVC_ATTF SB
+					ON SA.ATTF_SEQ = SB.ATTF_SEQ AND SA.DATA_APLC_NO = SB.DATA_APLC_NO
+				 WHERE SA.RSR_ASMT_NO = A.RSR_ASMT_NO
+				   AND SA.DTTO_APLC_DT = A.DTTO_APLC_DT
+				 LIMIT 1
+		       ) AS DATA_DTTO_APLC_FILE_NM
+		      ,(
+		        SELECT COUNT(1)
+				  FROM KCURE_SVC_DTTO_PROG SA
+				  INNER JOIN KCURE_SVC_ATTF SB
+					ON SA.ATTF_SEQ = SB.ATTF_SEQ AND SA.DATA_APLC_NO = SB.DATA_APLC_NO
+				 WHERE SA.RSR_ASMT_NO = A.RSR_ASMT_NO
+				   AND SA.DTTO_APLC_DT = A.DTTO_APLC_DT
+		       ) AS DATA_DTTO_APLC_FILE_CNT
+		       , (SELECT to_char(to_date(rsr_edt, 'yyyyMMdd'),'yyyy-MM-dd') FROM PORTAL.KCURE_SVC_DATA_APLC WHERE DATA_APLC_NO = A.DATA_APLC_NO) AS RSR_EDT
+			   , TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD') AS APLC_DT
+		  FROM KCURE_SVC_DTTO_APLC A
+		       INNER JOIN KCURE_COM_USER B
+		               ON A.DTTO_APLC_ID = B.USER_ID
+		 WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+		 ORDER BY A.DTTO_APLC_DT DESC
+		 <if test='allListYn == "N"'>
+			LIMIT 5
+		</if>
+    </select>
+
+    <select id="selectMypRscInfOut" parameterType="egovMap" resultType="egovMap">
+		SELECT
+			RJC_RSN_CONT
+		FROM KCURE_SVC_DTTO_PROG
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND DATA_APLC_NO = #{dataAplcNo}
+			AND TO_CHAR(DTTO_APLC_DT, 'YYYY.MM.DD HH24:MI:SS')  = #{dttoAplcDt}
+			AND DTTO_APLC_PROG_STCD = 'U03'
+    </select>
+
+    <select id="selectMypRscInfOutFileList" parameterType="egovMap" resultType="egovMap">
+		SELECT DATA_APLC_NO
+		      ,ATTF_SEQ
+		      ,ATTF_SPCD
+		      ,ATTD_NM_SPCD
+		      ,ATTF_OWNR_ID
+		      ,ATTF_NM
+		      ,ATTF_STR_NM
+		      ,ATTF_PTH_NM
+		  FROM KCURE_SVC_ATTF
+		 WHERE DATA_APLC_NO = #{dataAplcNo}
+		   AND ATTF_SPCD = '05'  --05 신청자반출파일
+		   AND ATTF_OWNR_ID = #{dttoAplcId}
+		   AND TO_CHAR(FRST_RGST_DT, 'YYYYMMDD') = #{dttoAplcDt}
+    </select>
+
+	<select id="selectMypRscInfRsrRslt" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+		      ,A.SPNS_EXPS_YN
+		      ,A.TES_PBLC_CONT
+		      ,A.ANC_RSLT_CONT
+		      ,A.ETC_RSLT_CONT
+		      ,A.FRST_REGP_ID
+		      ,A.LAST_MODP_ID
+		      ,TO_CHAR(A.FRST_RGST_DT, 'YYYY/MM/DD') AS FRST_RGST_DT
+		  FROM KCURE_SVC_RSR_RSLT A
+		 WHERE A.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<update id="saveMypRscInfRsrRslt" parameterType="egovMap">
+		WITH UPQRY AS (
+		               UPDATE KCURE_SVC_RSR_RSLT
+		                  SET SPNS_EXPS_YN = #{spnsExpsYn}
+		                     ,TES_PBLC_CONT = #{tesPblcCont}
+		                     ,ANC_RSLT_CONT = #{ancRsltCont}
+		                     ,ETC_RSLT_CONT = #{etcRsltCont}
+		                     ,LAST_MODP_ID = #{frstRegpId}
+		                     ,LAST_MODF_DT = NOW()
+		                 WHERE DATA_APLC_NO = #{dataAplcNo}
+		                RETURNING *
+		              )
+		INSERT INTO KCURE_SVC_RSR_RSLT
+		       (
+		        DATA_APLC_NO
+		       ,SPNS_EXPS_YN
+		       ,TES_PBLC_CONT
+		       ,ANC_RSLT_CONT
+		       ,ETC_RSLT_CONT
+		       ,FRST_REGP_ID
+		       ,FRST_RGST_DT
+		       ,LAST_MODP_ID
+		       ,LAST_MODF_DT
+		       )
+		SELECT #{dataAplcNo}
+		      ,#{spnsExpsYn}
+		      ,#{tesPblcCont}
+		      ,#{ancRsltCont}
+		      ,#{etcRsltCont}
+		      ,#{frstRegpId}
+		      ,NOW()
+		      ,#{frstRegpId}
+		      ,NOW()
+		 WHERE NOT EXISTS (SELECT * FROM UPQRY)
+    </update>
+
+    <delete id="deleteSvcDataAplc" parameterType="egovMap">
+    	DELETE FROM KCURE_SVC_DATA_APLC
+    	WHERE DATA_APLC_NO = #{dataAplcNo}
+    </delete>
+
+    <delete id="deleteSvcAttf" parameterType="egovMap">
+    	DELETE FROM KCURE_SVC_ATTF
+    	WHERE DATA_APLC_NO = #{dataAplcNo}
+    </delete>
+
+    <delete id="deleteSvcRsp" parameterType="egovMap">
+    	DELETE FROM KCURE_SVC_RSP
+    	WHERE DATA_APLC_NO = #{dataAplcNo}
+    </delete>
+
+    <delete id="deleteSvcDataAplcRvw" parameterType="egovMap">
+    	DELETE FROM KCURE_SVC_DATA_APLC_RVW
+    	WHERE DATA_APLC_NO = #{dataAplcNo}
+    </delete>
+
+    <delete id="deleteSvcDataPrvdInst" parameterType="egovMap">
+    	DELETE FROM KCURE_SVC_DATA_PRVD_INST
+    	WHERE DATA_APLC_NO = #{dataAplcNo}
+    </delete>
+
+    <update id="updateSvcDataAplcCncl" parameterType="egovMap">
+    	UPDATE KCURE_SVC_DATA_APLC
+    	SET CNCL_YN = #{cnclYn}
+    	WHERE DATA_APLC_NO = #{dataAplcNo}
+    </update>
+
+    <select id="selectDataAplcDetail" parameterType="egovMap" resultType="egovMap">
+    	SELECT A.DATA_APLC_NO
+		       , A.RSR_SBJ_NM
+		       , A.DATA_TPCD
+			   , (SELECT D.detl_cd_nm FROM kcure_com_cd D WHERE A.data_tpcd = D.detl_cd AND grp_cd= 'DATA_TPCD')  AS DATA_TPCD_NM
+   		       , TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_SDT_FMT
+		       , TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_EDT_FMT
+		       , A.PBL_DTS_SPCD
+		       , (SELECT D.detl_cd_nm FROM kcure_com_cd D WHERE A.data_tpcd = D.detl_cd AND grp_cd= 'PBL_DTS_SPCD')  AS PBL_DTS_SPCD_NM
+			   , C.MP_SRLB_NM
+			   , D.USER_NM AS RSP02
+			   , A.PBL_STLM_AMT
+			   , A.PBL_STLM_CMPT_ID
+		FROM PORTAL.KCURE_SVC_DATA_APLC A
+		INNER JOIN
+		(SELECT A.DATA_APLC_NO
+			   ,A.DTAP_STAT_SEQ
+			   ,A.DTAP_STAT_SPCD
+			   ,B.MP_SRLB_NM
+		FROM
+		(SELECT DATA_APLC_NO
+			 ,MAX(dtap_stat_seq) DTAP_STAT_SEQ
+			 ,MAX(dtap_stat_spcd) DTAP_STAT_SPCD
+		FROM KCURE_SVC_DTAP_STAT_HST
+		GROUP BY DATA_APLC_NO)A,
+		(SELECT DTAP_STAT_SPCD
+			   ,DTAP_STP_SPCD
+			   ,MP_SRLB_NM
+		FROM KCURE_SVC_STAT_MST)B
+		WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+		) C ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		INNER JOIN PORTAL.KCURE_SVC_RSP SR
+		ON A.DATA_APLC_NO = SR.DATA_APLC_NO
+		AND SR.RSRP_SPCD = '02'				<!-- 책임연구원 -->
+		INNER JOIN KCURE_COM_USER D
+		ON SR.RSRP_ID = D.USER_ID
+		WHERE A.DATA_APLC_NO = #{dataAplcNo}
+    </select>
+
+    <select id="selectDataPrvdInstList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+		, C.PRTI_NM
+		, B.RVW_STP_STCD
+		, D.DETL_CD_NM
+		FROM PORTAL.KCURE_SVC_DATA_PRVD_INST A
+		LEFT OUTER JOIN PORTAL.KCURE_SVC_DATA_PRVD_STAT B
+		ON A.DATA_APLC_NO = B.DATA_APLC_NO
+		LEFT OUTER JOIN PORTAL.KCURE_SVC_PRTI C
+		ON A.PRTI_ID = C.PRTI_ID
+		LEFT OUTER JOIN PORTAL.KCURE_COM_CD D
+		ON B.RVW_STP_STCD = D.DETL_CD
+		AND D.GRP_CD = 'RVW_STP_STCD'
+		WHERE A.DATA_APLC_NO = #{dataAplcNo}
+    </select>
+
+	<!-- 설문조사 링크 조회 -->
+    <select id="selectSrvyLnk" parameterType="egovMap" resultType="egovMap">
+	    SELECT SRVY_IVSTG_TTL_NM, LNK_ADDR
+		FROM PORTAL.KCURE_SVC_SRVY_IVSTG
+		WHERE VIEW_YN = 'Y'
+    </select>
+
+    <!-- 반려 및 보안요청 사유 조회 -->
+    <select id="selectDataAplcRvw" parameterType="egovMap" resultType="egovMap">
+		SELECT
+		   RJC_RSN_CONT
+		   ,RVW_STP_STCD
+		FROM KCURE_SVC_DATA_APLC_RVW
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+    </select>
+
+
+
+    <select id="selectExtnList" parameterType="egovMap" resultType="kcure.portal.myp.rsc.inf.service.impl.ExtnVO">
+    	SELECT SA.DATA_APLC_NO
+    			,SA.RSR_ASMT_NO
+				,SA.RSR_SBJ_NM
+				,SA.DATA_TPCD
+				,SA.DATA_APLP_ID
+				,USR.USER_NM AS DATA_APLP_USER_NM
+				,COM.DETL_CD_NM AS DATA_TPNM
+				,SA.RSR_SDT
+				,SA.RSR_EDT
+				,TO_CHAR(SA.RSR_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.RSR_EDT::DATE,'YYYY.MM.DD')||' ('||
+					CASE WHEN CURRENT_DATE  <![CDATA[>]]> TO_DATE(SA.RSR_SDT,'YYYYMMDD') AND CURRENT_DATE <![CDATA[<]]> TO_DATE(SA.RSR_EDT,'YYYYMMDD')
+						 THEN  TO_DATE(SA.RSR_EDT::TEXT,'YYYYMMDD') - CURRENT_DATE +1
+						 WHEN CURRENT_DATE > TO_DATE(SA.RSR_EDT::TEXT,'YYYYMMDD')
+						 THEN '0'
+						 ELSE  DATE_PART('DAY',SA.RSR_EDT::TIMESTAMP-SA.RSR_SDT::TIMESTAMP) +1
+					END
+					||' 일 남음)'
+				AS RSR_DTM
+				,SA.DATA_KEP_SDT
+				,SA.DATA_KEP_EDT
+				,TO_CHAR(SA.DATA_KEP_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.DATA_KEP_EDT::DATE,'YYYY.MM.DD')||' ('||
+					CASE WHEN CURRENT_DATE  <![CDATA[>]]>  TO_DATE(SA.DATA_KEP_SDT,'YYYYMMDD') AND CURRENT_DATE  <![CDATA[<]]> TO_DATE(SA.DATA_KEP_EDT,'YYYYMMDD')
+						 THEN  TO_DATE(SA.DATA_KEP_EDT::TEXT,'YYYYMMDD') - CURRENT_DATE +1
+						 WHEN CURRENT_DATE  <![CDATA[>]]>  TO_DATE(SA.DATA_KEP_EDT::TEXT,'YYYYMMDD')
+						 THEN '0'
+						 ELSE  DATE_PART('DAY',SA.DATA_KEP_EDT::TIMESTAMP-SA.DATA_KEP_SDT::TIMESTAMP)	+1
+					END
+					||' 일 남음)'
+				AS DATA_KEP_DTM
+				,SA.DTU_SDT
+				,SA.DTU_EDT
+				,TO_CHAR(SA.DTU_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.DTU_EDT::DATE,'YYYY.MM.DD')||' ('||
+					CASE WHEN CURRENT_DATE <![CDATA[>]]> TO_DATE(SA.DTU_SDT,'YYYYMMDD') AND CURRENT_DATE <![CDATA[<]]> TO_DATE(SA.DTU_EDT,'YYYYMMDD')
+						 THEN  TO_DATE(SA.DTU_EDT::TEXT,'YYYYMMDD') - CURRENT_DATE +1
+						 WHEN CURRENT_DATE <![CDATA[>]]> TO_DATE(SA.DTU_EDT::TEXT,'YYYYMMDD')
+						 THEN '0'
+						 ELSE  DATE_PART('DAY',SA.DTU_EDT::TIMESTAMP-SA.DTU_SDT::TIMESTAMP) +1
+					END
+					||' 일 남음)'
+				AS DTU_DTM
+				,SA.RUS_SDT
+				,SA.RUS_EDT
+				,TO_CHAR(SA.RUS_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.RUS_EDT::DATE,'YYYY.MM.DD')||' ('||
+					CASE WHEN CURRENT_DATE <![CDATA[>]]> TO_DATE(SA.RUS_SDT,'YYYYMMDD') AND CURRENT_DATE <![CDATA[<]]> TO_DATE(SA.RUS_EDT,'YYYYMMDD')
+						 THEN  TO_DATE(SA.RUS_EDT::TEXT,'YYYYMMDD') - CURRENT_DATE +1
+						 WHEN CURRENT_DATE <![CDATA[>]]> TO_DATE(SA.RUS_EDT::TEXT,'YYYYMMDD')
+						 THEN '0'
+						 ELSE  DATE_PART('DAY',SA.RUS_EDT::TIMESTAMP-SA.RUS_SDT::TIMESTAMP) +1
+					END
+					||' 일 남음)'
+				AS RUS_DTM
+		  FROM KCURE_SVC_DATA_APLC SA
+				LEFT OUTER JOIN KCURE_COM_USER USR ON USR.USER_ID = SA.DATA_APLP_ID
+				LEFT OUTER JOIN KCURE_COM_CD COM ON COM.GRP_CD = 'DATA_TPCD' AND COM.DETL_CD =  SA.DATA_TPCD
+		 WHERE (SA.RSR_ASMT_NO IS NOT NULL AND SA.RSR_ASMT_NO <![CDATA[<> ]]> '')
+		    AND SA.RSR_EDT  <![CDATA[>= ]]> TO_CHAR(NOW(), 'YYYYMMDD')
+		    AND (
+		                SA.DATA_APLP_ID = #{userId}
+		                OR EXISTS (
+		                           SELECT '1'
+		                             FROM KCURE_SVC_RSP CC
+		                            WHERE 1=1
+		                              AND CC.RSRP_ID = #{userId}
+		                              AND CC.DATA_APLC_NO = SA.DATA_APLC_NO
+		                              )
+                   )
+    </select>
+
+
+
+    <select id="selectExtnSubList" parameterType="kcure.portal.myp.rsc.inf.service.impl.ExtnVO" resultType="egovMap">
+		SELECT EXD.RSR_ASMT_NO
+			,EXD.EXTD_APLC_NO
+			,EXD.DATA_APLC_NO
+			,EXD.EXTD_STCD
+			,STCD.DETL_CD_NM AS EXTD_STNM
+			-- 가상화 , 재사용신청
+			,CASE WHEN EXD.EXTD_STCD = '01'	OR EXD.EXTD_STCD = '03'
+				  THEN EXD.DTU_SDT ||' ~ ' || EXD.DTU_EDT
+			-- 보관연장
+				  WHEN EXD.EXTD_STCD = '02'
+				  THEN EXD.DATA_KEP_SDT ||' ~ ' || EXD.DATA_KEP_EDT
+			-- 연구유효기간연장신청
+				  WHEN EXD.EXTD_STCD = '04'
+				  THEN EXD.RSR_SDT ||' ~ ' || EXD.RSR_EDT
+			ELSE ''
+			END REQ_EXTD_DTM
+			--DTU_APLC_PROG_STCD 기준
+			,EXD.EXTD_PROG_STCD
+			,MST.MP_SRLB_NM AS EXTD_PROG_STNM
+			,EXD.FRST_REGP_ID AS REQ_USER_ID
+			,USR.USER_NM AS REQ_USER_NM
+			,TO_CHAR(EXD.FRST_RGST_DT ,'YYYY.MM.DD') AS REQ_DTM
+			,EXD.PBL_STLM_CMPT_ID
+			,EXD.RJC_RSN_CONT
+		FROM KCURE_SVC_EXTD EXD
+			LEFT OUTER JOIN KCURE_COM_CD STCD ON STCD.DETL_CD = EXD.EXTD_STCD AND STCD.GRP_CD = 'EXTD_STCD'
+			LEFT OUTER JOIN KCURE_SVC_STAT_MST MST ON MST.DTAP_STP_SPCD =  EXD.EXTD_STCD AND MST.DETL_CD = EXD.EXTD_PROG_STCD
+			LEFT OUTER JOIN KCURE_COM_USER USR ON USR.USER_ID = EXD.FRST_REGP_ID
+		WHERE RSR_ASMT_NO = #{rsrAsmtNo}
+		AND EXTD_STCD != '999'
+		ORDER BY EXTD_APLC_NO DESC
+    </select>
+
+	<select id="selectExtnPopup" parameterType="egovMap" resultType="egovMap">
+		SELECT	SA.RSR_SBJ_NM
+				,TO_CHAR(SA.RSR_SDT::DATE,'YYYY-MM-DD') RSR_SDT
+				,TO_CHAR(SA.RSR_EDT::DATE,'YYYY-MM-DD') RSR_EDT
+				,TO_CHAR(SA.RSR_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.RSR_EDT::DATE,'YYYY.MM.DD')
+				AS RSR_DTM --연구기간
+				,TO_CHAR(SA.DATA_KEP_SDT::DATE,'YYYY-MM-DD') DATA_KEP_SDT
+				,TO_CHAR(SA.DATA_KEP_EDT::DATE,'YYYY-MM-DD') DATA_KEP_EDT
+				,TO_CHAR(SA.DATA_KEP_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.DATA_KEP_EDT::DATE,'YYYY.MM.DD')
+				AS DATA_KEP_DTM --보관기간
+				,TO_CHAR(SA.DTU_SDT::DATE,'YYYY-MM-DD') DTU_SDT
+				,TO_CHAR(SA.DTU_EDT::DATE,'YYYY-MM-DD') DTU_EDT
+				,TO_CHAR(SA.DTU_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.DTU_EDT::DATE,'YYYY.MM.DD')
+				AS DTU_DTM --가상화 사용기간
+				,TO_CHAR(SA.RUS_SDT::DATE,'YYYY-MM-DD') RUS_SDT
+				,TO_CHAR(SA.RUS_EDT::DATE,'YYYY-MM-DD') RUS_EDT
+				,TO_CHAR(SA.RUS_SDT::DATE,'YYYY.MM.DD')||' ~ '||
+					TO_CHAR(SA.RUS_EDT::DATE,'YYYY.MM.DD')
+				AS RUS_DTM --가상화 재사용 기간
+				,SS.AENV_SPCD --가상화환경선택
+				,(SELECT USER_NM FROM KCURE_COM_USER WHERE  USER_ID = #{userId}) AS DATA_APLP_USER_NM
+				,SS.VRT_ANLS_DVCE_CONT
+				,(
+					SELECT STRING_AGG(DETL_CD_NM, ',')
+					FROM   KCURE_COM_CD
+					WHERE  GRP_CD = 'VRT_ANLS_DVCE_SPCD'
+					       AND DETL_CD IN (SELECT UNNEST(STRING_TO_ARRAY(SS.VRT_ANLS_DVCE_CONT, ',')))
+				) AS VRT_ANLS_DVCE_CONT_NM
+		FROM	KCURE_SVC_DATA_APLC SA
+				INNER JOIN KCURE_SVC_DATA_APLC_SMRY SS
+				ON SS.DATA_APLC_NO = SA.DATA_APLC_NO
+				<!-- LEFT OUTER JOIN KCURE_COM_USER USR ON USR.USER_ID = SA.DATA_APLP_ID -->
+		WHERE	SA.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectExtnPayPopup" parameterType="egovMap" resultType="egovMap">
+		SELECT	APLC.RSR_SBJ_NM
+				,EXD.RSR_SDT || ' ~ ' || EXD.RSR_EDT RSR_DTM
+				,EXD.DATA_KEP_SDT || ' ~ ' || EXD.DATA_KEP_EDT DATA_KEP_DTM
+				,EXD.DTU_SDT || ' ~ ' || EXD.DTU_SDT DTU_DTM
+				-- 가상화 , 재사용신청
+				,CASE WHEN EXD.EXTD_STCD = '01'	OR EXD.EXTD_STCD = '03'
+					  THEN EXD.DTU_SDT ||' ~ ' || EXD.DTU_EDT
+				-- 보관연장
+					  WHEN EXD.EXTD_STCD = '02'
+					  THEN EXD.DATA_KEP_SDT ||' ~ ' || EXD.DATA_KEP_EDT
+				-- 연구유효기간연장신청
+					  WHEN EXD.EXTD_STCD = '04'
+					  THEN EXD.RSR_SDT ||' ~ ' || EXD.RSR_EDT
+				ELSE ''
+				END REQ_EXTD_DTM
+				,EXD.EXTD_STCD
+				,(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'EXTD_STCD'
+							AND DETL_CD = EXD.EXTD_STCD
+				) EXTD_STNM
+				,EXD.EXTD_PROG_STCD
+				,MST.MP_SRLB_NM AS EXTD_PROG_STNM
+				,USR.USER_NM DATA_APLP_NM
+				,SMRY.AENV_SPCD
+				,(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'AENV_SPCD'
+							AND DETL_CD = EXD.EXTD_STCD
+				) AENV_SPNM
+				,SMRY.VRT_ANLS_DVCE_CONT
+				,(
+					SELECT	STRING_AGG(DETL_CD_NM, ',')
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'VRT_ANLS_DVCE_SPCD'
+							AND DETL_CD IN (SELECT UNNEST(STRING_TO_ARRAY(SMRY.VRT_ANLS_DVCE_CONT, ',')))
+				) AS VRT_ANLS_DVCE_CONT_NM
+				,SMRY.RDC_RT_SPCD
+				,(
+					SELECT	RDC_RT_ITEM_CONT || ' (' || RDC_RT || '%)'
+					FROM	KCURE_SVC_RDRT_ITEM
+					WHERE	RDC_RT_SPCD = SMRY.RDC_RT_SPCD
+				) RDC_RT_SPNM
+				,EXD.EXTD_APLC_RSN_CONT
+				,EXD.CLNC_PBL_STLM_AMT
+				,EXD.RJC_RSN_CONT
+				,APLC.DATA_TPCD
+				, APLC.PBL_STLM_CMPT_ID
+		FROM	KCURE_SVC_EXTD EXD
+				INNER JOIN KCURE_SVC_DATA_APLC APLC
+				ON APLC.RSR_ASMT_NO = EXD.RSR_ASMT_NO
+				INNER JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = APLC.DATA_APLP_ID
+				INNER JOIN KCURE_SVC_DATA_APLC_SMRY SMRY
+				ON SMRY.DATA_APLC_NO = APLC.DATA_APLC_NO
+				INNER JOIN KCURE_SVC_STAT_MST MST
+				ON MST.DTAP_STP_SPCD = EXD.EXTD_STCD
+				AND MST.DETL_CD = EXD.EXTD_PROG_STCD
+		WHERE	EXD.RSR_ASMT_NO = #{rsrAsmtNo}
+				AND EXD.EXTD_APLC_NO = #{extdAplcNo}
+	</select>
+	
+	<select id="selectMypRscInfOutApl" parameterType="egovMap" resultType="egovMap">
+		SELECT A.*
+		      ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_DT_TERM
+		  FROM (
+		        SELECT A.DATA_APLC_NO     	---- 신청번호
+		              ,A.DATA_APLC_YMD    	--- 데이신청일자
+		              ,A.DATA_APLP_ID     	--- 데이터신청자ID
+		              ,A.DATA_TPCD		  	--- 데이터유형코드 임상/공공/결합
+		              ,(SELECT D.DETL_CD_NM FROM KCURE_COM_CD D WHERE A.DATA_TPCD = D.DETL_CD AND GRP_CD= 'DATA_TPCD')  DATA_TPCD_NM  --- 데이터유형코드명
+		              ,A.PINF_CNU_AGR_YN  	--- 개인정보수집이용동의여부
+		              ,A.PINF_SP3P_AGR_YN  	--- 개인정보제3자제공동의여부
+		              ,A.PRTI_ID			--- 참여기관ID
+		              ,A.RSR_SBJ_NM			--- 연구주제명
+		              ,A.IRB_APRI_NM		--- IRB승인기관명
+		              ,A.IRB_NO				--- IRB번호
+		              ,A.CLNT_ACNT_NM		--- 폐쇠망분석센터명
+		              ,A.RSR_SPCD			--- 연구구분코드
+		              ,A.RSR_SDT 			--- 연구시작일자
+		              ,A.RSR_EDT			--- 연구종료일자
+		              ,A.RSR_PRPS_CONT		--- 연구목적내용
+		              ,A.RSR_SBJ_CONT		--- 연구주제내용
+		              ,A.KYW_CONT			--- 키워드내용
+		              ,A.APLC_STP_SPCD		--- 신청단계구분코드
+		              ,A.APLC_PROG_STCD		--- 신청진행상태코드
+		              ,A.ADD_RVW_APLP_ID	--- 추가심의신청자ID
+		              ,A.ADD_RVW_APLC_YMD   --- 추가심의신청일자
+		              ,A.DTTI_YN			--- 데이터반입여부
+		              ,A.DTTO_APLC_YN		--- 데이터반출신청여부
+		              ,A.DTTO_APRV_YN		--- 데이터반출승인여부
+		              ,A.DATA_APLC_APRV_NO	--- 데이터신청승인번호
+		              ,A.DTU_SDT			--- 데이터활용시작일자
+		              ,A.DTU_EDT			--- 데이터활용종료일자
+		              ,TO_CHAR(A.FRST_RGST_DT, 'YYYY/MM/DD') AS FRST_RGST_DT    --- 등록일자
+		              ,B.USER_NM AS DATA_APLP_NM    --- 신청자명
+		              ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'APLC_PROG_STCD' AND DETL_CD = A.APLC_PROG_STCD) AS APLC_PROG_NM    --- 신청진행상태 코드명
+		              ,TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_SDT_FMT			--- 연구시작일자
+		              ,TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_EDT_FMT			--- 연구종료일자
+		              ,TO_CHAR(TO_DATE(A.DTU_SDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DTU_SDT_FMT			--- 데이터활용시작일자
+		              ,TO_CHAR(TO_DATE(A.DTU_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS DTU_EDT_FMT			--- 데이터활용종료일자
+		              ,A.RSR_ASMT_NO													--- 연구과제번호
+		              ,A.DATA_KEP_SDT													--- 보관시작일자
+		              ,A.DATA_KEP_EDT													--- 보관종료일자
+		              ,C.ACNT_SPCD						---- 분석센터구분코드
+		              ,(
+				        SELECT SB.USER_NM
+				          FROM KCURE_SVC_RSP SA
+				               INNER JOIN KCURE_COM_USER SB
+				                       ON SA.RSRP_ID = SB.USER_ID
+				         WHERE SA.RSRP_SPCD = '01' --책임연구원
+				           AND SA.DATA_APLC_NO = A.DATA_APLC_NO
+				       ) AS RSRP_NM   -- 책임연구자명
+		          FROM KCURE_SVC_DATA_APLC A
+		               INNER JOIN KCURE_COM_USER B
+		                       ON A.DATA_APLP_ID = B.USER_ID
+		               INNER JOIN KCURE_SVC_DATA_APLC_SMRY C
+		               		ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		         WHERE 1 = 1
+		           AND (
+		                A.DATA_APLP_ID = #{userId}
+		                OR EXISTS (
+		                           SELECT '1'
+		                             FROM KCURE_SVC_RSP CC
+		                            WHERE CC.RSRP_SPCD = '01' --책임연구원
+		                              AND CC.RSRP_ID = #{userId}
+		                              AND CC.DATA_APLC_NO = A.DATA_APLC_NO
+		                          )
+		               )
+		          AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+		         ORDER BY A.FRST_RGST_DT DESC
+		       ) A
+    </select>
+
+     <select id="selectMypRscInfTkOutFileList" parameterType="egovMap" resultType="egovMap">
+    	SELECT
+			A.RSR_ASMT_NO
+			,TO_CHAR(A.DTTO_APLC_DT, 'YYYY.MM.DD HH24:MI:SS') AS DTTO_APLC_DT
+			,A.DATA_APLC_NO
+			,A.DTTO_APLC_PROG_STCD
+			,A.RJC_RSN_CONT
+			,A.ATTF_SEQ
+			,(
+				SELECT 
+					TKOT_FILE_UNLD_YN 
+				FROM KCURE_SVC_DTTO_APLC 
+				WHERE 
+					RSR_ASMT_NO = A.RSR_ASMT_NO 
+					AND DTTO_APLC_DT = A.DTTO_APLC_DT
+			 ) AS TKOT_FILE_UNLD_YN
+			,B.ATTF_NM
+			,B.ATTF_STR_NM
+			,B.ATTF_PTH_NM
+		FROM KCURE_SVC_DTTO_PROG A, KCURE_SVC_ATTF B
+		WHERE
+			A.DATA_APLC_NO = B.DATA_APLC_NO
+			AND A.ATTF_SEQ = B.ATTF_SEQ
+			AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			AND TO_CHAR(A.DTTO_APLC_DT, 'YYYY.MM.DD HH24:MI:SS')  = #{dttoAplcDt}
+		ORDER BY A.ATTF_SEQ
+    </select>
+
+    <select id="checkExtdStcdCnt" parameterType="kcure.portal.myp.rsc.inf.service.impl.ExtnVO" resultType="egovMap">
+    <!-- 종료일자 기준 신청여부 확인. 
+				1. 가상화연장 가상화사용 종료일자 한달전 부터 가상화 종료 일자까지만 신청가능
+				2. 보관연장 가상화사용 종료일자 한달전 부터 가상화 종료 일자까지만 신청가능
+				3. 재사용 보관연장 종료일자 한달전 IRB 기간 내에서만 신청가능.
+				3. IRB 기간 내에서만 신청가능.
+			 -->
+			 
+		SELECT 
+			<!-- 가상화 횟수  -->
+			CASE WHEN APLC.DTU_EXTD_NT >= KPEX.DTU_EXTD_NT
+				THEN 'N'
+				<!-- 보관연장이나, 재사용이 진행되었다면 진행할수 없다.  -->
+				WHEN APLC.DATA_KEP_EXTD_NT > 0 OR APLC.RUS_EXTD_NT > 0
+				THEN 'N'
+				<!-- 가상화 종료한달전 부터 신청가능  -->
+				WHEN
+					TO_CHAR( (TO_DATE(APLC.DTU_EDT,'YYYYMMDD') - INTERVAL '1 MONTHS'),'YYYYMMDD') <![CDATA[>]]> TO_CHAR(NOW(),'YYYYMMDD')
+				 AND 
+				 	TO_CHAR( TO_DATE(APLC.DTU_EDT,'YYYYMMDD') ,'YYYYMMDD') <![CDATA[<=]]> TO_CHAR(NOW(),'YYYYMMDD')
+				THEN 'N'
+				
+				ELSE 'Y'
+				END DTU_EXTD_YN
+			<!-- 보관연장 횟수  -->
+			,CASE WHEN APLC.DATA_KEP_EXTD_NT >= KPEX.DATA_KEP_EXTD_NT
+				THEN 'N'
+				ELSE 'Y'
+				END DATA_KEP_EXTD_YN
+			<!-- 재사용 횟수  -->
+			,CASE WHEN APLC.RUS_EXTD_NT >= KPEX.RUS_EXTD_NT
+				THEN 'N'
+				ELSE 'Y'
+				END RUS_EXTD_YN
+			<!-- 연구유효기간 연장횟수  -->
+			,CASE WHEN APLC.RSR_TMVL_EXTD_NT >= KPEX.RSR_TMVL_EXTD_NT
+				THEN 'N'
+				ELSE 'Y'
+				END RSR_TMVL_EXTD_YN
+			<!-- 승인진행 중인건 ( 결재대기중인건 ) 있는지 여부 확인  -->
+			,(
+				SELECT COUNT(*) 
+				FROM KCURE_SVC_EXTD
+				WHERE RSR_ASMT_NO = #{rsrAsmtNo}
+				AND  EXTD_PROG_STCD NOT IN ('U05','U03')
+				AND (EXTD_STCD,EXTD_PROG_STCD) != ('04','U02')
+			) AS ING_CNT
+			
+		FROM KCURE_SVC_DATA_APLC APLC
+			,KCURE_COM_KEP_EXTD KPEX
+		WHERE APLC.RSR_ASMT_NO = #{rsrAsmtNo}
+	</select>
+	
+	<!-- getDefaultExtdInfo -->
+	<!-- <select id="checkExtdStcdCnt" parameterType="egovMap" resultType="kcure.portal.myp.rsc.inf.service.impl.ExtnVO">
+	</select> -->
+	
+	<sql id="insertReqExit-col">
+		<!-- 가상화사용연장신청  -->
+		RSR_ASMT_NO
+		, EXTD_APLC_NO
+		, DATA_APLC_NO
+		, EXTD_STCD
+		, DTU_SDT
+		, DTU_EDT
+		, DATA_KEP_SDT
+		, DATA_KEP_EDT
+		, DATA_RNDM_KEP_SDT
+		, DATA_RNDM_KEP_EDT
+		, EXTD_PROG_STCD
+		<if test="rdcRtSpcd != null  and rdcRtSpcd != ''">
+		, RDC_RT_SPCD
+		</if>
+		, FRST_REGP_ID
+		, FRST_RGST_DT
+		, LAST_MODP_ID
+		, LAST_MODF_DT
+		, RSR_SDT
+		, RSR_EDT
+		, BFR_RSR_SDT
+		, BFR_RSR_EDT
+		, BFR_DTU_SDT
+		, BFR_DTU_EDT
+		, BFR_DATA_KEP_SDT
+		, BFR_DATA_KEP_EDT
+		<if test="rdcRtAttfSeq != null  and rdcRtAttfSeq != ''">
+			, RDC_RT_ATTF_SEQ
+		</if>
+		,EXTD_APLC_RSN_CONT
+		,BFR_RUS_SDT
+		,BFR_RUS_EDT
+		,EXTD_APLC_YMD		
+		<if test="irbRsltAvtsmtAttfSeq != null  and irbRsltAvtsmtAttfSeq != ''">
+		,IRB_RSLT_AVTSMT_ATTF_SEQ
+		</if>
+		<if test="irbRsrPlanAttfSeq != null  and irbRsrPlanAttfSeq != ''">
+		,IRB_RSR_PLAN_ATTF_SEQ
+		</if>
+	</sql>
+	<sql id="insertReqExit-val">
+		<choose>
+			<!-- 연구유효기간연장신청  -->
+			<when test="extdStcd eq '04' ">
+				SELECT 
+					--연구과제번호
+					A.RSR_ASMT_NO AS RSR_ASMT_NO
+					--연장신청번호
+					,( SELECT  'EXTD-'||TO_CHAR(NOW(),'YYYYMMDD')||'-'|| LPAD( (COUNT(*)+1)::TEXT,3,'0') FROM KCURE_SVC_EXTD WHERE EXTD_APLC_NO LIKE 'EXTD-'||TO_CHAR(NOW(),'YYYYMMDD')||'%') AS EXTD_APLC_NO
+					--데이터신청번호
+					,A.DATA_APLC_NO AS DATA_APLC_NO
+					--보관/연장 코드
+					,#{extdStcd} AS EXTD_STCD
+					--데이터활용 일자
+					,A.DTU_SDT 
+					,A.DTU_EDT 
+					--데이터보관일자
+					,A.DATA_KEP_SDT 
+					,A.DATA_KEP_EDT 
+					--데이터임의보관일자
+					,A.DATA_RNDM_KEP_SDT 
+					,A.DATA_RNDM_KEP_EDT 
+					-- 보관/연장 상태코드
+					,#{extdProgStcd} AS EXTD_PROG_STCD
+					, #{userId}, NOW(), #{userId}, NOW()
+					, A.RSR_SDT AS RSR_SDT  , A.RSR_EDT AS RSR_EDT
+					, A.RSR_SDT AS BFR_RSR_SDT ,A.RSR_EDT AS BFR_RSR_EDT
+					, A.DTU_SDT AS BFR_DTU_SDT
+					, A.DTU_EDT AS BFR_DTU_EDT, A.DATA_KEP_SDT AS BFR_DATA_KEP_SDT, A.DATA_KEP_EDT AS BFR_DATA_KEP_EDT
+					--신청사유
+					,#{extdAplcRsnCont} AS EXTD_APLC_RSN_CONT
+					--이전연구기간
+					,A.RUS_SDT AS BFR_RUS_SDT, A.RUS_EDT AS BFR_RUS_EDT		
+					,TO_CHAR(NOW() , 'YYYYMMDD') AS EXTD_APLC_YMD
+					<if test="irbRsltAvtsmtAttfSeq != null  and irbRsltAvtsmtAttfSeq != ''">
+					,#{irbRsltAvtsmtAttfSeq}
+					</if>
+					<if test="irbRsrPlanAttfSeq != null  and irbRsrPlanAttfSeq != ''">
+					,#{irbRsrPlanAttfSeq}
+					</if>
+				FROM KCURE_SVC_DATA_APLC A
+				WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+			</when>
+			<otherwise>
+			SELECT 
+				--연구과제번호
+				A.RSR_ASMT_NO AS RSR_ASMT_NO
+				--연장신청번호
+				,( SELECT  'EXTD-'||TO_CHAR(NOW(),'YYYYMMDD')||'-'|| LPAD( (COUNT(*)+1)::TEXT,3,'0') FROM KCURE_SVC_EXTD WHERE EXTD_APLC_NO LIKE 'EXTD-'||TO_CHAR(NOW(),'YYYYMMDD')||'%') AS EXTD_APLC_NO
+				--데이터신청번호
+				,A.DATA_APLC_NO AS DATA_APLC_NO
+				--보관/연장 코드
+				,#{extdStcd} AS EXTD_STCD
+				--데이터활용 일자
+				,REPLACE(#{dtuSdt},'-','') AS DTU_SDT 
+				,REPLACE(#{dtuEdt},'-','') AS DTU_EDT 
+				--데이터보관일자
+				,REPLACE(#{dataKepSdt},'-','')  AS DATA_KEP_SDT 
+				,REPLACE(#{dataKepEdt},'-','') AS DATA_KEP_EDT 
+				--데이터임의보관일자
+				,TO_CHAR( (#{dataKepEdt}::DATE +'1 DAY'::INTERVAL), 'YYYYMMDD')  AS DATA_RNDM_KEP_SDT 
+				,TO_CHAR( ((#{dataKepEdt}::DATE +'1 DAY'::INTERVAL) + ( (SELECT DATA_RNDM_KEP_DCNT FROM KCURE_COM_KEP_EXTD )||' DAY')::INTERVAL ), 'YYYYMMDD')  AS DATA_RNDM_KEP_EDT 
+				-- 보관/연장 상태코드
+				,#{extdProgStcd} AS EXTD_PROG_STCD
+				<if test="rdcRtSpcd != null  and rdcRtSpcd != ''">
+				--감면율 항목
+				,#{rdcRtSpcd} AS RDC_RT_SPCD
+				</if>
+				, #{userId}, NOW(), #{userId}, NOW()
+				, A.RSR_SDT AS RSR_SDT  , A.RSR_EDT AS RSR_EDT
+				, A.RSR_SDT AS BFR_RSR_SDT ,A.RSR_EDT AS BFR_RSR_EDT
+				, A.DTU_SDT AS BFR_DTU_SDT
+				, A.DTU_EDT AS BFR_DTU_EDT, A.DATA_KEP_SDT AS BFR_DATA_KEP_SDT, A.DATA_KEP_EDT AS BFR_DATA_KEP_EDT
+				-- 감면율 파일 SEQ
+				<if test="rdcRtAttfSeq != null  and rdcRtAttfSeq != ''">
+					, #{rdcRtAttfSeq} AS RDC_RT_ATTF_SEQ
+				</if>
+				--신청사유
+				,#{extdAplcRsnCont} AS EXTD_APLC_RSN_CONT
+				--이전연구기간
+				,A.RUS_SDT AS BFR_RUS_SDT
+				, A.RUS_EDT AS BFR_RUS_EDT		
+				,TO_CHAR(NOW() , 'YYYYMMDD') AS EXTD_APLC_YMD
+			FROM KCURE_SVC_DATA_APLC A
+			WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+		</otherwise>
+		</choose>
+	
+	</sql>
+	
+	<insert id="insertReqExit" parameterType="egovMap">
+		INSERT INTO KCURE_SVC_EXTD(
+		<include refid="insertReqExit-col"  />
+		)
+		<include refid="insertReqExit-val" />
+			
+	</insert>
+    
+    <update id="updateFileUnldYn" parameterType="egovMap">
+		UPDATE KCURE_SVC_DTTO_APLC
+			SET TKOT_FILE_UNLD_YN = 'Y'
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND TO_CHAR(DTTO_APLC_DT, 'YYYY.MM.DD HH24:MI:SS')  = #{dttoAplcDt}
+	</update>
+	
+</mapper>

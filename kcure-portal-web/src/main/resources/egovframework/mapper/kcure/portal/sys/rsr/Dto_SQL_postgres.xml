@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Dto">
+	<sql id="whereSvcDttoAplcList">
+		<if test="searchCondition == 'rsrSbjNm' and searchKeyword != null and searchKeyword != ''">
+		AND DT.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'userNm' and searchKeyword != null and searchKeyword != ''">
+		AND USR.USER_NM LIKE '%' || #{userNm} || '%'
+		</if>
+		<if test="dttoAplcDtFrom != null and dttoAplcDtFrom != ''">
+		AND TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDD') BETWEEN #{dttoAplcDtFrom} AND #{dttoAplcDtTo}
+		</if>
+		<if test="prtiId != null and prtiId != ''">
+		AND DT.PRTI_ID = #{prtiId}
+		</if>
+		<if test="dttoAplcProgStcd != null and dttoAplcProgStcd != ''">
+		AND DTTO.DTTO_APLC_PROG_STCD = #{dttoAplcProgStcd}
+		</if>
+	</sql>
+	
+	<select id="selectSvcDttoAplcFileList" parameterType="kcure.portal.sys.rsr.dto.service.impl.RsrDtoSearchVO" resultType="egovMap">
+		SELECT
+    		A.RSR_ASMT_NO
+    		,TO_CHAR(A.DTTO_APLC_DT, 'YYYYMMDDHH24MISS') AS DTTO_APLC_DT
+    		,A.DATA_APLC_NO
+    		,A.DTTO_APLC_PROG_STCD
+    		,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.DTTO_APLC_PROG_STCD) AS DTTO_APLC_PROG_STCD_NM
+			,A.RJC_RSN_CONT
+    		,A.ATTF_SEQ
+    		,B.ATTF_NM
+    		,B.ATTF_STR_NM
+    		,B.ATTF_PTH_NM
+		FROM KCURE_SVC_DTTO_PROG A, KCURE_SVC_ATTF B
+		WHERE
+			A.DATA_APLC_NO = B.DATA_APLC_NO
+			AND A.ATTF_SEQ = B.ATTF_SEQ
+			AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			AND TO_CHAR(A.DTTO_APLC_DT, 'YYYYMMDDHH24MISS') = #{dttoAplcDt}
+	</select>
+
+	<select id="selectSvcDttoAplcList" parameterType="kcure.portal.sys.rsr.dto.service.impl.RsrDtoSearchVO" resultType="egovMap">
+		SELECT	
+			DTTO.RSR_ASMT_NO
+			,DT.DATA_APLC_NO
+			,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD ='DATA_TPCD' AND DETL_CD = DT.DATA_TPCD) AS DATA_TPCD_NM
+			,DT.RSR_SBJ_NM
+			,DT.PRTI_ID
+			,PRTI.PRTI_NM
+			,DTTO.DTTO_APLC_ID
+			,USR.USER_NM AS DTTO_APLC_NM
+			,TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYY.MM.DD') AS DTTO_APLC_DT
+			,TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDDHH24MISS') AS DTTO_APLC_DT2
+			,DTTO.DTTO_APLC_PROG_STCD
+			,CD.DETL_CD_NM AS DTTO_APLC_PROG_STNM
+		FROM KCURE_SVC_DTTO_APLC DTTO
+			INNER JOIN KCURE_SVC_DATA_APLC DT
+			ON DT.DATA_APLC_NO = DTTO.DATA_APLC_NO
+			INNER JOIN KCURE_SVC_PRTI PRTI
+			ON PRTI.PRTI_ID = DT.PRTI_ID
+			INNER JOIN KCURE_COM_USER USR
+			ON USR.USER_ID = DTTO.DTTO_APLC_ID
+			INNER JOIN KCURE_COM_CD CD
+			ON CD.GRP_CD = 'DTU_APLC_PROG_STCD'
+			AND CD.DETL_CD = DTTO.DTTO_APLC_PROG_STCD
+		WHERE	1 = 1
+				<include refid="whereSvcDttoAplcList" />
+		ORDER BY DTTO.DTTO_APLC_DT DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectSvcDttoAplcListTotCnt" parameterType="kcure.portal.sys.rsr.dto.service.impl.RsrDtoSearchVO" resultType="int">
+		SELECT	COUNT(*) totCnt
+		FROM	KCURE_SVC_DTTO_APLC DTTO
+				INNER JOIN KCURE_SVC_DATA_APLC DT
+				ON DT.DATA_APLC_NO = DTTO.DATA_APLC_NO
+				INNER JOIN KCURE_SVC_PRTI PRTI
+				ON PRTI.PRTI_ID = DT.PRTI_ID
+				INNER JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = DTTO.DTTO_APLC_ID
+				INNER JOIN KCURE_COM_CD CD
+				ON CD.GRP_CD = 'DTTO_APLC_PROG_STCD'
+				AND CD.DETL_CD = DTTO.DTTO_APLC_PROG_STCD
+		WHERE	1 = 1
+				<include refid="whereSvcDttoAplcList" />
+	</select>
+
+
+	<select id="selectSvcDttoAplc" parameterType="kcure.portal.sys.rsr.dto.service.impl.RsrDtoSearchVO" resultType="egovMap">
+		SELECT	
+				DT.DATA_APLC_NO, DTTO.RSR_ASMT_NO,
+				DT.RSR_SBJ_NM, DT.PRTI_ID, PRTI.PRTI_NM,
+				TO_CHAR(TO_DATE(DT.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(DT.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_DT_TERM,
+				DTTO.DTTO_APLC_ID, USR.USER_NM DTTO_APLC_NM,
+				TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDDHH24MISS') DTTO_APLC_DT,
+				DTTO.DTTO_APLC_PROG_STCD
+				, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DATA_TPCD' AND DETL_CD = DT.DATA_TPCD) AS DATA_TPCD_NM
+		FROM	KCURE_SVC_DTTO_APLC DTTO
+				INNER JOIN KCURE_SVC_DATA_APLC DT
+				ON DT.DATA_APLC_NO = DTTO.DATA_APLC_NO
+				INNER JOIN KCURE_SVC_PRTI PRTI
+				ON PRTI.PRTI_ID = DT.PRTI_ID
+				INNER JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = DTTO.DTTO_APLC_ID
+
+		WHERE	
+				DT.DATA_APLC_NO = #{dataAplcNo}
+				AND TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDDHH24MISS') = #{dttoAplcDt}
+				AND DTTO.RSR_ASMT_NO = #{rsrAsmtNo}
+	</select>
+
+	<update id="updateDttoAplcFileProgStcd" parameterType="egovMap">
+		UPDATE	KCURE_SVC_DTTO_PROG
+		SET		DTTO_APLC_PROG_STCD = #{dttoAplcProgStcd}
+				<if test="dttoAplcProgStcd == 'U03'">
+			   		, RJC_RSN_CONT = #{rjcRsnCont}
+			   	</if>
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+		WHERE	(DATA_APLC_NO, TO_CHAR(DTTO_APLC_DT, 'YYYYMMDDHH24MISS'), RSR_ASMT_NO, ATTF_SEQ) IN
+				((#{dataAplcNo}, #{dttoAplcDt}, #{rsrAsmtNo}, #{attfSeq}))
+	</update>
+	
+	<update id="updateDttoAplcProgStcd" parameterType="egovMap">
+		UPDATE	KCURE_SVC_DTTO_APLC
+		SET		DTTO_APLC_PROG_STCD = #{dttoAplcProgStcd}
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+		WHERE	(DATA_APLC_NO, TO_CHAR(DTTO_APLC_DT, 'YYYYMMDDHH24MISS'), RSR_ASMT_NO) IN
+				((#{dataAplcNo}, #{dttoAplcDt}, #{rsrAsmtNo}))
+	</update>
+	
+	<insert id="insertDtapStatHst" parameterType="egovMap" >
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+				DATA_APLC_NO
+				,DTAP_STAT_SEQ
+				,DTAP_STAT_SPCD
+				,FRST_REGP_ID
+				,FRST_RGST_DT
+				,LAST_MODP_ID
+				,LAST_MODF_DT
+			)VALUES(
+				#{dataAplcNo}
+				,(SELECT COUNT(1) + 1 FROM KCURE_SVC_DTAP_STAT_HST)
+				,#{datpStatSpcd}
+				,#{userId}
+				,now()
+				,#{userId}
+				,now()
+			)
+	</insert>
+	
+</mapper>

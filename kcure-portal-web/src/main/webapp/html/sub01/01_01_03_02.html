@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=yes" />
+<meta name="title" content="" />
+<meta name="keyword" content="" />
+<meta name="description" content="" />
+<title>데이터 모델 | 공공 라이브러리 | 데이터 소개 | Project Name</title>
+
+<link rel="stylesheet" href="../../css/common.css" />
+<link rel="stylesheet" href="../../css/style.css" />
+
+<script src="../../js/jquery-3.6.3.min.js"></script>
+<script src="../../js/plugin/slick.min.js"></script>
+<script src="../../js/plugin/vegas.min.js"></script>
+<script src="../../js/common.js"></script>
+</head>
+<body>
+<div id="wrap">
+	<div id="skipNav">
+		<a href="#content">본문으로 바로가기</a>
+		<a href="#gnb">주메뉴 바로가기</a>
+	</div>
+
+	<!-- header -->
+	<header id="header">
+		<div class="header-wrap">
+			<div class="header-inbox">
+				<h1 class="logo"><a href="/" title="메인페이지로 이동"><span class="blind">K-CURE 운영관리 포털</span></a></h1>
+				<ul class="top-link01">
+					<li><a href="#">로그인</a></li>
+					<li><a href="#">회원가입</a></li>
+				</ul>
+				<div class="top-link02">
+					<div class="sccontrol-box">
+						<span>화면크기</span>
+						<button type="button" class="zoom-plus"><span class="blind">화면확대</span></button>
+						<button type="button" class="zoom-minus"><span class="blind">화면축소</span></button>
+					</div>
+					<button type="button" class="btn-searchopen"><span class="blind">통합검색 열기</span></button>
+					<button type="button" class="btn-allmenuopen">
+						<span class="bar"></span>
+						<span class="bar num02"></span>
+						<span class="bar"></span>
+						<span class="blind">전체메뉴 열기</span>
+					</button>
+				</div>
+			</div>
+			<!-- gnb -->
+			<div id="gnb-bg"></div>
+			<nav id="gnb">
+				<ul class="gnb">
+					<li class="li-num01 current"><span class="a-depth01"><a href="#">데이터 소개</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">K-CURE 라이브러리</a></li>
+								<li class="yesdepth"><a href="#">임상 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">데이터 모델</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="yesdepth"><a href="#">공공 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">데이터 모델</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">보건복지공공데이터</a></li>
+							</ul>
+						</div>
+					</li>
+					<li class="li-num02"><span class="a-depth01"><a href="#">데이터 시각화</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li class="yesdepth"><a href="#">임상 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">BaselineDB</a></li>
+											<li><a href="#">암공통</a></li>
+											<li><a href="#">암임상_위암</a></li>
+											<li><a href="#">암임상_유방암</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">공공 라이브러리</a></li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num03"><span class="a-depth01"><a href="#">데이터 신청</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">데이터 신청 개요</a></li>
+								<li><a href="#">데이터 활용 신청</a></li>
+								<li><a href="#">안심활용센터예약</a></li>
+								<li><a href="#">데이터 반입출신청</a></li>
+								<li><a href="#">OPEN API 신청</a></li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num04"><span class="a-depth01"><a href="#">이용자 지원</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li class="yesdepth"><a href="#">데이터 교육</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">온라인교육</a></li>
+											<li><a href="#">실습교육</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">공지사항</a></li>
+								<li><a href="#">K-CURE소식</a></li>
+								<li><a href="#">데이터 활용사례</a></li>
+								<li class="yesdepth"><a href="#">데이터 중심병원</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">공지사항</a></li>
+											<li><a href="#">FAQ</a></li>
+											<li><a href="#">Q&amp;A</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="yesdepth"><a href="#">문의하기</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">FAQ</a></li>
+											<li><a href="#">Q&amp;A</a></li>
+										</ul>
+									</div>
+								</li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num05"><span class="a-depth01"><a href="#">K-CURE 소개</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">K-CURE 서비스 개요</a></li>
+								<li><a href="#">서비스 유형 및 이용방법</a></li>
+								<li><a href="#">안심활용센터 소개</a></li>
+								<li><a href="#">의료중심데이터 병원</a></li>
+								<li><a href="#">운영조직 및 참여기관</a></li>							
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</nav>
+			<!-- //gnb -->
+		</div>
+	</header>
+	<!-- //header -->
+
+	<div class="subtop-tab">
+		<div class="mo-scrolltab">
+			<ul>
+				<li><a href="#">K-CURE 라이브러리</a></li>
+				<li><a href="#">임상 라이브러리</a></li>
+				<li class="on"><a href="#">공공 라이브러리</a></li>
+				<li><a href="#">보건복지공공데이터</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- //subtop-tab -->
+
+	<div class="subtop-infor" id="content">
+		<div class="inbox-wrap">
+			<div class="location">
+				<a href="#" class="home"><span class="blind">홈</span></a>
+				<a href="#"><span>데이터 소개</span></a>
+				<a href="#"><span>공공 라이브러리</span></a>
+				<a href="#" class="current"><span>데이터 모델</span></a>
+			</div>
+			<h2>공공 라이브러리 데이터 모델</h2>
+			<ul class="list-type02">
+				<li>K-CURE 공공 라이브러리 데이터 모델은 결합된 공공 데이터에 대한 모델을 검색/생성할 수 있도록 설계되었습니다.</li>
+				<li>이 사이트는 데이터 모델의 현재 버전 모델 구조와 각 DB의 테이블, 항목 에 대한 내용을 제공합니다.</li>
+				<li>데이터베이스에 대한 상세 설명은 <a href="#" class="link">공공 라이브러리 데이터 모델</a> 에서 확인하실 수 있습니다.</li><!-- 2022-12-27 : 텍스트 수정 -->
+			</ul>
+		</div>
+	</div>
+	<!-- //subtop-infor -->
+
+	<!-- container -->
+	<div id="container">
+		<div class="tab-type03 mo-scrolltab">
+			<ul>
+				<li><a href="#"><span>개요</span></a></li>
+				<li class="on"><a href="#"><span>데이터 모델</span></a></li>
+			</ul>
+		</div>
+		<div class="subcon-wrap">
+			<div class="inbox-wrap">
+				<section class="round-box">
+					<h3 class="tit-type02 color01">공공 라이브러리 데이터 모델 v1.0 </h3>
+					<ul class="list-type02">
+						<li>본 문서는 각   DB별 테이블, 테이블 내 항목, 항목에서 수집되는 값 등에 대한 설명입니다.</li>
+					</ul>
+				</section>
+
+				<section class="round-box cli-datamodelbox datamodelbox02 mgt30">
+					<h3 class="tit-type02">공공 라이브러리 스키마 구조</h3>
+					<div class="img-inbox datamodeltool">
+						<p><img src="../../images/sub01/img_clinical_datamodel02.png" alt="공공 라이브러리 스키마 구조"></p>
+						<h4 class="blind">암등록본부</h4>
+						<ul class="list01-01">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">암등록DB</span></a></li>
+						</ul>
+						<h4 class="blind">건강보험심사평가원</h4>
+						<ul class="list02-01">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">수진자 상병내역</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">명세서 일반내역</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">원외처방전 상세내역</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">진료내역</span></a></li>
+						</ul>
+						<h4 class="blind">통계청</h4>
+						<ul class="list02-02">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">사망정보</span></a></li>
+						</ul>
+						<h4 class="blind">국민건강보험공단</h4>
+						<h5 class="blind">보험자격기준</h5>
+						<ul class="list03-01">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">자격 및 보험료</span></a></li>
+						</ul>
+						<h5 class="blind">일반건강검진</h5>
+						<ul class="list03-02">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">일반건강검진_대상자</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">일반건강검진</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">일반건강검진_결과 및 판정</span></a></li>
+						</ul>
+						<h5 class="blind">문진</h5>
+						<ul class="list03-03">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">위암</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">대장암</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">자궁경부암</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">유방암</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">간암</span></a></li>
+						</ul>
+						<h5 class="blind">검진</h5>
+						<ul class="list03-04">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">위암</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">대장암</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">자궁경부암</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">유방암</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">간암</span></a></li>
+						</ul>
+					</div>
+				</section>
+			</div>
+		</div>
+		<!-- //subcon-wrap -->
+	</div>
+	<!-- //container -->
+
+	<!-- footer -->
+	<footer id="footer">
+		<div class="footer-wrap">
+			<div class="footer-link">
+				<div class="footlogo"><a href="/" title="메인페이지로 이동"><span class="blind">K-CURE 운영관리 포털</span></a></div>
+				<ul class="link-ul">
+					<li><a href="#">이용약관</a></li>
+					<li><a href="#">개인정보처리방침</a></li>
+					<li><a href="#">고객의소리</a></li>
+				</ul>
+			</div>
+			<!-- //footer-link -->
+			<div class="footer-site">
+				<button type="button" class="btn-sopen"><span>관련사이트</span></button>
+				<div class="linklist-box">
+					<div class="inbox">
+						<ul>
+							<li><a href="#" target="_blank" title="새창">링크1</a></li>
+							<li><a href="#" target="_blank" title="새창">링크2</a></li>
+							<li><a href="#" target="_blank" title="새창">링크3</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- //footer-site -->
+			<address>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원 (남대문로4가 45, 서울상공회의소)</address>
+			<p class="txt-copy">COPYRIGHT©By KHIS. All rights Reserved</p>
+			<button type="button" class="btn-wintop"><span class="blind">최상단으로 이동</span></button>
+		</div>
+	</footer>
+	<!-- //footer -->
+</div>
+</body>
+</html>

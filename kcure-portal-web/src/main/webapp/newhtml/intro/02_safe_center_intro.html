@@ -1,0 +1,621 @@
+<!-- 상단 공통 시작 -->
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes"><meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta property="og:image" content="">
+	<link rel="stylesheet" href="../../css/slick.css">
+	<link rel="stylesheet" href="../../css/kc_common.css">
+	<link rel="stylesheet" href="../../css/kc_style.css">
+	<link rel="stylesheet" href="../../css/kc_media.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+	<script src="../../js/jquery-3.6.0.min.js"></script>
+	<script src="../../js/slick.min.js"></script>
+	<script src="../../js/kc.js"></script>
+	<title>K-CURE ADMIN</title>
+</head>
+<body class="">
+	<header class="">
+		<div class="top">
+			<a href="javascript:void(0)">로그인</a>
+			<a href="javascript:void(0)" class="all_menu">전체메뉴</a>
+			<div class="body_size">
+				<p>글자크기</p>
+				<a href="javascript:void(0)" class="up"></a>
+				<a href="javascript:void(0)" class="down"></a>
+			</div>
+		</div>
+		<div class="middle">
+			<div class="left">
+				<a href="javascript:void(0)" class="logo"></a>
+			</div>
+			<nav>
+				<ul>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 소개</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 시각화</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 신청</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">이용자 지원</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">K-CURE</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<ul>
+							<li class="search">
+								<input type="text">
+								<a href="javascript:void(0)" class="btn">
+									<img src="../../images/m_search_icon.svg" alt="검색버튼">
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<div class="right">
+				<!-- 로그인전 div class="user"을 날림 | 부모 div class="right"는 있어야함 -->
+				<div class="user">
+					<p class="name">서울대병원 홍길동</p>
+					<div class="mark">
+						<p>심의<br>연구</p>
+						<span class="count">99</span>
+					</div>
+					<div class="drop">
+						<div class="item">
+							<ul>
+								<li><a href="javascript:void(0)">회원정보</a></li>
+								<li><a href="javascript:void(0)">나의연구</a></li>
+								<li><a href="javascript:void(0)">심의활동</a></li>
+							</ul>
+							<ul>
+								<li>
+									<!-- class="alarm" 알림이 있을시 클래스 추가 -->
+									<a href="javascript:void(0)" class="alarm">알림<span class="count">99</span></a>
+								</li>
+								<li><a href="javascript:void(0)">관리자모드로 전환</a></li>
+								<li><a href="javascript:void(0)">로그아웃</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div class="bk_hide"></div>
+	<div class="header_top">
+		<div class="location_wrap">
+			<a href="javascript:void(0)">홈</a>
+			<a href="javascript:void(0)">K-CURE</a>
+			<a href="javascript:void(0)">K-CURE 서비스 개요</a>
+		</div>
+		<h1 class="title">권한별메뉴관리</h1>
+	</div>
+	<!-- 상단 공통 끝 -->
+	
+	<div class="wrap">
+		<div class="sub_visual_wrap">
+			<div class="intro">
+				<ul>
+					<li>K-CURE</li>
+				</ul>
+			</div>
+		</div>
+		<div class="sub_nav_wrap">
+			<!-- class="on"시 색변경 및 보더 생김 -->
+			<a href="javascript:void(0)" class="">K-CURE 서비스 개요</a>
+			<a href="javascript:void(0)" class="">서비스 유형 및 이용방법</a>
+			<a href="javascript:void(0)" class="on">안심활용센터소개</a>
+			<a href="javascript:void(0)" class="">데이터 중심병원</a>
+			<a href="javascript:void(0)" class="">운영조직 및 참여기관</a>
+		</div>
+		<div class="intro_wrap">
+			<div class="con">
+				<div class="sub_pag_title">
+					<p>안심활용센터 소개</p>
+					<div class="shadow_box">
+						<ul>
+							<li>・ 안심활용센터는 다양한 보건의료데이터를 과학적, 학술적 목적을 위해 안전하게 활용할 수 있도록 ‘데이터’를 지원하고 ‘환경’을 제공하는 센터입니다.</li>
+							<li>・ 안심활용센터는 보건의료데이터 활용 접근 불균형 해소를 위해 서울 뿐만아니라 권역별 안심활용센터를 지정ㆍ운영하고 있습니다．</li>
+						</ul>
+					</div>
+				</div>
+                <div class="map_img">
+                    <img src="../../images/safe_center_map.svg" alt="안심활용센터 소개 이미지">
+					<a href="javascript:void(0)" class="capital"></a>
+					<a href="javascript:void(0)" class="gangwon"></a>
+					<a href="javascript:void(0)" class="chungcheong"></a>
+					<a href="javascript:void(0)" class="gyeongsang"></a>
+                </div>
+                <div class="provide_insti">
+                    <div class="sm_title">
+                        <p>데이터 제공기관</p>
+                    </div>
+                    <div class="provide_slide">
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_k_cure_logo.svg" alt="케이큐어 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>K-CURE</li>
+                                    <li>
+                                        전국 의료데이터<br>중심병원 40개
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_nation_health_logo.svg" alt="국민건강보험">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>국민건강보험</li>
+                                    <li>
+                                        진료내역정보, 약품처방내역정보,<br>건강검진정보 관리 등에 업무를 통해<br>국민건강향상에 이바지하는 기관
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_cancer_logo.svg" alt="국립암센터 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>국립암센터</li>
+                                    <li>
+                                        암빅데이터 및 인공지능을<br>활용한 첨단 융복합 암 연구의<br>선도기관입니다.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_insure_logo.svg" alt="건강보험심사평가원 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>건강보험심사평가원</li>
+                                    <li>
+                                        요양 급여비용의 심사 및 요양급여의<br>적정성 평가업무를 수행하여<br>국민보건의 향상과<br>사회보장 증진에 기여하는 기관
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_disease_logo.svg" alt="질병청 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>질병청</li>
+                                    <li>
+                                        방역·검역 등 감염병에 관한<br>사무 등에 관한 조사·시험·연구에<br>관한 사무를 관장하는 기관
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_ilsan_logo.svg" alt="건강보험공단일산병원 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>건강보험공단일산병원</li>
+                                    <li>
+                                        보험자 직영 병원으로서<br>의료 공공서비스 수준을<br>높이려고 설립된 병원
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_rehalbilitate.svg" alt="국립재활원 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>국립재활원</li>
+                                    <li>
+                                        장애인의 복지증진을 위한<br>진료 및 지역사회중심재활 등에<br>업무를 관장하는 기관
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_organ.svg" alt="국립장기조직혈액관리원 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>국립장기조직혈액관리원</li>
+                                    <li>
+                                        장기, 조직, 혈액, 세포 등의 활용과<br>장기기증 등을 통해 국민보건향상에<br>이바지하는 기관
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <div class="lg">
+                                <img src="../../images/p_medical_center.svg" alt="국립중앙의료원 로고">
+                            </div>
+                            <div class="txt">
+                                <ul>
+                                    <li>국립중앙의료원</li>
+                                    <li>
+                                        의료 기술 수준의 향상을 위한<br>조사연구, KONOS 운영등에<br>업무를 관장하는 기관                                        
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="provide_tab">
+                    <div class="sm_title">
+                        <p>데이터 제공기관</p>
+                    </div>
+                    <div class="board_tab">
+                        <ul>
+                            <!-- class="on"일때 활성화 -->
+                            <li><a href="javascript:void(0)" class="on">안심활용중앙센터(수도권)</a></li>
+                            <li><a href="javascript:void(0)" class="">강원권</a></li>
+                            <li><a href="javascript:void(0)" class="">충청권</a></li>
+                            <li><a href="javascript:void(0)" class="">경상권</a></li>
+                        </ul>
+                    </div>
+					<!-- class='on' 시 탭 내용 전환 -->
+					<!-- 안심활용중앙센터(수도권) -->
+                    <div class="item on">
+                        <div class="capital">
+                            <p class="sub_tit">안심활용중앙센터 전경</p>
+                            <div class="bg_inn">
+								<!-- class='on' 시 opacity 활성화 -->
+                                <a href="javascript:void(0)" class="bg_01"></a>
+                                <a href="javascript:void(0)" class="bg_02 on" data-bg="../../images/capital_02.svg"></a>
+                                <a href="javascript:void(0)" class="bg_03" data-bg="../../images/capital_03.svg"></a>
+                                <a href="javascript:void(0)" class="bg_04" data-bg="../../images/capital_04.svg"></a>
+                                <a href="javascript:void(0)" class="bg_05" data-bg="../../images/capital_05.svg"></a>
+                                <a href="javascript:void(0)" class="bg_06" data-bg="../../images/capital_06.svg"></a>
+                                <a href="javascript:void(0)" class="bg_07" data-bg="../../images/capital_07.svg"></a>
+                            </div>
+                        </div>
+                    </div>
+					<!-- 강원권 -->
+                    <div class="item">
+                        <div class="gangwon">
+                            <p class="sub_tit">나중에 내용 나올 시 수정(강원권)</p>
+							<div class="bg_inn">
+								<!-- class='on' 시 opacity 활성화 -->
+                                <a href="javascript:void(0)" class="bg_01"></a>
+                                <a href="javascript:void(0)" class="bg_02 on" data-bg="../../images/data_center_01.png"></a>
+                                <a href="javascript:void(0)" class="bg_03" data-bg="../../images/data_center_02.png"></a>
+                                <a href="javascript:void(0)" class="bg_04" data-bg="../../images/data_center_03.png"></a>
+                                <a href="javascript:void(0)" class="bg_05" data-bg="../../images/data_center_04.png"></a>
+                                <a href="javascript:void(0)" class="bg_06" data-bg="../../images/data_center_05.png"></a>
+                                <a href="javascript:void(0)" class="bg_07" data-bg="../../images/data_center_06.png"></a>
+                            </div>
+                        </div>
+                    </div>
+					<!-- 충청권 -->
+                    <div class="item">
+                        <div class="chungcheong">
+                            <p class="sub_tit">나중에 내용 나올 시 수정(충청권)</p>
+							<div class="bg_inn">
+								<!-- class='on' 시 opacity 활성화 -->
+                                <a href="javascript:void(0)" class="bg_01"></a>
+                                <a href="javascript:void(0)" class="bg_02 on" data-bg="../../images/data_center_01.png"></a>
+                                <a href="javascript:void(0)" class="bg_03" data-bg="../../images/data_center_02.png"></a>
+                                <a href="javascript:void(0)" class="bg_04" data-bg="../../images/data_center_03.png"></a>
+                                <a href="javascript:void(0)" class="bg_05" data-bg="../../images/data_center_04.png"></a>
+                                <a href="javascript:void(0)" class="bg_06" data-bg="../../images/data_center_05.png"></a>
+                                <a href="javascript:void(0)" class="bg_07" data-bg="../../images/data_center_06.png"></a>
+                            </div>
+                        </div>
+                    </div>
+					<!-- 경상권 -->
+                    <div class="item">
+                        <div class="gyeongsang">
+                            <p class="sub_tit">나중에 내용 나올 시 수정(경상권)</p>
+							<div class="bg_inn">
+								<!-- class='on' 시 opacity 활성화 -->
+                                <a href="javascript:void(0)" class="bg_01"></a>
+                                <a href="javascript:void(0)" class="bg_02 on" data-bg="../../images/data_center_01.png"></a>
+                                <a href="javascript:void(0)" class="bg_03" data-bg="../../images/data_center_02.png"></a>
+                                <a href="javascript:void(0)" class="bg_04" data-bg="../../images/data_center_03.png"></a>
+                                <a href="javascript:void(0)" class="bg_05" data-bg="../../images/data_center_04.png"></a>
+                                <a href="javascript:void(0)" class="bg_06" data-bg="../../images/data_center_05.png"></a>
+                                <a href="javascript:void(0)" class="bg_07" data-bg="../../images/data_center_06.png"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="seoul_center">
+                    <p class="sub_tit">서울센터 분석환경정보</p>
+                    <ul>
+                        <li>
+                            <img src="../../images/sas_logo.svg" alt="sas 로고">
+                            <p>명령어 기반의 전문 통계 분석용<br>솔루션으로 비즈니스 인텔리전스,<br>데이터 관리, 고급 분석,<br>다변량 분석 등에 활용 가능</p>
+                        </li>
+                        <li>
+                            <img src="../../images/r_studio_logo.svg" alt="r studio 로고">
+                            <p>R 프로그래밍 언어 기반의 오픈소스<br>소프트웨어로 통계 분석에 보다<br>특화된 라이브러리를<br>활용한 데이터 분석 등에 유용</p>
+                        </li>
+                        <li>
+                            <img src="../../images/spss_logo.svg" alt="spss 로고">
+                            <p>다양한 분석 기능과<br>고급 데이터 준비 도구를 제공하고<br>분석 신뢰성을 높이기 위한<br>핵심 통계 프로시저 제공</p>
+                        </li>
+                        <li>
+                            <img src="../../images/stata_logo.svg" alt="stata 로고">
+                            <p>데이터 관리, 시각화, 통계 분석 및<br>리포트 자동화 등의 기능을<br>통합 제공하고, 학술·연구 뿐만<br>아니라 다양한 업무에 활용 가능</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="location"> 
+					<p class="sub_tit">서울센터 찾아오시는 길</p>
+                    <!-- map API style은 삭제 요망 -->
+                    <div class="map" style="border:1px solid #eee">
+						<div class="bubble daehan">
+							<img src="../../images/khis_logo.svg" alt="한국보건의료정보원 로고">
+							<p>(연세봉래빌딩)</p>
+						</div>
+						<div class="bubble yonsei">
+							<img src="../../images/khis_logo.svg" alt="한국보건의료정보원 로고">
+							<p>(대한상공회의소)</p>
+						</div>
+					</div>
+                    <div class="txt">
+                        <ul>
+                            <li>오시는 길</li>
+                            <li>
+                                <ul>
+                                    <li>서울 안심활용중앙센터</li>
+                                    <li>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원(남대문로4가, 대한상공회의소 신관)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>운영시간</li>
+                            <li>
+                                <ul>
+                                    <li>평일 오전9시 ~ 오후6시 (점심시간 12~13시)</li>
+                                    <li>토요일, 공휴일, 시스템점검기간 등 휴무</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+			</div>
+		</div>
+	</div>
+	<footer>
+		<div class="con">
+			<div class="info">
+				<img src="../../images/logo_w.svg" alt="케이큐어 로고">
+				<div class="item">
+					<div class="link">
+						<a href="javascript:void(0)">이용약관</a>
+						<a href="javascript:void(0)">개인정보처리방침</a>
+						<a href="javascript:void(0)">고객의소리</a>
+					</div>
+					<p>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원 (남대문로4가 45, 서울상공회의소)<br>COPYRIGHT©By KHIS. All rights Reserved</p>
+				</div>
+			</div>
+			<div class="site">관련사이트</div>
+		</div>
+		<!-- 로딩바 class="on"시 생성 -->
+		<div class="loading_box">
+			<div class="loading_con">
+				<div class="loading"></div>
+				<div class="loading_text"></div>
+			</div>
+			<div class="loading_info">잠시만 기다려 주세요.</div>
+		</div>
+	</footer>
+</body>
+</html>

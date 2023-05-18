@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 신청</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0;font-family: 'Noto Sans KR', sans-serif;">
+    <div style="max-width: 650px; margin: 0 auto; border: 2px solid #c7c7c7; border-top: 4px solid #1831AC;">
+        <div style="padding: 30px 50px;display:grid;">
+            <a href="{serverUrl}" style="height: 100%; display:inline-block; padding-bottom: 30px; width: 220px;">
+                <img src="{serverUrl}/images/n_k_cure_logo_c.svg" alt="로고" style="width:130px">
+            </a>
+            <p style="font-size:32px;font-weight:600;color:#003177;line-height:40px">회원가입 안내 메일입니다.</p>
+            <p style="margin: 0; color: #999; line-height: 27px;">
+                안녕하세요, K-CURE입니다.<br>회원가입 승인 내역은 아래와 같습니다.
+            </p>
+            <div style="width:100%;text-align:center;background:#eee;color:#2e2e2e;font-size:18px;font-weight:600;padding:40px;box-sizing: border-box;margin:30px 0">{contents}</div>
+           
+            <a href="{serverUrl}" style="margin:0 auto;padding:10px 30px;color:#fff;background: #183CA3;;font-size:17px;font-weight:500;text-decoration: none;border-radius:5px">K-CURE 바로가기</a>
+            <p style="font-size: 14px; color: #616161; font-weight: 400; line-height: 21px">
+            본 메일은 발신 전용 메일입니다. <br>
+            추가문의 사항은 K-CURE 내 문의게시판을 통해 문의주시기 바랍니다.
+          </p>
+        </div>
+        <div style="font-size: 11px; color: #636363; background-color: #f5f5f5; padding: 10px 30px 20px; display: flex; border-top: 1px solid #D8D8D8;">
+            <img src="{serverUrl}/images/logo_gray.svg" alt="하단로고" style="width:110px">
+            <p style="margin-top: 20px; padding-left: 30px;">
+                (04512) 서울특별시 중구 칠패로 36 8층 한국보건의료정보원 (봉래동1가, 연세봉래빌딩)<br><span style="padding-top: 5px; display: inline-block;">COPYRIGHT &copy; 2023 K-CURE ALL RIGHTS RESERVED</span>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

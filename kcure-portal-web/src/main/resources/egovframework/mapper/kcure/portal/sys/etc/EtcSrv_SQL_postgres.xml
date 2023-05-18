@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Etc">
+
+    <select id="selectSrvyList" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="egovMap">
+    
+    		SELECT 
+    			SRVY_IVSTG_NO, SRVY_IVSTG_TTL_NM, LNK_ADDR, VIEW_YN, LAST_MODP_ID, TO_CHAR(LAST_MODF_DT,'YYYY-MM-DD') AS LAST_MODF_DT
+    		FROM KCURE_SVC_SRVY_IVSTG
+    		WHERE 1=1
+            <if test="searchKeyword != null and searchKeyword !=''">
+            	AND UPPER(SRVY_IVSTG_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+            </if>
+            ORDER BY SRVY_IVSTG_NO DESC
+            LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+            
+    </select>
+
+    <select id="selectSrvyListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+    
+            SELECT COUNT(*) TOCNT
+            FROM KCURE_SVC_SRVY_IVSTG
+            WHERE 1=1
+            <if test="searchKeyword != null and searchKeyword !=''">
+            	AND UPPER(SRVY_IVSTG_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+            </if>
+            
+    </select>
+
+    <insert id="insertSrvy" parameterType="egovMap">
+    
+				INSERT INTO KCURE_SVC_SRVY_IVSTG
+                  ( SRVY_IVSTG_NO
+					, SRVY_IVSTG_TTL_NM
+					, LNK_ADDR
+					, VIEW_YN
+					, FRST_REGP_ID
+					, FRST_REGIST_PNTTM
+					, LAST_MODP_ID
+					, LAST_MODF_DT
+					)
+           VALUES ( 
+	           		(SELECT #{prtiId}||'-SRVY-'||to_char(now(), 'YYYYMMDD')||'-'||
+						(SELECT LPAD(
+							(SELECT CAST((count(*)+1)  AS TEXT)
+							FROM KCURE_SVC_SRVY_IVSTG
+							WHERE SRVY_IVSTG_NO like  #{prtiId}||'-SRVY-'||to_char(now(), 'YYYYMMDD')||'%')
+						,3,'0')) 
+					AS SRVY_IVSTG_NO)
+					,#{srvyIvstgTtlNm}
+					,#{lnkAddr}
+					,#{viewYn}
+					,#{frstRegpId}
+					,now()
+					,#{lastModpId}
+					,now()
+                  )
+                  
+    </insert>
+
+    <update id="updateSrvy" parameterType="egovMap">
+    
+            UPDATE KCURE_SVC_SRVY_IVSTG
+               SET SRVY_IVSTG_TTL_NM=#{srvyIvstgTtlNm}
+                 , LNK_ADDR=#{lnkAddr}
+                 , LAST_MODP_ID=#{lastModpId}
+                 , VIEW_YN=#{viewYn}
+				 , LAST_MODF_DT=now()
+             WHERE SRVY_IVSTG_NO = #{srvyIvstgNo}
+             
+    </update>
+
+    <delete id="deleteSrvy" parameterType="egovMap">
+    
+			DELETE FROM KCURE_SVC_SRVY_IVSTG
+			WHERE SRVY_IVSTG_NO=#{srvyIvstgNo}
+			
+    </delete>
+
+</mapper>

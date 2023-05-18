@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KcureLoginUsr">
+
+	<!-- 로그인인증제한 조회 -->
+	<select id="getLoginIncorrect" resultType="egovMap">
+		<!-- 일반회원 -->
+		<![CDATA[
+		SELECT a.user_id
+			, a.user_nm
+			, a.login_pswd
+			, a.pin
+			, a.pswd_slt_vl
+			, a.user_stcd
+			, a.prti_id
+			, a.user_mbph_no
+			, a.user_ent_medm_cd
+			, a.ent_medm_rcv_id
+			, a.trm_agr_yn
+			, a.pinf_cnu_agr_yn
+			, a.pinf_sp3p_agr_yn
+			, a.email_rcv_agr_yn
+			, a.sms_rcv_agr_yn
+			, a.user_ent_dt
+			, a.user_aprv_dt
+			, a.drmt_stat_chan_dt
+			, a.user_wthd_dt
+			, a.last_login_dt
+			, a.frst_regp_id
+			, a.frst_rgst_dt
+			, a.last_modp_id
+			, a.last_modf_dt
+			, (
+			   select (case when count(1) > 0 then 'Y' else 'N' end)
+		         from kcure_com_user_auth sa
+		              inner join kcure_com_auth sb
+			                  on sb.auth_id = sa.auth_id
+					             and sb.auth_spcd = '02' -- 관리자
+					             and sb.auth_use_yn = 'Y'
+		        where sa.user_id = a.user_id
+			  ) as adm_auth_poss_yn
+			, (
+			   select prti_nm
+		         from kcure_svc_prti sa
+		        where sa.prti_id = a.prti_id
+		          --and sa.inst_cls_spcd = '01'
+		          and sa.use_yn = 'Y'
+		        limit 1
+			  ) as prti_nm
+		FROM kcure_com_user a
+		WHERE 1=1
+		]]>
+		<!-- 기관ID 검색 -->
+		<if test="prtiId != null and prtiId !=''">
+			AND a.prti_id = #{prtiId}
+	    </if>
+		<!-- 아이디 검색 -->
+		<if test="userId != null and userId !=''">
+			AND a.user_id = #{userId}
+	    </if>
+	    <!-- 가입매체수신 ID ( 유니크키 ) 검색  -->
+	    <if test="entMedmRcvId != null and entMedmRcvId !=''">
+			AND a.ent_medm_rcv_id = #{entMedmRcvId}
+	    </if>
+	    <!-- 개인식별번호로 검색 ( CI ) 검색  -->
+	    <if test="pin != null and pin !=''">
+			AND a.pin = #{pin}
+	    </if>
+	</select>
+	<!-- 로그인인증제한 변경 > 일반회원 -->
+	<update id="updateLoginIncorrect">
+		<![CDATA[
+		UPDATE  kcure_com_user
+		   SET  last_login_dt = NOW()
+		   WHERE user_id = #{userId}
+		]]>
+	</update>
+
+	
+	<!-- api 로그인 권한 리스트 -->
+	<select id="getAuthList" resultType="EgovMap">
+	<![CDATA[
+		SELECT AUTH_ID AS AUTH_CODE
+		FROM PORTAL.KCURE_COM_USER_AUTH
+		WHERE USER_ID = #{userId}
+	]]>
+	</select>
+
+</mapper>

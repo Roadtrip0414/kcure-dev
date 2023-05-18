@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="666" viewBox="0 0 1200 666">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="사각형_1644" data-name="사각형 1644" width="229.649" height="279.571" fill="none" stroke="#d4dbed" stroke-width="7"/>
+    </clipPath>
+    <clipPath id="clip-path-3">
+      <rect id="사각형_1882" data-name="사각형 1882" width="229.649" height="279.571" transform="translate(-0.001 0)" fill="none" stroke="#0f249a" stroke-width="1" stroke-dasharray="2 4"/>
+    </clipPath>
+    <clipPath id="clip-path-4">
+      <rect id="사각형_1885" data-name="사각형 1885" width="229.649" height="279.571" transform="translate(-0.001)" fill="none" stroke="#0f249a" stroke-width="1" stroke-dasharray="2 4"/>
+    </clipPath>
+    <clipPath id="clip-path-7">
+      <rect id="사각형_1816" data-name="사각형 1816" width="229.649" height="279.571" transform="translate(0)" fill="none" stroke="#0f249a" stroke-width="1" stroke-dasharray="2 4"/>
+    </clipPath>
+  </defs>
+  <g id="그룹_3838" data-name="그룹 3838" transform="translate(6348 -2402)">
+    <path id="패스_3830" data-name="패스 3830" d="M109.369,233.779c0,21.9-15.2,37.55-50.537,37.55H10" transform="translate(-6156.875 2546.796)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+    <text id="암" transform="translate(-6160 2472)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-16.56" y="0">암</tspan></text>
+    <text id="호흡기" transform="translate(-6160 2825)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-49.68" y="0">호흡기</tspan></text>
+    <text id="심뇌혈관" transform="translate(-6160 2649)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-66.24" y="0">심뇌혈관</tspan></text>
+    <text id="기타" transform="translate(-6160 3003)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-33.12" y="0">기타</tspan></text>
+    <g id="그룹_3832" data-name="그룹 3832" transform="translate(-6158.023 2461.281)">
+      <g id="그룹_3519" data-name="그룹 3519" transform="translate(0)" clip-path="url(#clip-path)">
+        <path id="패스_3348" data-name="패스 3348" d="M10-40H68.44c22.7,0,41.11,21.96,41.11,49.048v166.5c0,27.088,18.405,49.048,41.11,49.048h67.055" transform="translate(0.967 45.117)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+      </g>
+    </g>
+    <g id="그룹_3833" data-name="그룹 3833" transform="translate(-6158.023 2721.288)">
+      <g id="그룹_3519-2" data-name="그룹 3519" transform="translate(0 0)" clip-path="url(#clip-path)">
+        <path id="패스_3348-2" data-name="패스 3348" d="M10,274.6H68.44c22.7,0,41.11-21.96,41.11-49.048V59.048C109.55,31.96,127.955,10,150.659,10h67.055" transform="translate(0.967 -0.143)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+      </g>
+    </g>
+    <g id="그룹_3834" data-name="그룹 3834" transform="translate(-6708 1031)">
+      <g id="그룹_3543" data-name="그룹 3543" transform="translate(759 1476)" opacity="0.5">
+        <g id="타원_44" data-name="타원 44" transform="translate(0)" fill="none" stroke="#0f249a" stroke-width="1" opacity="0.3">
+          <circle cx="201.5" cy="201.5" r="201.5" stroke="none"/>
+          <circle cx="201.5" cy="201.5" r="201" fill="none"/>
+        </g>
+        <g id="타원_43" data-name="타원 43" transform="translate(33 33)" fill="none" stroke="#0f249a" stroke-width="1">
+          <circle cx="168.5" cy="168.5" r="168.5" stroke="none"/>
+          <circle cx="168.5" cy="168.5" r="168" fill="none"/>
+        </g>
+      </g>
+      <circle id="타원_44-2" data-name="타원 44" cx="143" cy="143" r="143" transform="translate(817 1534)" fill="#b1bee2"/>
+      <circle id="타원_43-2" data-name="타원 43" cx="120.5" cy="120.5" r="120.5" transform="translate(840 1557)" fill="#9cafe2"/>
+      <circle id="타원_44-3" data-name="타원 44" cx="96" cy="96" r="96" transform="translate(864 1581)" fill="#5465c9"/>
+      <circle id="타원_43-3" data-name="타원 43" cx="71" cy="71" r="71" transform="translate(889 1606)" fill="#0f249a"/>
+    </g>
+    <text id="암_데이터" data-name="암 데이터" transform="translate(-5786 2717)" fill="#fff" font-size="20" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">암 데이터</tspan></text>
+    <g id="그룹_3835" data-name="그룹 3835" transform="translate(-6157.842 2721.288)" clip-path="url(#clip-path-3)">
+      <path id="패스_3831" data-name="패스 3831" d="M10,274.6H68.44c22.7,0,41.11-21.96,41.11-49.048V59.048C109.55,31.96,127.955,10,150.659,10h67.055" transform="translate(0.967 -0.143)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+    </g>
+    <g id="사각형_1883" data-name="사각형 1883" transform="translate(-6318 2402)" fill="none" stroke="#0f249a" stroke-width="1">
+      <rect width="210" height="666" rx="32" stroke="none"/>
+      <rect x="0.5" y="0.5" width="209" height="665" rx="31.5" fill="none"/>
+    </g>
+    <rect id="사각형_1884" data-name="사각형 1884" width="60" height="350" rx="30" transform="translate(-6348 2560)" fill="#02105f"/>
+    <text id="의_료_데_이_터_중_심_병_원" data-name="의
+료
+데
+이
+터
+
+중
+심
+병
+원" transform="translate(-6309 2636)" fill="#fff" font-size="20" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-18.4" y="0">의</tspan><tspan x="-18.4" y="24">료</tspan><tspan x="-18.4" y="48">데</tspan><tspan x="-18.4" y="72">이</tspan><tspan x="-18.4" y="96">터</tspan><tspan x="0" y="120"></tspan><tspan x="-18.4" y="144">중</tspan><tspan x="-18.4" y="168">심</tspan><tspan x="-18.4" y="192">병</tspan><tspan x="-18.4" y="216">원</tspan></text>
+    <circle id="타원_59" data-name="타원 59" cx="5" cy="5" r="5" transform="translate(-6155 2461)" fill="#0f249a"/>
+    <circle id="타원_60" data-name="타원 60" cx="5" cy="5" r="5" transform="translate(-6155 2813)" fill="#0f249a"/>
+    <circle id="타원_61" data-name="타원 61" cx="5" cy="5" r="5" transform="translate(-6155 2991)" fill="#0f249a"/>
+    <path id="패스_3832" data-name="패스 3832" d="M109.369,271.33c0-21.9-15.2-37.551-50.537-37.551H10" transform="translate(-6156.875 2409.688)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+    <path id="패스_3833" data-name="패스 3833" d="M109.5,203.232C104.976,180.862,87.95,171,58.832,171H10" transform="translate(-6156.875 2472.467)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+    <path id="패스_3834" data-name="패스 3834" d="M109.5,171c-4.528,22.369-21.554,32.231-50.672,32.231H10" transform="translate(-6156.875 2614.894)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+    <circle id="타원_62" data-name="타원 62" cx="5" cy="5" r="5" transform="translate(-6155 2638)" fill="#0f249a"/>
+    <g id="그룹_3836" data-name="그룹 3836" transform="translate(-6157.842 2461.281)" clip-path="url(#clip-path-4)">
+      <path id="패스_3835" data-name="패스 3835" d="M10-40H68.44c22.7,0,41.11,21.96,41.11,49.048v166.5c0,27.088,18.405,49.048,41.11,49.048h67.055" transform="translate(0.967 45.117)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+    </g>
+    <g id="그룹_3837" data-name="그룹 3837" transform="translate(-5567.807 2402)">
+      <path id="패스_3814" data-name="패스 3814" d="M10,233.779c0,21.9,15.2,37.55,50.537,37.55h48.832" transform="translate(109.313 144.797)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+      <text id="검진데이터" transform="translate(231.807 70)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">검진데이터</tspan></text>
+      <text id="청구데이터" transform="translate(231.807 423)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">청구데이터</tspan></text>
+      <text id="사망데이터" transform="translate(231.807 247)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">사망데이터</tspan></text>
+      <text id="상병데이터" transform="translate(231.807 601)" fill="#0f249a" font-size="18" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="0" y="0">상병데이터</tspan></text>
+      <g id="그룹_3649" data-name="그룹 3649" transform="translate(0.181 59.281)">
+        <g id="그룹_3519-3" data-name="그룹 3519" clip-path="url(#clip-path)">
+          <path id="패스_3348-3" data-name="패스 3348" d="M217.714-40h-58.44c-22.7,0-41.11,21.96-41.11,49.048v166.5c0,27.088-18.405,49.048-41.11,49.048H10" transform="translate(0.967 45.117)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+        </g>
+      </g>
+      <g id="그룹_3650" data-name="그룹 3650" transform="translate(0.181 319.289)">
+        <g id="그룹_3519-4" data-name="그룹 3519" clip-path="url(#clip-path)">
+          <path id="패스_3348-4" data-name="패스 3348" d="M217.714,274.6h-58.44c-22.7,0-41.11-21.96-41.11-49.048V59.048C118.165,31.96,99.759,10,77.055,10H10" transform="translate(0.967 -0.143)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+        </g>
+      </g>
+      <g id="그룹_3651" data-name="그룹 3651" transform="translate(0 319.289)" clip-path="url(#clip-path-7)">
+        <path id="패스_3815" data-name="패스 3815" d="M217.714,274.6h-58.44c-22.7,0-41.11-21.96-41.11-49.048V59.048C118.165,31.96,99.759,10,77.055,10H10" transform="translate(0.967 -0.143)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+      </g>
+      <g id="사각형_1817" data-name="사각형 1817" transform="translate(179.807)" fill="none" stroke="#0f249a" stroke-width="1">
+        <rect width="210" height="666" rx="32" stroke="none"/>
+        <rect x="0.5" y="0.5" width="209" height="665" rx="31.5" fill="none"/>
+      </g>
+      <rect id="사각형_1818" data-name="사각형 1818" width="60" height="187" rx="30" transform="translate(359.807 240)" fill="#02105f"/>
+      <text id="공_공_기_관" data-name="공
+공
+기
+관" transform="translate(398.807 306)" fill="#fff" font-size="20" font-family="NotoSansKR-Bold, Noto Sans KR" font-weight="700"><tspan x="-18.4" y="0">공</tspan><tspan x="-18.4" y="24">공</tspan><tspan x="-18.4" y="48">기</tspan><tspan x="-18.4" y="72">관</tspan></text>
+      <ellipse id="타원_55" data-name="타원 55" cx="5" cy="5" rx="5" ry="5" transform="translate(216.807 59)" fill="#0f249a"/>
+      <ellipse id="타원_56" data-name="타원 56" cx="5" cy="5" rx="5" ry="5" transform="translate(216.807 411)" fill="#0f249a"/>
+      <ellipse id="타원_57" data-name="타원 57" cx="5" cy="5" rx="5" ry="5" transform="translate(216.807 589)" fill="#0f249a"/>
+      <path id="패스_3816" data-name="패스 3816" d="M10,271.33c0-21.9,15.2-37.551,50.537-37.551h48.832" transform="translate(109.313 7.688)" fill="none" stroke="#d4dbed" stroke-linecap="round" stroke-miterlimit="10" stroke-width="7"/>
+      <path id="패스_3817" data-name="패스 3817" d="M10,203.232C14.528,180.862,31.554,171,60.672,171H109.5" transform="translate(109.178 70.467)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+      <path id="패스_3818" data-name="패스 3818" d="M10,171c4.528,22.369,21.554,32.231,50.672,32.231H109.5" transform="translate(109.178 212.895)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+      <ellipse id="타원_58" data-name="타원 58" cx="5" cy="5" rx="5" ry="5" transform="translate(216.807 236)" fill="#0f249a"/>
+      <g id="그룹_3652" data-name="그룹 3652" transform="translate(0 59.281)" clip-path="url(#clip-path-7)">
+        <path id="패스_3819" data-name="패스 3819" d="M217.714-40h-58.44c-22.7,0-41.11,21.96-41.11,49.048v166.5c0,27.088-18.405,49.048-41.11,49.048H10" transform="translate(0.967 45.117)" fill="none" stroke="#0f249a" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke-dasharray="2 4"/>
+      </g>
+    </g>
+  </g>
+</svg>

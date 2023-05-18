@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="kr">
+<!-- 상단 공통 시작 -->
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes"><meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta property="og:image" content="">
+	<link rel="stylesheet" href="../../css/slick.css">
+	<link rel="stylesheet" href="../../css/kc_common.css">
+	<link rel="stylesheet" href="../../css/kc_style.css">
+	<link rel="stylesheet" href="../../css/kc_media.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+	<script src="../../js/jquery-3.6.0.min.js"></script>
+	<script src="../../js/slick.min.js"></script>
+	<script src="../../js/kc.js"></script>
+	<title>K-CURE ADMIN</title>
+</head>
+<body class="admin">
+	<header class="">
+		<div class="top">
+			<a href="javascript:void(0)">로그인</a>
+			<a href="javascript:void(0)" class="all_menu">전체메뉴</a>
+			<div class="body_size">
+				<p>글자크기</p>
+				<a href="javascript:void(0)" class="up"></a>
+				<a href="javascript:void(0)" class="down"></a>
+			</div>
+		</div>
+		<div class="middle">
+			<div class="left">
+				<a href="javascript:void(0)" class="logo"></a>
+			</div>
+			<nav>
+				<ul>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 소개</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 시각화</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">데이터 신청</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">이용자 지원</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<!-- class="on"시 색변경 및 보더 -->
+						<a href="javascript:void(0)" class="">K-CURE</a>
+						<!-- class="active"시 나타남 -->
+						<div class="lnb_wrap ">
+							<div class="item">
+								<!-- 서브 2뎁스 가 ul로 돌아감 -->
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">라이브러리소개</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">임상 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+										<a href="javascript:void(0)" class="">표준 테이블 정의서</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">공공 라이브러리</a>
+										<a href="javascript:void(0)" class="">개요</a>
+										<a href="javascript:void(0)" class="">데이터 모델</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">질환별 특화 데이터</a>
+										<a href="javascript:void(0)" class="">개요／카달로그</a>
+										<a href="javascript:void(0)" class="">스키마</a>
+									</li>
+								</ul>
+								<ul>
+									<li>
+										<a href="javascript:void(0)" class="">보건복지공공데이터</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="gnb">
+						<ul>
+							<li class="search">
+								<input type="text">
+								<a href="javascript:void(0)" class="btn">
+									<img src="../../images/m_search_icon.svg" alt="검색버튼">
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<div class="right">
+				<!-- 로그인전 div class="user"을 날림 | 부모 div class="right"는 있어야함 -->
+				<div class="user">
+					<p class="name">서울대병원 홍길동</p>
+					<div class="mark">
+						<p>심의<br>연구</p>
+						<span class="count">99</span>
+					</div>
+					<div class="drop">
+						<div class="item">
+							<ul>
+								<li><a href="javascript:void(0)">회원정보</a></li>
+								<li><a href="javascript:void(0)">나의연구</a></li>
+								<li><a href="javascript:void(0)">심의활동</a></li>
+							</ul>
+							<ul>
+								<li><a href="javascript:void(0)">알림</a></li>
+								<li><a href="javascript:void(0)">관리자모드로 전환</a></li>
+								<li><a href="javascript:void(0)">로그아웃</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div class="bk_hide"></div>
+	<div class="header_top">
+		<div class="location_wrap">
+			<a href="javascript:void(0)">관리자</a>
+			<a href="javascript:void(0)">심의관리</a>
+			<a href="javascript:void(0)">데이터 신청관리</a>
+		</div>
+		<h1 class="title">데이터 신청관리</h1>
+	</div>
+	<!-- 상단 공통 끝 -->
+	<div class="wrap">
+		<div class="con">
+			<div class="area_wrap">
+				<div class="section">
+					<div class="data_set_title">
+						<div class="top">
+							<p class="mark">연구접수</p>
+							<p class="title">암센터 연구결과에 따른 두가지 행동패턴</p>
+						</div>
+						<div class="info">
+							<ul>
+								<li>연구기간</li>
+								<li>2023.10.10 ~ 2032.1010</li>
+							</ul>
+							<ul>
+								<li>유형</li>
+								<li>일상</li>
+							</ul>
+							<ul>
+								<li>신청자</li>
+								<li>서울대병원 / 이성일</li>
+							</ul>
+							<ul>
+								<li>신청일자</li>
+								<li>2023.10.10</li>
+							</ul>
+						</div>
+					</div>
+					<div class="data_set_flow">
+						<p class="title">심의절차</p>
+						<ul>
+							<!-- class="on"시 활성화 -->
+							<li class="on">연구접수</li>
+							<li class="">제공기관 결합진행</li>
+						</ul>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>신청유형</p>
+						</div>
+						<div class="ad_re_l_table">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>신청자 유형</th>
+										<td>정부부처</td>
+										<th>연구유형</th>
+										<td>정책연구</td>
+									</tr>
+									<tr>
+										<th>정책연구</th>
+										<td colspan="3">어느발주기관에 어느부서</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>IRB</p>
+						</div>
+						<div class="ad_re_l_table">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>IRB 연구기간</th>
+										<td colspan="3">2023-03-10 ~ 2023-12-30</td>
+									</tr>
+									<tr>
+										<th>IRB 승인번호</th>
+										<td>M934324234</td>
+										<th>IRB 승인기관</th>
+										<td>승인기관이름</td>
+									</tr>
+									<tr>
+										<th>IRB 연구계획서</th>
+										<td>
+											<div class="n_file_link">
+												<a href="javascript:void(0)">IRB연구계획서.hwp</a>
+											</div>
+										</td>
+										<th>IRB 결과통지서</th>
+										<td>
+											<div class="n_file_link">
+												<a href="javascript:void(0)">IRB결과통지서.hwp</a>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>가상화 환경</p>
+						</div>
+						<div class="ad_re_l_table tb_fixed">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>가상화 환경</th>
+										<td>폐쇄분석형</td>
+										<th>가상화 환경<br>사용 시작 예정일</th>
+										<td>2023-06-10</td>
+									</tr>
+									<tr>
+										<th>가상화 사용기간</th>
+										<td colspan="3">2023-06-20 ~ 2023-08-31</td>
+									</tr>
+									<tr>
+										<th>가상화분석도구</th>
+										<td colspan="3">Python</td>
+									</tr>
+									<tr>
+										<th>감면율</th>
+										<td>「정부조직법」제2조에 따른 중앙행정기관 (소속기관 포함) (100%)</td>
+										<th>감면율 첨부파일</th>
+										<td>
+											<div class="n_file_link">
+												<a href="javascript:void(0)">감면율 관련 첨부파일.hwp</a>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>연구정보</p>
+						</div>
+						<div class="ad_re_l_table">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>연구명</th>
+										<td>암센터 연구 결과에 따른 두가지 행동패턴</td>
+									</tr>
+									<tr>
+										<th>연구주제(대상질환)</th>
+										<td>연구주제가 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>연구목적</th>
+										<td>연구목적이 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>대상자 정의</th>
+										<td>대상자 정의가 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>연구내용</th>
+										<td>연구내용이 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>연구방법</th>
+										<td>연구방법이 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>기대효과/활용방안</th>
+										<td>기대효과/활용방안이 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>연구비 지원 출처</th>
+										<td>연구비 지원 출처가 나옵니다.</td>
+									</tr>
+									<tr>
+										<th>비고</th>
+										<td>비고 내용이 나옵니다.</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<!-- <div class="title">
+							<p>선택한 데이터</p>
+						</div> -->
+						<!-- 리얼그리드 영역 | 나중에 style 삭제요망-->
+						<!-- <div class="grid_area_wrap" style="height: 300px; background-color: #F9F9F9; border: 1px solid #DDDDDD; color: red;">리얼그리드 영역 | 나중에 style 삭제요망</div> -->
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>연구신청자</p>
+						</div>
+						<div class="ad_re_l_table tb_fixed">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>신청자 명</th>
+										<td>홍길동</td>
+										<th>휴대전화 번호</th>
+										<td>010-0000-0000</td>
+									</tr>
+									<tr>
+										<th>이메일 주소</th>
+										<td colspan="3">honggil#@naver.com</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>연구책임자</p>
+						</div>
+						<div class="ad_re_l_table tb_fixed">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>성명</th>
+										<td>홍길동</td>
+										<th>휴대전화 번호</th>
+										<td>010-0000-0000</td>
+									</tr>
+									<tr>
+										<th>이메일 주소</th>
+										<td>honggil#@naver.com</td>
+										<th>가상화 사용여부</th>
+										<td>사용</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>공동/보조 연구자</p>
+						</div>
+						<div class="ad_re_r_table">
+							<table>
+								<thead>
+									<tr>
+										<th>연구자 유형</th>
+										<th>성명</th>
+										<th>아이디</th>
+										<th>전화번호</th>
+										<th>이메일</th>
+										<th>가상화 사용여부</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>공동연구자</td>
+										<td>홍길동</td>
+										<td>hong112</td>
+										<td>010-9999-0000</td>
+										<td>hong@naver.com</td>
+										<td>사용</td>
+									</tr>
+									<tr>
+										<td>공동연구자</td>
+										<td>홍길동</td>
+										<td>hong112</td>
+										<td>010-9999-0000</td>
+										<td>hong@naver.com</td>
+										<td>미사용</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="ad_re_l_table">
+							<table>
+								<colgroup>
+									<col style="width: 200px;">
+									<col style="width: auto;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>연구자 동의 서류</th>
+										<td>
+											<div class="n_file_link">
+												<a href="javascript:void(0)">연구자동의서류.hwp</a>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<!-- <div class="title">
+							<p>선택한 데이터</p>
+						</div> -->
+						<!-- 리얼그리드 영역 | 나중에 style 삭제요망-->
+						<!-- <div class="grid_area_wrap" style="height: 300px; background-color: #F9F9F9; border: 1px solid #DDDDDD; color: red;">리얼그리드 영역 | 나중에 style 삭제요망</div> -->
+					</div>
+					<div class="n_title_tb_wrap">
+						<div class="title">
+							<p>선택한 데이터</p>
+						</div>
+						<div class="ad_re_r_table">
+							<table>
+								<thead>
+									<tr>
+										<th>번호</th>
+										<th>구분</th>
+										<th>데이터 제공기관</th>
+										<th>데이터셋</th>
+										<th>이메일</th>
+										<th>엑셀 다운로드</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>2</td>
+										<td>임상</td>
+										<td>서울대학교 병원</td>
+										<td>위암_환자_가족력 (GSCN_PT_FMHT)<br>위암_검사_영상 (GSCN_EXAM_IMAG)</td>
+										<td>hong@naver.com</td>
+										<td>
+											<div class="n_file_link">
+												<a href="javascript:void(0)">신청자데이터.xls(4.9MB)</a>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>1</td>
+										<td>임상</td>
+										<td>서울대학교 병원</td>
+										<td>위암_환자_가족력 (GSCN_PT_FMHT)<br>위암_검사_영상 (GSCN_EXAM_IMAG)</td>
+										<td>hong@naver.com</td>
+										<td>
+											<div class="n_file_link">
+												<a href="javascript:void(0)">신청자데이터.xls(4.9MB)</a>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="n_grid_tb_btn">
+							<div class="left"></div>
+							<div class="right">
+								<a href="javascript:void(0)" class="dk_red">반려</a>
+								<a href="javascript:void(0)" class="bc_green">보완요청</a>
+								<a href="javascript:void(0)" class="dk_blue">단계완료</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer>
+		<div class="con">
+			<div class="info">
+				<img src="../../images/logo_w.svg" alt="케이큐어 로고">
+				<div class="item">
+					<div class="link">
+						<a href="javascript:void(0)">이용약관</a>
+						<a href="javascript:void(0)">개인정보처리방침</a>
+						<a href="javascript:void(0)">고객의소리</a>
+					</div>
+					<p>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원 (남대문로4가 45, 서울상공회의소)<br>COPYRIGHT©By KHIS. All rights Reserved</p>
+				</div>
+			</div>
+			<div class="site">관련사이트</div>
+		</div>
+	</footer>
+</body>
+</html>

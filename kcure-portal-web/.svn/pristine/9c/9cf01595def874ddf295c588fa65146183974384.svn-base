@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=yes" />
+<meta name="title" content="" />
+<meta name="keyword" content="" />
+<meta name="description" content="" />
+<title>데이터 모델 | 임상 라이브러리 | 데이터 소개 | Project Name</title>
+
+<link rel="stylesheet" href="../../css/common.css" />
+<link rel="stylesheet" href="../../css/style.css" />
+
+<script src="../../js/jquery-3.6.3.min.js"></script>
+<script src="../../js/plugin/slick.min.js"></script>
+<script src="../../js/plugin/vegas.min.js"></script>
+<script src="../../js/common.js"></script>
+</head>
+<body>
+<div id="wrap">
+	<div id="skipNav">
+		<a href="#content">본문으로 바로가기</a>
+		<a href="#gnb">주메뉴 바로가기</a>
+	</div>
+
+	<!-- header -->
+	<header id="header">
+		<div class="header-wrap">
+			<div class="header-inbox">
+				<h1 class="logo"><a href="/" title="메인페이지로 이동"><span class="blind">K-CURE 운영관리 포털</span></a></h1>
+				<ul class="top-link01">
+					<li><a href="#">로그인</a></li>
+					<li><a href="#">회원가입</a></li>
+				</ul>
+				<div class="top-link02">
+					<div class="sccontrol-box">
+						<span>화면크기</span>
+						<button type="button" class="zoom-plus"><span class="blind">화면확대</span></button>
+						<button type="button" class="zoom-minus"><span class="blind">화면축소</span></button>
+					</div>
+					<button type="button" class="btn-searchopen"><span class="blind">통합검색 열기</span></button>
+					<button type="button" class="btn-allmenuopen">
+						<span class="bar"></span>
+						<span class="bar num02"></span>
+						<span class="bar"></span>
+						<span class="blind">전체메뉴 열기</span>
+					</button>
+				</div>
+			</div>
+			<!-- gnb -->
+			<div id="gnb-bg"></div>
+			<nav id="gnb">
+				<ul class="gnb">
+					<li class="li-num01 current"><span class="a-depth01"><a href="#">데이터 소개</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">K-CURE 라이브러리</a></li>
+								<li class="yesdepth"><a href="#">임상 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">데이터 모델</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="yesdepth"><a href="#">공공 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">데이터 모델</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">보건복지공공데이터</a></li>
+							</ul>
+						</div>
+					</li>
+					<li class="li-num02"><span class="a-depth01"><a href="#">데이터 시각화</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li class="yesdepth"><a href="#">임상 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">BaselineDB</a></li>
+											<li><a href="#">암공통</a></li>
+											<li><a href="#">암임상_위암</a></li>
+											<li><a href="#">암임상_유방암</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">공공 라이브러리</a></li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num03"><span class="a-depth01"><a href="#">데이터 신청</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">데이터 신청 개요</a></li>
+								<li><a href="#">데이터 활용 신청</a></li>
+								<li><a href="#">안심활용센터예약</a></li>
+								<li><a href="#">데이터 반입출신청</a></li>
+								<li><a href="#">OPEN API 신청</a></li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num04"><span class="a-depth01"><a href="#">이용자 지원</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li class="yesdepth"><a href="#">데이터 교육</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">온라인교육</a></li>
+											<li><a href="#">실습교육</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">공지사항</a></li>
+								<li><a href="#">K-CURE소식</a></li>
+								<li><a href="#">데이터 활용사례</a></li>
+								<li class="yesdepth"><a href="#">데이터 중심병원</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">공지사항</a></li>
+											<li><a href="#">FAQ</a></li>
+											<li><a href="#">Q&amp;A</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="yesdepth"><a href="#">문의하기</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">FAQ</a></li>
+											<li><a href="#">Q&amp;A</a></li>
+										</ul>
+									</div>
+								</li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num05"><span class="a-depth01"><a href="#">K-CURE 소개</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">K-CURE 서비스 개요</a></li>
+								<li><a href="#">서비스 유형 및 이용방법</a></li>
+								<li><a href="#">안심활용센터 소개</a></li>
+								<li><a href="#">의료중심데이터 병원</a></li>
+								<li><a href="#">운영조직 및 참여기관</a></li>							
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</nav>
+			<!-- //gnb -->
+		</div>
+	</header>
+	<!-- //header -->
+
+	<div class="subtop-tab">
+		<div class="mo-scrolltab">
+			<ul>
+				<li><a href="#">K-CURE 라이브러리</a></li>
+				<li class="on"><a href="#">임상 라이브러리</a></li>
+				<li><a href="#">공공 라이브러리</a></li>
+				<li><a href="#">보건복지공공데이터</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- //subtop-tab -->
+
+	<div class="subtop-infor" id="content">
+		<div class="inbox-wrap">
+			<div class="location">
+				<a href="#" class="home"><span class="blind">홈</span></a>
+				<a href="#"><span>데이터 소개</span></a>
+				<a href="#"><span>임상 라이브러리 </span></a>
+				<a href="#" class="current"><span>데이터 모델</span></a>
+			</div>
+			<h2>임상라이브러리 데이터 모델</h2>
+			<ul class="list-type02">
+				<li>K-CURE 임상 라이브러리 데이터 모델은 기본적 임상 데이터(Baseline DB)와 특정 질환 임상 데이터(암 임상 라이브러리)에 대한 모델을 검색/생성할 수 있도록 설계되었습니다.</li>
+				<li>이 사이트는 데이터 모델의 현재 버전 모델 구조와 각 DB의 테이블, 항목 에 대한 내용을 제공합니다.</li>
+				<li>데이터베이스에 대한 상세 설명은 <a href="#" class="link">임상라이브러리 데이터 모델</a> 에서 확인하실 수 있습니다</li><!-- 2022-12-27 : 텍스트 수정 -->
+			</ul>
+		</div>
+	</div>
+	<!-- //subtop-infor -->
+
+	<!-- container -->
+	<div id="container">
+		<div class="tab-type03 mo-scrolltab">
+			<ul>
+				<li><a href="#"><span>개요</span></a></li>
+				<li class="on"><a href="#"><span>데이터 모델</span></a></li>
+			</ul>
+		</div>
+		<div class="subcon-wrap">
+			<div class="inbox-wrap">
+				<section class="round-box">
+					<h3 class="tit-type02 color01">임상 라이브러리 데이터 모델</h3><!-- 2022-12-27  : 수정 -->
+					<ul class="list-type02">
+						<li>K-CURE 임상 라이브러리 데이터 모델 v1.0 은 암 임상 라이브러리, Baseline DB, 중앙 암등록DB로 구성됩니다.</li>
+						<li>본 문서는 각   DB별 테이블, 테이블 내 항목, 항목에서 수집되는 값 및 수집 절차 등에 대한 설명입니다.</li>
+					</ul>
+				</section>
+
+				<section class="round-box cli-datamodelbox mgt30">
+					<h3 class="tit-type02">임상 라이브러리 스키마 구조</h3><!-- 2022-12-27  : 수정 -->
+					<div class="img-inbox datamodeltool">
+						<p><img src="../../images/sub01/img_clinical_datamodel.png" alt="임상라이브러리 스키마 구조"></p>
+						<h4 class="blind">암임상라이브러리</h4>
+						<h5 class="blind">위암</h5>
+						<h6 class="blind">치료</h6>
+						<ul class="list01-01">
+							<li class="alink link01">
+								<a href="#none" title="상세 내용 보기"><span class="blind">치료_수술</span></a>
+								<div class="detail-box">
+									<div class="top-box">
+										병원코드<br>
+										환자대체번호<br>
+										수술일자<br>
+										수술순번
+									</div>
+									<div class="bot-box">
+										수술종류코드<br>
+										수술종류명<br>
+										수술코드<br>
+										수술명<br>
+										수술EDI코드<br>
+										수술EDI명<br>
+										수술SNOMEDCT코드<br>
+										수술SNOMEDCT명<br>
+										수술ICD9CM코드<br>
+										수술ICD9CM명<br>
+										수술소요시간<br>
+										수술목적코드<br>
+										수술목적명<br>
+										수술방법코드<br>
+										수술방법명<br>
+										수술마취부위코드<br>
+										수술마취부위명<br>
+										ASA점수코드<br>
+										ASA점수명<br>
+										수술절개방법코드<br>
+										수술절개방법명<br>
+										수술둘레방향종양위치코드<br>
+										수술둘레방향종양위치명<br>
+										수술종방향1종양위치코드<br>
+										수술종방향1종양위치명<br>
+										수술종방향2종양위치코드<br>
+										수술종방향2종양위치명<br>
+										진단복강경검사여부확인불가구분코드<br>
+										진단복강경검사여부확인불가구분명<br>
+										수술장내시경사용여부확인불가구분코드<br>
+										수술장내시경사용여부확인불가구분명<br>
+										형광영상사용여부확인불가구분코드<br>
+										형광영상사용여부확인불가구분명<br>
+										수술시항암요법코드<br>
+										수술시항암요법명<br>
+										유착방지제사용여부확인불가구분코드<br>
+										유착방지제사용여부확인불가구분명<br>
+										유착방지제제품명<br>
+										그물막절제범위코드<br>
+										그물막절제범위명<br>
+										근치도코드<br>
+										근치도명<br>
+										림프절절제정도코드<br>
+										림프절절제정도명<br>
+										림프절절제정도상세내용<br>
+										합병절제부위코드<br>
+										합병절제부위명<br>
+										재건술종류코드<br>
+										재건술종류명<br>
+										재건술사용도구명<br>
+										재건술방법코드<br>
+										재건술방법명<br>
+										재건술접근법코드<br>
+										재건술접근법명<br>
+										수술추정실혈량<br>
+										복수여부확인불가구분코드<br>
+										복수여부확인불가구분명<br>
+										생성일시
+									</div>
+								</div>
+							</li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">치료_수혈</span></a>
+								<div class="detail-box">
+									<div class="top-box">
+										병원코드<br>
+										환자대체번호<br>
+										수혈처방일자<br>
+										수혈처방순번
+									</div>
+									<div class="bot-box">
+										혈액제제종류코드<br>
+										혈액제제종류명<br>
+										혈액제제코드<br>
+										혈액제제명<br>
+										수혈팩수<br>
+										수혈총량<br>
+										생성일시
+									</div>
+								</div>
+							</li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">치료_시술</span></a>
+								<div class="detail-box">
+									<div class="top-box">
+										병원코드<br>
+										환자대체번호<br>
+										ESD시술일자<br>
+										ESD시술순번
+									</div>
+									<div class="bot-box">
+										ESD시술시작일시<br>
+										ESD시술종료일시<br>
+										ESD병변크기값<br>
+										ESD병변모양코드<br>
+										ESD병변모양명<br>
+										ESD병변위치가로코드<br>
+										ESD병변위치가로명<br>
+										ESD병변위치세로코드<br>
+										ESD병변위치세로명<br>
+										ESD궤양여부확인불가구분코드<br>
+										ESD궤양여부확인불가구분명<br>
+										ESD천공여부확인불가구분코드<br>
+										ESD천공여부확인불가구분명<br>
+										ESD천공조치코드<br>
+										ESD천공조치명<br>
+										ESD결과코드<br>
+										ESD결과명<br>
+										ESD소견내용<br>
+										ESD결과내용<br>
+									   생성일시
+									</div>
+								</div>
+							</li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">치료_약제성분</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">치료_항압요법</span></a></li>
+							<li class="alink link06"><a href="#none" title="상세 내용 보기"><span class="blind">치료_방사선</span></a></li>
+						</ul>
+						<h6 class="blind">추적관찰</h6>
+						<ul class="list01-02">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">추적관찰_재발</span></a></li>
+						</ul>
+						<h6 class="blind">환자</h6>
+						<ul class="list01-03">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">환자_건강정보</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">환자_가족력</span></a></li>
+						</ul>
+						<h6 class="blind">진단</h6>
+						<ul class="list01-04">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">진단_신체계측정보</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">진단_정보</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">진단_병기</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">진단_전이</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">진단_수술후합병증</span></a></li>
+						</ul>
+						<h6 class="blind">검사</h6>
+						<ul class="list01-05">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">검사_진단</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">검사_영상</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">검사_생체</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">검사_면역병리</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">검사_분자병리</span></a></li>
+							<li class="alink link06"><a href="#none" title="상세 내용 보기"><span class="blind">검사_HPYLORI</span></a></li>
+							<li class="alink link07"><a href="#none" title="상세 내용 보기"><span class="blind">검사_위내시경</span></a></li>
+							<li class="alink link08"><a href="#none" title="상세 내용 보기"><span class="blind">검사_EUS</span></a></li>
+							<li class="alink link09"><a href="#none" title="상세 내용 보기"><span class="blind">검사_외과병리</span></a></li>
+						</ul>
+						<h5 class="blind">유방암</h5>
+						<h6 class="blind">치료</h6>
+						<ul class="list02-01">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">치료_수술</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">치료_수혈</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">치료_약제성분</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">치료_항압요법</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">치료_방사선</span></a></li>
+						</ul>
+						<h6 class="blind">추적관찰</h6>
+						<ul class="list02-02">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">추적관찰_재발</span></a></li>
+						</ul>
+						<h6 class="blind">환자</h6>
+						<ul class="list02-03">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">환자_건강정보</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">환자_가족력</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">환자_산과정보</span></a></li>
+						</ul>
+						<h6 class="blind">진단</h6>
+						<ul class="list02-04">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">진단_신체계측정보</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">진단_정보</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">진단_병기</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">진단_전이</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">진단_수술후합병증</span></a></li>
+						</ul>
+						<h6 class="blind">검사</h6>
+						<ul class="list02-05">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">검사_진단</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">검사_영상</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">검사_생체</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">검사_면역병리</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">검사_분자병리</span></a></li>
+							<li class="alink link06"><a href="#none" title="상세 내용 보기"><span class="blind">검사_생식세포변이검사</span></a></li>
+							<li class="alink link07"><a href="#none" title="상세 내용 보기"><span class="blind">검사_유전자발현검사</span></a></li>
+							<li class="alink link08"><a href="#none" title="상세 내용 보기"><span class="blind">검사_EUS</span></a></li>
+							<li class="alink link09"><a href="#none" title="상세 내용 보기"><span class="blind">검사_외과병리</span></a></li>
+						</ul>
+						<h4 class="blind">BaselineDB OMOP CDM 5.3.1</h4>
+						<h5 class="blind">Clinical Data</h5>
+						<ul class="list03-01">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">PERSON</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">OBSERVATION_PERIOD</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">DEATH</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">VISIT_OCCURRENCE</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">VISIT_DETAIL</span></a></li>
+							<li class="alink link06"><a href="#none" title="상세 내용 보기"><span class="blind">CONDITION_OCCURRENCE</span></a></li>
+							<li class="alink link07"><a href="#none" title="상세 내용 보기"><span class="blind">DRUG_EXPOSURE</span></a></li>
+							<li class="alink link08"><a href="#none" title="상세 내용 보기"><span class="blind">PROCEDURE_OCCURRENCE</span></a></li>
+							<li class="alink link09"><a href="#none" title="상세 내용 보기"><span class="blind">DEVICE_EXPOSURE</span></a></li>
+							<li class="alink link10"><a href="#none" title="상세 내용 보기"><span class="blind">MEASUREMENT</span></a></li>
+							<li class="alink link11"><a href="#none" title="상세 내용 보기"><span class="blind">OBSERVATION</span></a></li>
+							<li class="alink link12"><a href="#none" title="상세 내용 보기"><span class="blind">NOTE</span></a></li>
+							<li class="alink link13"><a href="#none" title="상세 내용 보기"><span class="blind">NOTE_NLP</span></a></li>
+							<li class="alink link14"><a href="#none" title="상세 내용 보기"><span class="blind">SPECIMEN</span></a></li>
+							<li class="alink link15"><a href="#none" title="상세 내용 보기"><span class="blind">FACT_RELATIONSHIP</span></a></li>
+						</ul>
+						<h5 class="blind">Metadata</h5>
+						<ul class="list03-02">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">METADATA</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">CDM_SOURCE</span></a></li>
+						</ul>
+						<h5 class="blind">Health System Data</h5>
+						<ul class="list04-01">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">LOCATION</span></a>
+								<div class="detail-box">
+									<div class="top-box">
+										LOCATION_ID
+									</div>
+									<div class="bot-box">
+										ADDRESS_1<br>
+										ADDRESS_2<br>
+										CITY<br>
+										STATE<br>
+										ZIP<br>
+										COUNTRY<br>
+										LOCATION_SOURCE_VALUE<br>
+										COUNTRY_CONCEPT_ID<br>
+										COUNTRY_SOURCE_VALUE<br>
+										LATITUDE<br>
+										LONGITUDE
+									</div>
+								</div>
+							</li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">CARE_SITE</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">PROVIDER</span></a></li>
+						</ul>
+						<h5 class="blind">Vocabulary</h5>
+						<ul class="list04-02">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">CONCEPT</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">VOCABULARY</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">DOMAIN</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">CONCEPT_CLASS</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">CONCEPT_SYNONYM</span></a></li>
+							<li class="alink link06"><a href="#none" title="상세 내용 보기"><span class="blind">CONCEPT_RELATIONSHIP</span></a></li>
+							<li class="alink link07"><a href="#none" title="상세 내용 보기"><span class="blind">RELATIONSHIP</span></a></li>
+							<li class="alink link08"><a href="#none" title="상세 내용 보기"><span class="blind">CONCEPT_ANCESTOR</span></a></li>
+							<li class="alink link09"><a href="#none" title="상세 내용 보기"><span class="blind">SOURCE_TO_CENCEPT_MAP</span></a></li>
+							<li class="alink link10"><a href="#none" title="상세 내용 보기"><span class="blind">DRUG_STRENGTH</span></a></li>
+							<li class="alink link11"><a href="#none" title="상세 내용 보기"><span class="blind">COHORT</span></a></li>
+							<li class="alink link12"><a href="#none" title="상세 내용 보기"><span class="blind">COHORT_DEFINITION</span></a></li>
+						</ul>
+						<h5 class="blind">Health Economics data</h5>
+						<ul class="list04-03">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">COST</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">PLAYER_PLAN_PERIOD</span></a></li>
+						</ul>
+						<h5 class="blind">Standardized Derived Elements</h5>
+						<ul class="list04-04">
+							<li class="alink link01"><a href="#none" title="상세 내용 보기"><span class="blind">CONDITION_ERA</span></a></li>
+							<li class="alink link02"><a href="#none" title="상세 내용 보기"><span class="blind">DRUG_ERA</span></a></li>
+							<li class="alink link03"><a href="#none" title="상세 내용 보기"><span class="blind">DOSE_EAR</span></a></li>
+							<li class="alink link04"><a href="#none" title="상세 내용 보기"><span class="blind">EPISODE</span></a></li>
+							<li class="alink link05"><a href="#none" title="상세 내용 보기"><span class="blind">EPISODE_EVENT</span></a></li>
+						</ul>
+					</div>
+				</section>
+			</div>
+		</div>
+		<!-- //subcon-wrap -->
+	</div>
+	<!-- //container -->
+
+	<!-- footer -->
+	<footer id="footer">
+		<div class="footer-wrap">
+			<div class="footer-link">
+				<div class="footlogo"><a href="/" title="메인페이지로 이동"><span class="blind">K-CURE 운영관리 포털</span></a></div>
+				<ul class="link-ul">
+					<li><a href="#">이용약관</a></li>
+					<li><a href="#">개인정보처리방침</a></li>
+					<li><a href="#">고객의소리</a></li>
+				</ul>
+			</div>
+			<!-- //footer-link -->
+			<div class="footer-site">
+				<button type="button" class="btn-sopen"><span>관련사이트</span></button>
+				<div class="linklist-box">
+					<div class="inbox">
+						<ul>
+							<li><a href="#" target="_blank" title="새창">링크1</a></li>
+							<li><a href="#" target="_blank" title="새창">링크2</a></li>
+							<li><a href="#" target="_blank" title="새창">링크3</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- //footer-site -->
+			<address>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원 (남대문로4가 45, 서울상공회의소)</address>
+			<p class="txt-copy">COPYRIGHT©By KHIS. All rights Reserved</p>
+			<button type="button" class="btn-wintop"><span class="blind">최상단으로 이동</span></button>
+		</div>
+	</footer>
+	<!-- //footer -->
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Editor">
+	<!--에디터 등록 예제 쿼리  -->
+	<insert id="editorInsert" parameterType="kcure.portal.example.service.impl.ExEditorVO">
+			INSERT INTO test_temp
+			(seq ,col1, col2)
+			VALUES
+			((select count(*)+1 from test_temp), #{col1}, #{col2})			
+	</insert>
+	<!--에디터 상세조회 예제 쿼리  -->
+	<select id="selectEditorDetail" parameterType="kcure.portal.example.service.impl.ExEditorVO" resultType="kcure.portal.example.service.impl.ExEditorVO">
+		SELECT seq ,col1, col2
+		FROM test_temp
+		WHERE seq = #{seq}
+	</select>
+	<!-- 에디터 수정 예제 쿼리  -->
+	<insert id="editorUpdate" parameterType="kcure.portal.example.service.impl.ExEditorVO">
+		UPDATE test_temp
+		set col1=#{col1}
+			, col2 =  #{col2}
+		WHERE seq = #{seq}			
+	</insert>
+	
+	<!--에디터 조회 예제 쿼리  -->
+	<select id="selectList" parameterType="kcure.portal.example.service.impl.ExEditorVO" resultType="kcure.portal.example.service.impl.ExEditorVO">
+		<include refid="selectList_sql" />
+		order by seq 
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+	
+	<select id="selectListCnt" parameterType="kcure.portal.example.service.impl.ExEditorVO" resultType="java.lang.Integer">
+		select count(a.*) as cnt
+		from (
+			<include refid="selectList_sql" />
+		) a
+	</select>
+	
+	<sql id="selectList_sql">
+		SELECT seq , col2
+		FROM test_temp
+	</sql>
+	
+</mapper>

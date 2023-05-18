@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommonFile">
+	<insert id="insertCommonFileInfo">
+		INSERT INTO PORTAL.KCURE_COM_COMTNFILE
+		(
+			ATCH_FILE_ID, CREAT_DT, USE_AT
+		)
+		VALUES (#{atchFileId}, now(), 'Y')
+	</insert>
+
+	<delete id="deleteCommonFileInfo">
+		DELETE FROM PORTAL.KCURE_COM_COMTNFILE
+		WHERE ATCH_FILE_ID = #{atchFileId}
+	</delete>
+
+	<insert id="insertCommonDetailFileInfo">
+		<selectKey keyProperty="fileSn" resultType="int" order="BEFORE">
+			SELECT COALESCE(MAX(FILE_SN),0)+1 AS FILE_SN FROM KCURE_COM_COMTNFILEDETAIL
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		</selectKey>
+		INSERT INTO PORTAL.KCURE_COM_COMTNFILEDETAIL
+		(
+			ATCH_FILE_ID, FILE_SN, FILE_STRE_COURS, STRE_FILE_NM
+			, ORIGNL_FILE_NM, FILE_EXTSN, FILE_CN, FILE_SIZE, TMBNL_YN
+		)
+		VALUES (#{atchFileId}, #{fileSn}, #{fileStreCours}, #{streFileNm}
+		, #{orignlFileNm}, #{fileExtsn}, #{fileCn}, #{fileSize}, #{tmbnlYn})
+	</insert>
+
+	<delete id="deleteCommonDetailFileInfo">
+		DELETE FROM PORTAL.KCURE_COM_COMTNFILEDETAIL
+		WHERE ATCH_FILE_ID = #{atchFileId}
+		<if test="fileSn != null and fileSn != ''">
+		AND FILE_SN = #{fileSn}
+		</if>
+	</delete>
+
+	<select id="selectCommonFiles" parameterType="kcure.portal.cmn.service.impl.CommonFileVO" resultType="kcure.portal.cmn.service.impl.CommonFileVO">
+		SELECT ATCH_FILE_ID
+			, FILE_SN
+			, FILE_STRE_COURS
+			, STRE_FILE_NM
+			, ORIGNL_FILE_NM
+			, FILE_EXTSN
+			, FILE_CN
+			, FILE_SIZE
+			, TMBNL_YN
+		FROM PORTAL.KCURE_COM_COMTNFILEDETAIL
+		WHERE ATCH_FILE_ID = #{atchFileId}
+		<if test="fileSn != null and fileSn != ''">
+		AND FILE_SN = #{fileSn}
+		</if>
+	</select>
+
+	<insert id="fileDownLog" parameterType="kcure.portal.cmn.service.impl.CommonFileVO">
+		  INSERT INTO KCURE_COM_ATTF_UNLD_HST(
+			ATTF_UNLD_DT, ATTF_ID, ATTF_NM, ATTF_PTH_NM, USER_ID, CONN_IP_ADDR, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT,MENU_NM,MENU_URI_ADDR
+		)VALUES (
+			now(), #{atchFileId}, #{orignlFileNm},  #{fileStreCours}, #{userId},#{ip}, #{userId}, now(), #{userId}, now(),
+			(	SELECT RS.MENU_NM
+					FROM (
+						SELECT A.MENU_NM,
+							CASE  WHEN POSITION( A.MENU_URI_PATT_CONT IN C.URI) >0  THEN 'Y' ELSE 'N' END  CHECK_URI
+						FROM KCURE_COM_MENU A
+							,(SELECT #{baseUrl} AS URI) C
+						WHERE A.MENU_USE_YN = 'Y'
+						AND A.MENU_URI_PATT_CONT IS NOT NULL
+						AND A.MENU_URI_PATT_CONT !=''
+						) RS
+					WHERE RS.CHECK_URI = 'Y' )
+					,#{menuUrl}
+		)
+	</insert>
+
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KcureVisitLog">
+
+	<!-- 시스템로그 맵 -->	
+	<resultMap id="VisitLogVo" type="kcure.portal.sys.log.vlg.service.VisitLog" >
+		<result property="vstRcrdYmd" column="VST_RCRD_YMD"/>
+		<result property="vstrCnt" column="VSTR_CNT"/>
+		<result property="loginCnt" column="LOGIN_CNT"/>
+		<result property="acmlVstrCnt" column="ACML_VSTR_CNT"/>
+		<result property="acmlLoginCnt" column="ACML_LOGIN_CNT"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="lastModpId" column="LAST_MODP_ID"/>
+		<result property="lastModfDt" column="LAST_MODF_DT"/>
+	</resultMap>
+
+	<!-- 시스템 로그 목록 조회 -->
+	<select id="selectVisitLogInf" parameterType="kcure.portal.sys.log.vlg.service.VisitLog" resultMap="VisitLogVo">			
+			SELECT TO_DATE(VST_RCRD_YMD,'yyyyMMdd') AS VST_RCRD_YMD
+				, VSTR_CNT
+				, LOGIN_CNT
+				, ACML_VSTR_CNT
+				, ACML_LOGIN_CNT
+				, FRST_REGP_ID
+				, FRST_RGST_DT
+				, LAST_MODP_ID
+				, LAST_MODF_DT
+			FROM KCURE_SVC_VST_RCRD
+			WHERE 1=1
+			<if test="searchBgnDe != null and searchBgnDe != ''">
+				AND VST_RCRD_YMD
+				BETWEEN REPLACE(#{searchBgnDe},'-','')
+				AND REPLACE(#{searchEndDe},'-','')		
+			</if> 
+				ORDER BY VST_RCRD_YMD DESC
+				LIMIT #{recordCountPerPage} OFFSET #{firstIndex} 
+			
+	</select>
+
+	<!-- 시스템 로그 총건수 -->
+	<select id="selectVisitLogInfCnt" parameterType="kcure.portal.sys.log.vlg.service.VisitLog" resultType="int">
+		SELECT COUNT(VST_RCRD_YMD) CNT
+		FROM KCURE_SVC_VST_RCRD
+		WHERE 1=1
+		<if test="searchBgnDe != null and searchBgnDe != ''">
+			AND VST_RCRD_YMD
+			BETWEEN REPLACE(#{searchBgnDe},'-','')
+			AND REPLACE(#{searchEndDe},'-','')
+		</if>
+	</select>
+</mapper>

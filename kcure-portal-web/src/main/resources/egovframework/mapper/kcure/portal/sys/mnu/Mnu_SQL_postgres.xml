@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Mnu">
+
+    <resultMap id="menuList" type="kcure.portal.sys.mnu.mng.service.impl.MnuVO">
+        <result property="menuId" column="MENU_ID"/>
+        <result property="hghrMenuId" column="HGHR_MENU_ID"/>
+        <result property="menuNm" column="MENU_NM"/>
+        <result property="menuUriAddr" column="MENU_URI_ADDR"/>
+        <result property="menuExplCont" column="MENU_EXPL_CONT"/>
+        <result property="menuOputOrd" column="MENU_OPUT_ORD"/>
+        <result property="menuUseYn" column="MENU_USE_YN"/>
+        <result property="menuDmnSpcd" column="MENU_DMN_SPCD"/>
+        <result property="menuLvlVl" column="MENU_LVL_VL"/>
+        <result property="menuUriPattCont" column="MENU_URI_PATT_CONT"/>
+        <result property="childMenuId" column="CHILD_MENU_ID"/>
+    </resultMap>
+
+	<select id="selectMenuManageList" parameterType="comDefaultVO" resultMap="menuList">
+		SELECT
+			MENU_ID, HGHR_MENU_ID, MENU_NM, MENU_URI_ADDR
+			, MENU_EXPL_CONT, MENU_OPUT_ORD, MENU_USE_YN
+			, MENU_DMN_SPCD, MENU_URI_PATT_CONT
+		FROM PORTAL.KCURE_COM_MENU
+	</select>
+
+	<!-- 총건수 조회 -->
+	<select id="selectMenuManageListTotCnt" parameterType="comDefaultVO" resultType="int">
+		SELECT
+			COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_COM_MENU
+	</select>
+
+	<!-- 메뉴 등록 -->
+	<insert id="insertMenuManage" parameterType="kcure.portal.sys.mnu.mng.service.impl.MnuVO">
+		INSERT INTO PORTAL.KCURE_COM_MENU
+		(
+			MENU_ID
+			, HGHR_MENU_ID
+			, MENU_NM
+			, MENU_URI_ADDR
+			, MENU_EXPL_CONT
+			, MENU_OPUT_ORD
+			, MENU_USE_YN
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+			, MENU_DMN_SPCD
+			, MENU_URI_PATT_CONT
+		)
+		VALUES
+		(
+			#{menuId}
+			, #{hghrMenuId}
+			, #{menuNm}
+			, #{menuUriAddr}
+			, #{menuExplCont}
+			, #{menuOputOrd}
+			, #{menuUseYn}
+			, #{frstRegpId}
+			, NOW()
+			, #{lastModpId}
+			, NOW()
+			, #{menuDmnSpcd}
+			, #{menuUriPattCont}
+		)
+	</insert>
+
+	<update id="updateMenuManage" parameterType="kcure.portal.sys.mnu.mng.service.impl.MnuVO">
+		UPDATE PORTAL.KCURE_COM_MENU
+		SET
+			HGHR_MENU_ID     = #{hghrMenuId}
+			, MENU_NM        = #{menuNm}
+			, MENU_URI_ADDR  = #{menuUriAddr}
+			, MENU_EXPL_CONT = #{menuExplCont}
+			, MENU_OPUT_ORD  = #{menuOputOrd}
+			, MENU_USE_YN    = #{menuUseYn}
+			, LAST_MODP_ID   = #{lastModpId}
+			, LAST_MODF_DT   = NOW()
+			, MENU_DMN_SPCD  = #{menuDmnSpcd}
+			, MENU_URI_PATT_CONT  = #{menuUriPattCont}
+		WHERE MENU_ID = #{menuId}
+	</update>
+
+	<delete id="deleteMenuManage" parameterType="kcure.portal.sys.mnu.mng.service.impl.MnuVO">
+		DELETE FROM PORTAL.KCURE_COM_MENU
+		WHERE MENU_ID = #{menuId}
+	</delete>
+
+	<select id="selectGnbMenuList" parameterType="hashmap" resultMap="menuList">
+		WITH RECURSIVE GNB_MENU(MENU_ID, HGHR_MENU_ID, MENU_NM, MENU_DMN_SPCD, MENU_URI_PATT_CONT, MENU_URI_ADDR, MENU_EXPL_CONT, MENU_OPUT_ORD, MENU_ORD, MENU_LVL_VL, PATH, CYCLE)
+		     AS (
+		         --START_QUERY
+		         SELECT MENU_ID
+		               ,HGHR_MENU_ID
+		               ,MENU_NM
+		               ,MENU_DMN_SPCD
+		               ,MENU_URI_PATT_CONT
+		               ,MENU_URI_ADDR
+		               ,MENU_EXPL_CONT
+		               ,MENU_OPUT_ORD
+		               ,ARRAY[MENU_OPUT_ORD::INT] AS MENU_ORD
+		               ,1 AS MENU_LVL_VL
+		               ,ARRAY[MENU_ID::TEXT] AS PATH
+		               ,FALSE AS CYCLE
+		           FROM KCURE_COM_MENU
+		          WHERE 1=1
+		            AND MENU_ID != '00'
+		            AND HGHR_MENU_ID = ''
+		            AND MENU_USE_YN = 'Y'
+		          <if test="menuDmnSpcd != null and menuDmnSpcd !=''">
+		            AND MENU_DMN_SPCD = #{menuDmnSpcd}
+		          </if>
+		         UNION
+		         --REPEAT_QUERY
+		         SELECT D.MENU_ID
+		               ,D.HGHR_MENU_ID
+		               ,D.MENU_NM
+		               ,D.MENU_DMN_SPCD
+		               ,D.MENU_URI_PATT_CONT
+		               ,D.MENU_URI_ADDR
+		               ,D.MENU_EXPL_CONT
+		               ,D.MENU_OPUT_ORD
+		               ,ARRAY_APPEND(FD.MENU_ORD, D.MENU_OPUT_ORD::INT) AS MENU_ORD
+		               ,FD.MENU_LVL_VL+1 AS MENU_LVL_VL
+		               ,ARRAY_APPEND(FD.PATH, D.MENU_ID::TEXT) AS PATH
+		               ,D.MENU_ID = ANY(FD.PATH) AS CYCLE
+		           FROM GNB_MENU FD
+		                INNER JOIN KCURE_COM_MENU D
+		                   ON FD.MENU_ID = D.HGHR_MENU_ID
+		                      AND D.MENU_USE_YN = 'Y'
+		            AND NOT CYCLE
+		        )
+		,GNB_MENU_VIEW
+		 AS (
+		     --VIEW_QUERY
+		     SELECT A.MENU_ID
+		           ,A.HGHR_MENU_ID
+		           ,A.MENU_NM
+		           ,A.MENU_DMN_SPCD
+		           ,A.MENU_URI_PATT_CONT
+		           ,A.MENU_URI_ADDR
+		           ,A.MENU_EXPL_CONT
+		           ,A.MENU_OPUT_ORD
+		           ,A.MENU_LVL_VL
+		           ,A.MENU_ORD
+		           ,LEAD(A.MENU_URI_ADDR, 1) OVER (ORDER BY A.MENU_ORD) AS MENU_URI_ADDR_FST
+		           ,LEAD(A.MENU_URI_ADDR, 2) OVER (ORDER BY A.MENU_ORD) AS MENU_URI_ADDR_SND
+		       FROM GNB_MENU A
+		      WHERE 1=1
+		        AND EXISTS (
+		                    SELECT '1'
+		                      FROM KCURE_COM_MENU_AUTH SA
+		                       <choose>
+		                         <when test="loginId != null and loginId !=''">
+		                           INNER JOIN KCURE_COM_USER_AUTH SB
+		                              ON SA.AUTH_ID = SB.AUTH_ID
+		                                 AND ( SB.USER_ID = #{loginId} OR SB.AUTH_ID = 'AU007' ) 
+		                         </when>
+		                         <otherwise>		<!-- 로그인전에는 미승인연구자 권한으로 처리 -->
+		                           INNER JOIN (SELECT 'AU007' AS AUTH_ID) SB
+		                              ON SA.AUTH_ID = SB.AUTH_ID		                    
+		                         </otherwise>
+		                       </choose>
+		                     WHERE SA.MENU_ID = A.MENU_ID
+		                   )
+		      ORDER BY A.MENU_ORD
+		    )
+		--VIEW_QUERY
+		SELECT A.MENU_ID
+		      ,A.HGHR_MENU_ID
+		      ,A.MENU_NM
+		      ,A.MENU_DMN_SPCD
+		      ,A.MENU_URI_PATT_CONT
+		      ,(CASE WHEN (A.MENU_URI_ADDR IS NOT NULL AND A.MENU_URI_ADDR != '') THEN A.MENU_URI_ADDR
+		             WHEN (A.MENU_URI_ADDR_FST IS NOT NULL AND A.MENU_URI_ADDR_FST != '') THEN A.MENU_URI_ADDR_FST
+		        ELSE A.MENU_URI_ADDR_SND END) AS MENU_URI_ADDR
+		      ,A.MENU_EXPL_CONT
+		      ,A.MENU_OPUT_ORD
+		      ,A.MENU_LVL_VL
+		      ,A.MENU_ORD
+		      ,(
+		        SELECT CC.HGHR_MENU_ID
+		          FROM GNB_MENU CC
+		         WHERE CC.HGHR_MENU_ID = A.MENU_ID
+		         LIMIT 1
+		       ) AS CHILD_MENU_ID
+		  FROM GNB_MENU_VIEW A
+		 WHERE 1=1
+	</select>
+
+	<select id="selectNavMenuList" parameterType="hashmap" resultMap="menuList">
+		WITH RECURSIVE NAV_MENU(MENU_ID, HGHR_MENU_ID, MENU_NM, MENU_DMN_SPCD, MENU_URI_ADDR, MENU_EXPL_CONT, MENU_OPUT_ORD, MENU_ORD, PATH, CYCLE)
+		     AS (
+		         --START_QUERY
+		         SELECT MENU_ID
+		               ,HGHR_MENU_ID
+		               ,MENU_NM
+		               ,MENU_DMN_SPCD
+		               ,MENU_URI_ADDR
+		               ,MENU_EXPL_CONT
+		               ,MENU_OPUT_ORD
+		               ,ARRAY[MENU_OPUT_ORD::INT] AS MENU_ORD
+		               ,ARRAY[MENU_ID::TEXT] AS PATH
+		               ,FALSE AS CYCLE
+		           FROM KCURE_COM_MENU
+		          WHERE 1=1
+		            AND MENU_URI_PATT_CONT = #{nowPageUriPatt}
+				    AND MENU_USE_YN = 'Y'
+		         UNION
+		         --REPEAT_QUERY
+		         SELECT D.MENU_ID
+		               ,D.HGHR_MENU_ID
+		               ,D.MENU_NM
+		               ,D.MENU_DMN_SPCD
+		               ,D.MENU_URI_ADDR
+		               ,D.MENU_EXPL_CONT
+		               ,D.MENU_OPUT_ORD
+		               ,ARRAY_APPEND(FD.MENU_ORD, D.MENU_OPUT_ORD::INT) AS MENU_ORD
+		               ,ARRAY_APPEND(FD.PATH, D.MENU_ID::TEXT) AS PATH
+		               ,D.MENU_ID = ANY(FD.PATH) AS CYCLE
+		           FROM NAV_MENU FD
+		                INNER JOIN KCURE_COM_MENU D
+		                   ON FD.HGHR_MENU_ID = D.MENU_ID
+		                      AND D.MENU_USE_YN = 'Y'
+		            AND NOT CYCLE
+		        )
+		--VIEW_QUERY
+		SELECT A.MENU_ID
+		      ,A.HGHR_MENU_ID
+		      ,A.MENU_NM
+		      ,A.MENU_DMN_SPCD
+		      ,A.MENU_URI_ADDR
+		      ,A.MENU_EXPL_CONT
+		      ,A.MENU_OPUT_ORD
+		  FROM NAV_MENU A
+		 WHERE 1=1
+		 ORDER BY A.MENU_ORD DESC
+	</select>
+
+	<select id="selectNowMenuInfo" parameterType="egovMap" resultType="egovMap">
+		SELECT MENU_ID
+		      ,HGHR_MENU_ID
+		      ,MENU_NM
+		      ,MENU_DMN_SPCD
+		      ,MENU_URI_PATT_CONT
+		      ,MENU_URI_ADDR
+		      ,MENU_EXPL_CONT
+		      ,MENU_OPUT_ORD
+		      ,MENU_LVL_VL
+		  FROM KCURE_COM_MENU
+		 WHERE MENU_URI_PATT_CONT = #{nowPageUriPatt}
+		   AND MENU_USE_YN = 'Y'
+	</select>
+</mapper>

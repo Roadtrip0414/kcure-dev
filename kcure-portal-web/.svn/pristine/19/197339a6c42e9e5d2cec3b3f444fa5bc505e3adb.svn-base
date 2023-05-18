@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Dac">
+
+    <select id="selectSvcPrtiSpCdIs01" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="egovMap">
+		SELECT	P.PRTI_NM, P.PRTI_ID,
+				COALESCE(U.RVW_PRNC_PST_NM, '') RVW_PRNC_PST_NM,
+				COALESCE(U.USER_NM, '') USER_NM,
+				REGEXP_REPLACE(COALESCE(U.USER_MBPH_NO, ''), '(.{3})(.*)(.{4})', '\1-\2-\3') USER_MBPH_NO,
+				REGEXP_REPLACE(COALESCE(U.RVW_PST_PN, ''), '(.{3})(.*)(.{4})', '\1-\2-\3') RVW_PST_PN,
+				COALESCE(U.USER_ID, '') USER_ID
+		FROM	KCURE_SVC_PRTI P
+				LEFT JOIN KCURE_COM_USER U
+				ON U.PRTI_ID = P.PRTI_ID
+				AND U.RVW_PRNC_YN = 'Y'
+		WHERE	P.INST_CLS_SPCD = '01'
+		ORDER BY P.PRTI_ID
+    </select>
+
+    <update id="saveUserRvwPrncYn" parameterType="egovMap">
+		UPDATE	KCURE_COM_USER
+		SET		RVW_PRNC_YN = 'N',
+				LAST_MODP_ID = #{lastModpId},
+				LAST_MODF_DT = NOW()
+		WHERE	PRTI_ID = #{prtiId}
+				AND RVW_PRNC_YN = 'Y';
+
+		UPDATE	KCURE_COM_USER
+		SET		RVW_PRNC_YN = 'Y',
+				RVW_PRNC_PST_NM = #{rvwPrncPstNm},
+				RVW_PST_PN = #{rvwPstPn},
+				LAST_MODP_ID = #{lastModpId},
+				LAST_MODF_DT = NOW()
+		WHERE	PRTI_ID = #{prtiId}
+				AND USER_ID = #{userId};
+				
+				
+		DELETE FROM KCURE_COM_USER_AUTH
+		WHERE AUTH_ID = 'AU002'
+		AND USER_ID IN (SELECT USER_ID 
+		FROM KCURE_COM_USER
+		WHERE PRTI_ID =  #{prtiId});
+		
+		INSERT INTO KCURE_COM_USER_AUTH(
+				AUTH_ID,USER_ID,FRST_REGP_ID,FRST_RGST_DT,LAST_MODP_ID, LAST_MODF_DT
+			)VALUES(
+				'AU002',#{userId},#{lastModpId},now(),#{lastModpId}, now()
+			);		
+    </update>
+
+    <select id="selectUserList" parameterType="egovMap" resultType="egovMap">
+		SELECT	U.PRTI_ID, U.RVW_PRNC_PST_NM, U.USER_NM, U.USER_MBPH_NO, U.RVW_PST_PN, U.USER_ID
+		FROM	KCURE_COM_USER U
+		WHERE	U.PRTI_ID = #{prtiId}
+				AND U.USER_NM LIKE '%' || #{userNm} || '%'
+		ORDER BY U.USER_NM
+    </select>
+
+	<sql id="formDataAplcRvwList">
+		FROM	KCURE_SVC_DATA_APLC_RVW RVW
+
+				INNER JOIN KCURE_SVC_DATA_APLC APLC
+				ON APLC.DATA_APLC_NO = RVW.DATA_APLC_NO
+
+				INNER JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = APLC.DATA_APLP_ID
+
+				
+				LEFT OUTER JOIN (
+					SELECT INST.DATA_APLC_NO , ARRAY_TO_STRING(ARRAY_AGG(PRTI.PRTI_NM),',') AS PRTI_NM
+					FROM KCURE_SVC_DATA_PRVD_INST INST
+						, KCURE_SVC_PRTI PRTI
+					WHERE INST.PRTI_ID = PRTI.PRTI_ID
+					GROUP BY DATA_APLC_NO
+				) INST  ON INST.DATA_APLC_NO =  RVW.DATA_APLC_NO
+				
+			,
+			(	
+				SELECT A.DATA_APLC_NO,B.*
+				FROM (
+					SELECT ROW_NUMBER() OVER( PARTITION BY DATA_APLC_NO ORDER BY DTAP_STAT_SEQ DESC  ) AS RNUM
+							,DTAP_STAT_SPCD
+							,DATA_APLC_NO
+					FROM KCURE_SVC_DTAP_STAT_HST
+				) A
+				,KCURE_SVC_STAT_MST B
+				WHERE A.RNUM = 1
+				AND A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD 
+				AND CD_CLCD = 'RVW'
+			) MST
+		WHERE	1 = 1
+		AND RVW.DATA_APLC_NO = MST.DATA_APLC_NO
+		AND  NOT EXISTS (SELECT * FROM KCURE_SVC_DATA_UTLC_APLC UTLC WHERE UTLC.DATA_APLC_NO =  RVW.DATA_APLC_NO)
+		
+		AND (
+			   SELECT 
+<!-- 			임상 연구접수 일때  -->
+				CASE WHEN MST.DATA_TPCD = '01' AND MST.DTAP_STP_SPCD = 'R01' AND #{prtiId} !=  'M0000' THEN 'N'
+<!-- 			공공 연구접수 -->
+				WHEN MST.DATA_TPCD = '02' AND MST.DTAP_STP_SPCD = 'R01' AND #{prtiId} =  'M0000' THEN 'N'
+<!-- 			 공공 결재정보입력 -->
+				WHEN MST.DATA_TPCD = '02' AND MST.DTAP_STP_SPCD = 'R09' AND #{prtiId}  =  'M0000' THEN 'N'
+<!-- 			 결합 연구접수 AND MST.DTAP_STP_SPCD = 'R01'  -->
+				WHEN MST.DATA_TPCD = '03' AND #{prtiId} !=  'M0000' THEN 'N'
+<!-- 			 전체 의정원이 아닌경우 -->
+				WHEN #{prtiId} !=  'M0000' AND  ( SELECT COUNT(*) FROM KCURE_SVC_DATA_PRVD_INST INST WHERE  PRTI_ID = #{prtiId} AND DATA_APLC_NO = MST.DATA_APLC_NO) = 0 THEN 'N'
+				ELSE 'Y'
+			END LIST_YN
+		   ) = 'Y'
+		
+	</sql>
+
+	<sql id="whereDataAplcRvwList">
+		
+		<if test="dataAplcYmdFrom != null and dataAplcYmdFrom != ''">
+		AND APLC.DATA_APLC_YMD BETWEEN #{dataAplcYmdFrom} AND #{dataAplcYmdTo}
+		</if>
+		<if test="searchCondition == 'dataAplpNm' and searchKeyword != null and searchKeyword != ''">
+		AND USR.USER_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'rsrSbjNm' and searchKeyword != null and searchKeyword != ''">
+		AND APLC.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'dataAplcNo' and searchKeyword != null and searchKeyword != ''">
+		AND RVW.DATA_APLC_NO = #{searchKeyword}
+		</if>
+		<if test="rvwStpSpcd != null and rvwStpSpcd != ''">
+		AND MST.DETL_CD = #{rvwStpSpcd}
+		</if>
+	</sql>
+
+    <select id="selectDataAplcRvwList" parameterType="egovMap" resultType="egovMap">
+		SELECT	RVW.DATA_APLC_NO, APLC.RSR_SBJ_NM, APLC.DATA_APLP_ID, USR.USER_NM DATA_APLP_NM,
+
+				SUBSTRING(APLC.DATA_APLC_YMD, 1, 4)
+				|| '-' || SUBSTRING(APLC.DATA_APLC_YMD, 5, 2)
+				|| '-' || SUBSTRING(APLC.DATA_APLC_YMD, 7, 2) DATA_APLC_YMD,
+				MST.DTAP_STP_SPCD AS RVW_STP_SPCD,
+				MST.DETL_CD AS RVW_STP_STCD,
+
+				MST.DATA_SRLB_NM AS RVW_STP_SPNM,
+				MST.DATA_URI_ADDR,
+				(
+					SELECT DETL_CD_NM FROM KCURE_COM_CD
+					WHERE GRP_CD = 'DATA_TPCD'
+					AND DETL_CD = MST.DATA_TPCD 
+					AND CD_USE_YN = 'Y'
+				)  AS DATA_TPNM,
+				INST.PRTI_NM
+				
+				<include refid="formDataAplcRvwList" />
+				<include refid="whereDataAplcRvwList" />
+		ORDER BY RVW.FRST_RGST_DT DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+	<select id="selectDataAplcRvwListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+		SELECT	COUNT(*) totCnt
+		<include refid="formDataAplcRvwList" />
+		<include refid="whereDataAplcRvwList" />
+	</select>
+
+    <select id="selectRvwStpSpcdList" resultType="egovMap">
+		SELECT	DETL_CD, DETL_CD_NM
+		FROM	KCURE_COM_CD
+		WHERE	GRP_CD = 'RVW_STP_SPCD'
+				AND CD_USE_YN = 'Y'
+		ORDER BY DETL_CD
+    </select>
+
+    <sql id="whereDataAplcEndList">
+		AND A.APLC_PROG_STCD = '05' --승인완료
+		AND A.RSR_EDT <![CDATA[<]]> TO_CHAR(NOW(), 'YYYYMMDD')
+		<if test="searchCondition == 'aplcProgNm' and searchKeyword != null and searchKeyword != ''">
+		AND A.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'dataAplpNm' and searchKeyword != null and searchKeyword != ''">
+		AND (
+				USR.USER_NM LIKE '%' || #{searchKeyword} || '%'
+				OR RSP.RSRP_PST_NM LIKE '%' || #{searchKeyword} || '%'
+			)
+		</if>
+		<if test="rsrEdtFrom != null and rsrEdtFrom != ''">
+		AND A.RSR_EDT BETWEEN #{rsrEdtFrom} AND #{rsrEdtTo}
+		</if>
+		<if test="rsrRstExists == 'true'">
+		AND EXISTS (
+			SELECT	1
+			FROM	KCURE_SVC_RSR_RSLT
+			WHERE	DATA_APLC_NO = A.DATA_APLC_NO
+		)
+		</if>
+		<if test="rsrRstExists == 'false'">
+		AND NOT EXISTS (
+			SELECT	1
+			FROM	KCURE_SVC_RSR_RSLT
+			WHERE	DATA_APLC_NO = A.DATA_APLC_NO
+		)
+		</if>
+	</sql>
+
+    <select id="selectDataAplcEndList" parameterType="egovMap" resultType="egovMap">
+		SELECT	A.DATA_APLC_NO,
+				A.RSR_SBJ_NM,
+				TO_CHAR(TO_DATE(A.RSR_SDT,'YYYYMMDD'), 'YYYY/MM/DD') || ' ~ ' || TO_CHAR(TO_DATE(A.RSR_EDT,'YYYYMMDD'), 'YYYY/MM/DD') AS RSR_DT_TERM,
+				(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'APLC_PROG_STCD'
+							AND DETL_CD = A.APLC_PROG_STCD
+				) AS APLC_PROG_NM,
+				'종료' STATUS,
+				(
+					SELECT	1
+					FROM	KCURE_SVC_RSR_RSLT
+					WHERE	DATA_APLC_NO = A.DATA_APLC_NO
+				) AS RSR_RSLT_CNT,
+				COALESCE(USR.USER_NM, RSP.RSRP_PST_NM) DATA_APLP_NM,
+				TO_CHAR(A.LAST_MODF_DT, 'YYYY/MM/DD') LAST_MODF_DT
+
+		FROM	KCURE_SVC_DATA_APLC A
+
+				LEFT JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = A.DATA_APLP_ID
+
+				LEFT JOIN KCURE_SVC_RSP RSP
+				ON RSP.RSRP_SPCD = '01' --책임연구원
+				AND RSP.RSRP_ID = A.DATA_APLP_ID
+				AND RSP.DATA_APLC_NO = A.DATA_APLC_NO
+
+		WHERE	1 = 1
+				<include refid="whereDataAplcEndList" />
+		ORDER BY A.LAST_MODF_DT DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+	<select id="selectDataAplcEndListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+		SELECT	COUNT(*) totCnt
+
+		FROM	KCURE_SVC_DATA_APLC A
+
+				LEFT JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = A.DATA_APLP_ID
+
+				LEFT JOIN KCURE_SVC_RSP RSP
+				ON RSP.RSRP_SPCD = '01' --책임연구원
+				AND RSP.RSRP_ID = A.DATA_APLP_ID
+				AND RSP.DATA_APLC_NO = A.DATA_APLC_NO
+
+		WHERE	1 = 1
+				<include refid="whereDataAplcEndList" />
+	</select>
+</mapper>

@@ -1,0 +1,1323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="clcinf2DAO">
+
+	<select id="selectPrtiTreeList01" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReqTreeVo">
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 '02' AS itemCd,
+			 '#' AS itemKey,
+			 '임상 라이브러리' AS itemNm1,
+			 '임상 라이브러리' AS itemNm2
+
+		UNION ALL
+
+		SELECT
+			'2' AS itemLvl,
+			 '02'AS parentItemCd,
+			 'M_' || A.prti_id AS itemCd,
+			 A.prti_id AS itemKey,
+			 A.prti_nm AS itemNm1,
+			 A.prti_nm AS itemNm2
+		FROM KCURE_SVC_PRTI A
+		WHERE A.INST_TPCD = '01' AND A.use_yn = 'Y';
+	</select>
+
+	<select id="selectPrtiTreeList02" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo"  resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReqTreeVo">
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 '01' AS itemCd,
+			 '#' AS itemKey,
+			 '공공 라이브러리' AS itemNm1,
+			 '공공 라이브러리' AS itemNm2
+
+		UNION ALL
+
+		SELECT
+			'2' AS itemLvl,
+			 '01' AS parentItemCd,
+			 'M_' || A.prti_id AS itemCd,
+			 A.prti_id AS itemKey,
+			 <choose>
+			      <when test="pblDtsSpcd == '01'">
+			           '표준형'
+			      </when>
+			      <otherwise>
+			           '맞춤형'
+			   </otherwise>
+			 </choose>  AS itemNm1,
+			 A.prti_nm AS itemNm2
+		FROM KCURE_SVC_PRTI A
+		WHERE A.use_yn = 'Y' AND A.prti_id in('M0019')
+	</select>
+
+	<select id="selectPrtiTreeList03" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReqTreeVo">
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 '01' AS itemCd,
+			 '#' AS itemKey,
+			 '공공 라이브러리' AS itemNm1,
+			 '공공 라이브러리' AS itemNm2
+
+		UNION ALL
+
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 '02' AS itemCd,
+			 '#' AS itemKey,
+			 '임상 라이브러리' AS itemNm1,
+			 '임상 라이브러리' AS itemNm2
+
+		UNION ALL
+
+		SELECT
+			'2' AS itemLvl,
+			 '01' AS parentItemCd,
+			 '01' AS itemCd,
+			 A.prti_id AS itemKey,
+			 '표준형' AS itemNm1,
+			 A.prti_nm AS itemNm2
+		FROM KCURE_SVC_PRTI A
+		WHERE A.use_yn = 'Y' AND A.prti_id in('M0019')
+
+		UNION ALL
+
+		SELECT
+			'2' AS itemLvl,
+			 '01' AS parentItemCd,
+			 '02' AS itemCd,
+			 A.prti_id AS itemKey,
+			 '맞춤형' AS itemNm1,
+			 A.prti_nm AS itemNm2
+		FROM KCURE_SVC_PRTI A
+		WHERE A.use_yn = 'Y' AND A.prti_id in('M0019')
+
+		UNION ALL
+
+		SELECT
+			'2' AS itemLvl,
+			 '02'AS parentItemCd,
+			 'M_' || A.prti_id AS itemCd,
+			 A.prti_id AS itemKey,
+			 A.prti_nm AS itemNm1,
+			 A.prti_nm AS itemNm2
+		FROM KCURE_SVC_PRTI A
+		WHERE A.INST_TPCD = '01' AND A.use_yn = 'Y';
+	</select>
+
+	<select id="selectDtsTreeList" parameterType="String" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReqTreeVo">
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 'L_' || detl_cd AS itemCd,
+			 '#' AS itemKey,
+			 detl_cd_nm AS itemNm1,
+			 detl_cd_nm AS itemNm2,
+			 #{prtiId} AS itemNm3,
+			 '0' AS pblDtsSpcd,
+			 detl_cd AS dtsLclsCd,
+			 'Y' AS holdYn
+		FROM kcure_com_cd
+		WHERE
+			grp_cd = 'DTS_LCLS_CD'
+			AND detl_cd in (
+									SELECT
+										dts_lcls_cd
+									FROM KCURE_COM_DTS_DFND
+									WHERE
+										prti_id = #{prtiId}
+										AND dts_lcls_cd NOT IN ('04', '05', '06', '07', '08', '09', '10', '11')
+										AND use_yn = 'Y'
+								)
+
+		UNION ALL
+
+		SELECT
+			 '2' AS itemLvl,
+			 'L_' || dts_lcls_cd AS parentItemCd,
+			 dts_id AS itemCd,
+			 'dta' AS itemKey,
+			 dts_knm || ' ( ' || dts_id || ' )' AS itemNm1,
+			 dts_knm AS itemNm2,
+			 #{prtiId} AS itemNm3,
+			 '0' AS pblDtsSpcd,
+			 dts_lcls_cd AS dtsLclsCd,
+			 'Y' AS holdYn
+		FROM kcure_com_dts_dfnd
+		WHERE
+			prti_id = #{prtiId}
+			AND dts_lcls_cd NOT IN ('04', '05', '06', '07', '08', '09', '10', '11')
+		   	AND use_yn = 'Y'
+
+	    UNION ALL
+
+		SELECT
+			 '2' AS itemLvl,
+			 'L_' || dts_lcls_cd AS parentItemCd,
+			 dts_id AS itemCd,
+			 'dta' AS itemKey,
+			 dts_knm || ' ( ' || dts_id || ' )' AS itemNm1,
+			 dts_knm AS itemNm2,
+			 #{prtiId} AS itemNm3,
+			 '0' AS pblDtsSpcd,
+			 dts_lcls_cd AS dtsLclsCd,
+			 'N' AS holdYn
+		FROM kcure_com_dts_dfnd
+		WHERE
+			prti_id <![CDATA[<>]]> #{prtiId}
+			AND dts_lcls_cd NOT IN ('04', '05', '06', '07', '08', '09', '10', '11')
+		   	AND use_yn = 'Y'
+			AND dts_id NOT IN (SELECT dts_id FROM kcure_com_dts_dfnd WHERE prti_id = #{prtiId} AND use_yn = 'Y')
+
+		ORDER BY itemLvl, parentItemCd, itemCd
+	</select>
+
+	<select id="selectPub01DtsTreeList" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReqTreeVo">
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 'L_' || detl_cd AS itemCd,
+			 '#' AS itemKey,
+			 detl_cd_nm AS itemNm1,
+			 detl_cd_nm AS itemNm2,
+			 'M0019' AS itemNm3,
+			 '01' AS pblDtsSpcd,
+			 detl_cd AS dtsLclsCd,
+			 'Y' AS holdYn
+		FROM kcure_com_cd
+		WHERE
+			grp_cd = 'DTS_LCLS_CD'
+			AND detl_cd in (
+									SELECT
+										dts_lcls_cd
+									FROM KCURE_COM_DTS_DFND
+									WHERE
+										prti_id = 'M0019'
+										AND dts_lcls_cd IN ('06', '07', '08', '09', '10', '11')
+										AND use_yn = 'Y'
+								)
+
+		ORDER BY itemLvl, parentItemCd, itemCd
+	</select>
+
+	<select id="selectPub02DtsTreeList" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReqTreeVo">
+		SELECT
+			 '1' AS itemLvl,
+			 '0' AS parentItemCd,
+			 'L_' || detl_cd AS itemCd,
+			 '#' AS itemKey,
+			 detl_cd_nm AS itemNm1,
+			 detl_cd_nm AS itemNm2,
+			 'M0019' AS itemNm3,
+			 '02' AS pblDtsSpcd,
+			 detl_cd AS dtsLclsCd,
+			 'Y' AS holdYn
+		FROM kcure_com_cd
+		WHERE
+			grp_cd = 'DTS_LCLS_CD'
+			AND detl_cd in (
+									SELECT
+										dts_lcls_cd
+									FROM KCURE_COM_DTS_DFND
+									WHERE
+										prti_id = 'M0019'
+										AND dts_lcls_cd =  '05'
+										AND use_yn = 'Y'
+								)
+
+		ORDER BY itemLvl, parentItemCd, itemCd
+	</select>
+
+	<select id="selectTmplte1List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+	      A.dts_id AS dtsId,
+	      A.dts_knm AS dtsKnm,
+	      (SELECT COUNT(1) FROM kcure_com_dts_col_dfnd WHERE prti_id = #{prtiId} AND dts_id = A.dts_id AND use_yn = 'Y') AS colCnt
+	   FROM kcure_com_dts_dfnd A
+	   WHERE
+	   		prti_id = #{prtiId}
+	   		AND A.dts_lcls_cd NOT IN ('03', '04', '05', '06', '07', '08', '09', '10', '11')
+	   		AND A.dts_id IN
+			<foreach collection="dstsIdArray" item="ids" open="(" close=")" separator=",">
+			    #{ids}
+			</foreach>
+	   		AND use_yn = 'Y'
+	</select>
+
+	<select id="selectPubTmplte1List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+	      A.dts_id AS dtsId,
+	      A.dts_knm AS dtsKnm,
+	      (	SELECT COUNT(1)
+	      	FROM kcure_com_dts_col_dfnd
+	      	WHERE
+	      		prti_id = #{prtiId}
+	      		AND dts_id = A.dts_id
+	      		AND dts_lcls_cd = #{dtsLclsCd}
+	      		AND use_yn = 'Y'
+	      ) AS colCnt
+	   FROM kcure_com_dts_dfnd A
+	   WHERE
+	   		prti_id = #{prtiId}
+	   		AND A.dts_lcls_cd = #{dtsLclsCd}
+	   		AND use_yn = 'Y'
+	</select>
+
+	<select id="selectTmplte2List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+	     A.dts_knm AS dtsKnm
+	     , A.dts_id AS dtsId
+	     , B.col_enm AS colEnm
+	     , B.col_knm AS colKnm
+	     , B.col_expl_cont AS colExplCont
+	     , B.data_tp_cont || '(' || B.data_lnth_cont || ')' AS dataTpCont
+		 , B.cd_value  AS cdValue
+	   FROM portal.kcure_com_dts_dfnd A, portal.kcure_com_dts_col_dfnd B
+	   WHERE
+	   	   A.prti_id = B.prti_id
+		   AND A.dts_id = B.dts_id
+		   AND A.prti_id = #{prtiId}
+		   AND A.dts_lcls_cd IN ('01', '02')
+		   AND A.use_yn = 'Y'
+		   AND B.use_yn = 'Y'
+		   AND A.dts_id IN
+			<foreach collection="dstsIdArray" item="ids" open="(" close=")" separator=",">
+			    #{ids}
+			</foreach>
+
+	   ORDER BY A.dts_id
+	</select>
+
+	<select id="selectPubTmplte2List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+	     A.dts_knm AS dtsKnm
+	     , A.dts_id AS dtsId
+	     , B.col_enm AS colEnm
+	     , B.col_knm AS colKnm
+	     , B.col_expl_cont AS colExplCont
+	     , B.data_tp_cont || '(' || B.data_lnth_cont || ')' AS dataTpCont
+		 , B.cd_value  AS cdValue
+	   FROM portal.kcure_com_dts_dfnd A, portal.kcure_com_dts_col_dfnd B
+	   WHERE
+	   	   A.prti_id = B.prti_id
+		   AND A.dts_id = B.dts_id
+		   AND A.prti_id = #{prtiId}
+		   AND A.dts_lcls_cd = #{dtsLclsCd}
+		   AND B.dts_lcls_cd = #{dtsLclsCd}
+		   AND A.use_yn = 'Y'
+		   AND B.use_yn = 'Y'
+	   ORDER BY A.dts_id
+	</select>
+
+	<select id="selectTmplte3List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			A.grp_cd AS codeId
+			, A.grp_cd_nm AS codeNm
+			, B.detl_cd AS codeVal
+			, B.detl_cd_nm codeValNm
+		 FROM kcure_com_grp_cd A, kcure_com_cd B
+		 WHERE
+		   A.grp_cd = B.grp_cd
+		   AND A.dts_com_cd_yn = 'Y'
+		 ORDER BY A.grp_cd, B.detl_cd
+	</select>
+
+	<select id="selectTmplte4List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			(SELECT detl_cd_nm FROM kcure_com_cd WHERE grp_cd = 'DTS_MCLS_CD' AND detl_cd = A.dts_mcls_cd) AS category
+			, A.dts_id AS dtsId
+			,(SELECT COUNT(1) FROM kcure_com_dts_col_dfnd WHERE prti_id = #{prtiId} AND dts_id = A.dts_id AND use_yn = 'Y') AS colCnt
+		FROM kcure_com_dts_dfnd A
+		WHERE
+			dts_lcls_cd = '03'
+			AND prti_id = #{prtiId}
+			AND A.dts_id IN
+			<foreach collection="dstsIdArray" item="ids" open="(" close=")" separator=",">
+			    #{ids}
+			</foreach>
+		   	AND use_yn = 'Y'
+	</select>
+
+	<select id="selectTmplte5List" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			(SELECT detl_cd_nm FROM kcure_com_cd WHERE grp_cd = 'DTS_MCLS_CD' AND detl_cd = A.dts_mcls_cd) AS category
+			, A.dts_id AS dtsId
+			, B.col_knm AS colKnm
+			, B.col_enm AS colEnm
+			, B.data_tp_cont || '(' || B.data_lnth_cont || ')' AS dataTpCont
+		FROM kcure_com_dts_dfnd A, kcure_com_dts_col_dfnd B
+		WHERE
+			A.prti_id = B.prti_id
+			AND A.dts_id = B.dts_id
+			AND A.dts_lcls_cd = '03'
+			AND A.prti_id = #{prtiId}
+			AND A.dts_id IN
+			<foreach collection="dstsIdArray" item="ids" open="(" close=")" separator=",">
+			    #{ids}
+			</foreach>
+			AND A.use_yn = 'Y'
+		ORDER BY A.dts_id
+	</select>
+
+	<select id="selectDetailClcInfReserch"
+				parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo"
+				resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo">
+		SELECT
+			DATA_APLC_NO 				AS dataAplcNo
+			,DATA_APLC_YMD 			AS dataAplcYmd
+			,DATA_APLP_ID 				AS dataAplpId
+			,DATA_TPCD 						AS dataTpcd
+			,PINF_CNU_AGR_YN 		AS pinfCnuAgrYn
+			,PINF_SP3P_AGR_YN 		AS pinfSp3pAgrYn
+			,PRTI_ID 							AS prtiId
+			,RSR_SBJ_NM 					AS rsrSbjNm
+			,IRB_APRI_NM 					AS irbApriNm
+			,IRB_NO 							AS irbNo
+			,CLNT_ACNT_NM 				AS clntAcntNm
+			,RSR_SPCD 						AS rsrSpcd
+			,(
+				SELECT DETL_CD_NM
+				FROM KCURE_COM_CD
+				WHERE
+					GRP_CD = 'RSR_SPCD'
+					AND DETL_CD = RSR_SPCD
+					AND CD_USE_YN = 'Y'
+			 ) 										AS rsrSpcdNm
+			,RSR_SDT 						AS rsrSdt
+			,RSR_EDT 						AS rsrEdt
+			,RSR_PRPS_CONT 			AS rsrPrpsCont
+			,RSR_SBJ_CONT 				AS rsrSbjCont
+			,KYW_CONT 						AS kywCont
+			,APLC_STP_SPCD 			AS aplcStpSpcd
+			,APLC_PROG_STCD 			AS aplcProgStcd
+			,ADD_RVW_APLP_ID 		AS addRvwAplpId
+			,ADD_RVW_APLC_YMD 	AS addRvwAplcYmd
+			,DATA_APLC_APRV_NO 	AS dataAplcAprvNo
+			,FRST_REGP_ID 				AS frstRegpId
+			,FRST_RGST_DT 				AS frstRgstDt
+			,LAST_MODP_ID 				AS lastModpId
+			,LAST_MODF_DT 				AS lastModfDt
+		FROM
+			KCURE_SVC_DATA_APLC
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</select>
+	
+	<update id="updateAplcProgStcd" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo">
+		UPDATE
+			KCURE_SVC_DATA_APLC
+		SET
+			APLC_PROG_STCD = #{aplcProgStcd}
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</update>
+
+	<select id="selectClcInfRspCnt" parameterType="String"  resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			KCURE_SVC_RSP A
+		WHERE
+			COALESCE(A.RSR_APLP_YN, 'N') != 'Y'
+			AND	DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectClcInfRsp" parameterType="String"
+				resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo">
+		SELECT
+			A.DATA_APLC_NO 				AS dataAplcNo
+			,A.RSRP_ID 							AS rsrpId
+			,B.USER_NM							AS rsrpNm
+			,A.RSRP_PST_NM 					AS rsrpPstNm
+			,A.RSRP_SPCD 						AS rsrpSpcd
+			,(
+				SELECT DETL_CD_NM
+				FROM KCURE_COM_CD
+				WHERE
+					GRP_CD = 'RSRP_SPCD'
+					AND DETL_CD = A.RSRP_SPCD
+					AND CD_USE_YN = 'Y'
+			 ) 										AS rsrpSpcdNm
+			,TO_CHAR(A.RSR_PRT_SDT::date, 'yyyy/mm/dd') 	AS rsrPrtSdt
+			,TO_CHAR(A.RSR_PRT_EDT::date, 'yyyy/mm/dd') 	AS rsrPrtEdt
+			,A.PINF_CNU_AGR_YN 			AS pinfCnuAgrYn
+			,A.SCR_AGR_YN 					AS scrAgrYn
+			,A.FRST_REGP_ID 				AS frstRegpId
+			,A.FRST_RGST_DT 				AS frstRgstDt
+			,A.LAST_MODP_ID 				AS lastModpId
+			,A.LAST_MODF_DT 				AS lastModfDt
+			,A.RSR_APLP_YN 					AS rsrAplpYn
+			,B.PRTI_ID 							AS prtiId
+			,(
+				SELECT PRTI_NM
+				FROM KCURE_SVC_PRTI
+				WHERE
+					PRTI_ID = B.PRTI_ID
+					AND USE_YN = 'Y'
+			 ) 											AS prtiNm
+			,B.USER_MBPH_NO 				AS userMbphNo1
+			,B.USER_ID 							AS email
+		FROM
+			KCURE_SVC_RSP A, KCURE_COM_USER B
+		WHERE
+			A.RSRP_ID = B.USER_ID
+			AND COALESCE(A.RSR_APLP_YN, 'N') = 'Y'
+			AND	A.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectClcInfRspList" parameterType="String" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo">
+		SELECT
+			A.DATA_APLC_NO 				AS dataAplcNo
+			,A.RSRP_ID 							AS rsrpId
+			,B.USER_NM							AS rsrpNm
+			,A.RSRP_PST_NM 					AS rsrpPstNm
+			,A.RSRP_SPCD 						AS rsrpSpcd
+			,(
+				SELECT DETL_CD_NM
+				FROM KCURE_COM_CD
+				WHERE
+					GRP_CD = 'RSRP_SPCD'
+					AND DETL_CD = A.RSRP_SPCD
+					AND CD_USE_YN = 'Y'
+			 ) 										AS rsrpSpcdNm
+			,TO_CHAR(A.RSR_PRT_SDT::date, 'yyyy/mm/dd') 	AS rsrPrtSdt
+			,TO_CHAR(A.RSR_PRT_EDT::date, 'yyyy/mm/dd') 	AS rsrPrtEdt
+			,A.PINF_CNU_AGR_YN 			AS pinfCnuAgrYn
+			,A.SCR_AGR_YN 					AS scrAgrYn
+			,A.FRST_REGP_ID 				AS frstRegpId
+			,A.FRST_RGST_DT 				AS frstRgstDt
+			,A.LAST_MODP_ID 				AS lastModpId
+			,A.LAST_MODF_DT 				AS lastModfDt
+			,A.RSR_APLP_YN 					AS rsrAplpYn
+			,B.PRTI_ID 							AS prtiId
+			,(
+				SELECT PRTI_NM
+				FROM KCURE_SVC_PRTI
+				WHERE
+					PRTI_ID = B.PRTI_ID
+					AND USE_YN = 'Y'
+			 ) 											AS prtiNm
+			,B.USER_MBPH_NO 				AS userMbphNo1
+			,B.USER_ID 							AS email
+			,A.VRT_USE_YN
+		FROM
+			KCURE_SVC_RSP A, KCURE_COM_USER B
+		WHERE
+			A.RSRP_ID = B.USER_ID
+			AND COALESCE(A.RSR_APLP_YN, 'N') != 'Y'
+			AND	A.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<insert id="insertAplcTempDts" parameterType="HashMap" >
+		INSERT INTO KCURE_SVC_TEMP_DATA_APLC_DTS(
+				DATA_APLC_NO
+				,DTS_LCLS_CD
+				,PRTI_ID
+				,DTS_ID
+				,COL_ENM
+				,ATTF_SEQ
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataAplcNo}
+				,#{dtsLclsCd}
+				,#{prtiId}
+				,#{dtsId}
+				,#{colEnm}
+				,#{attfSeq}
+				,#{userId}
+				,#{userId}
+			)
+	</insert>
+
+	<insert id="insertAplcDts" parameterType="HashMap" >
+		INSERT INTO KCURE_SVC_DATA_APLC_DTS(
+				DATA_APLC_NO
+				,PRTI_ID
+				,DTS_LCLS_CD
+				,DTS_ID
+				,COL_ENM
+				,ATTF_SEQ
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataaplcno}
+				,#{prtiid}
+				,#{dtslclscd}
+				,#{dtsid}
+				,#{colenm}
+				,#{attfseq}
+				,#{userid}
+				,#{userid}
+			)
+	</insert>
+
+	<insert id="insertAplcAddDts" parameterType="HashMap" >
+		INSERT INTO KCURE_SVC_ADDDATA_APLC_DTS(
+				DATA_APLC_NO
+				,PRTI_ID
+				,ADD_DATA_CONT
+				,DATA_TPCD
+				,DTS_LCLS_CD
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataaplcno}
+				,#{prtiid}
+				,#{adddatacont}
+				,#{datatpcd}
+				,#{dtslclscd}
+				,#{userid}
+				,#{userid}
+			)
+	</insert>
+
+	<insert id="insertAplcAddTmpDts" parameterType="HashMap" >
+		INSERT INTO KCURE_SVC_TEMP_ADDDATA_APLC_DTS(
+				DATA_APLC_NO
+				,PRTI_ID
+				,ADD_DATA_CONT
+				,DATA_TPCD
+				,DTS_LCLS_CD
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataAplcNo}
+				,#{prtiId}
+				,#{addDataCont}
+				,#{dataTpcd}
+				,#{dtsLclsCd}
+				,#{userId}
+				,#{userId}
+			)
+	</insert>
+
+	<update id="updateAplcAddTmpDts" parameterType="HashMap" >
+		UPDATE KCURE_SVC_TEMP_ADDDATA_APLC_DTS
+			SET
+				ADD_DATA_CONT = #{addDataCont}
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND PRTI_ID = #{prtiId}
+			AND DTS_LCLS_CD = #{dtsLclsCd}
+			AND DATA_TPCD = #{dataTpcd}
+	</update>
+
+	<insert id="insertDtapStatHst" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo" >
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+				DATA_APLC_NO
+				,DTAP_STAT_SEQ
+				,DTAP_STAT_SPCD
+				,FRST_REGP_ID
+				,FRST_RGST_DT
+				,LAST_MODP_ID
+				,LAST_MODF_DT
+			)VALUES(
+				#{dataAplcNo}
+				,(SELECT COALESCE(MAX(DTAP_STAT_SEQ), 0) + 1 FROM KCURE_SVC_DTAP_STAT_HST WHERE DATA_APLC_NO = #{dataAplcNo})
+				,#{datpStatSpcd}
+				,#{userId}
+				,now()
+				,#{userId}
+				,now()
+			)
+	</insert>
+
+	<insert id="insertAplcRvw" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" >
+		INSERT INTO KCURE_SVC_DATA_APLC_RVW(
+				DATA_APLC_NO
+			    ,DATA_TPCD
+				,RVW_TMP_ID
+				,RVW_STDT
+				,RVW_EDDT
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataAplcNo}
+				,#{dataTpcd}
+				,(SELECT rvw_tmp_id FROM KCURE_SVC_RVW_TMP WHERE rvw_stp_seq = 1 AND data_tpcd = #{dataTpcd})
+				,current_timestamp
+				,current_timestamp + '20 days '
+				,#{userId}
+				,#{userId}
+			)
+	</insert>
+	
+	<select id="selectAplcRvwCnt" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			KCURE_SVC_DATA_APLC_RVW
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND DATA_TPCD = #{dataTpcd}
+	</select>
+	
+	<select id="selectPrvdInstCnt" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			KCURE_SVC_DATA_PRVD_INST
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}	
+	</select>
+	
+	<delete id="deleteAplcRvw" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo">
+		DELETE FROM
+			KCURE_SVC_DATA_APLC_RVW
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND DATA_TPCD = #{dataTpcd}		
+	</delete>
+	
+	<delete id="deletePrvdInst" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo">
+		DELETE FROM
+			KCURE_SVC_DATA_PRVD_INST
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}	
+	</delete>
+	
+
+	<insert id="insertPrvdInst" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" >
+		INSERT INTO KCURE_SVC_DATA_PRVD_INST(
+				DATA_APLC_NO
+				,PRTI_ID
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataAplcNo}
+				,#{prtiId}
+				,#{userId}
+				,#{userId}
+			)
+	</insert>
+
+	<select id="selectTmpAplcAddTmpDtsCnt" parameterType="HashMap" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			KCURE_SVC_TEMP_ADDDATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND PRTI_ID = #{prtiId}
+			AND DTS_LCLS_CD = #{dtsLclsCd}
+			AND DATA_TPCD = #{dataTpcd}
+	</select>
+
+	<select id="selectTmpAplcAddTmpDtsList" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			DATA_APLC_NO AS dataAplcNo
+			,PRTI_ID AS prtiId
+			,ADD_DATA_CONT AS addDataCont
+			,DATA_TPCD AS dataTpcd
+			,DTS_LCLS_CD AS dtsLclsCd
+			,FRST_REGP_ID AS userId
+			,LAST_MODP_ID AS userId
+		FROM
+			KCURE_SVC_TEMP_ADDDATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<delete id="deleteTmpDataAplcDtsOne" parameterType="HashMap">
+		DELETE FROM
+			KCURE_SVC_TEMP_DATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND PRTI_ID = #{prtiId}
+			<if test="dtsLclsCd != null and dtsLclsCd != '' and gubun != null and gubun != ''">
+				<if test="gubun == '공공' ">
+					AND DTS_LCLS_CD = #{dtsLclsCd}
+				</if>
+			</if>
+	</delete>
+
+	<delete id="deleteTmpDataAplcDts" parameterType="HashMap">
+		DELETE FROM
+			KCURE_SVC_TEMP_ADDDATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND DATA_TPCD = #{dataTpcd}
+	</delete>
+
+	<delete id="deleteTmpAddDataAplcDtsOne" parameterType="HashMap">
+		DELETE FROM
+			KCURE_SVC_TEMP_ADDDATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			<if test="dtsLclsCd != null and dtsLclsCd != '' and gubun != null and gubun != ''">
+				<if test="gubun == '공공' ">
+					AND DTS_LCLS_CD = #{dtsLclsCd}
+				</if>
+			</if>
+	</delete>
+
+	<delete id="deleteTmpAddDataAplcDts" parameterType="HashMap">
+		DELETE FROM
+			KCURE_SVC_TEMP_ADDDATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</delete>
+
+	<select id="selectTmpDtsList" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			data_aplc_no AS dataAplcNo
+			, prti_id AS prtiId
+			, dts_lcls_cd AS dtsLclsCd
+			, dts_id AS dtsId
+			, col_enm AS colEnm
+			, attf_seq AS attfSeq
+			, frst_regp_id AS userId
+		FROM
+			KCURE_SVC_TEMP_DATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectTmpDtsOne" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			data_aplc_no AS dataAplcNo
+			, prti_id AS prtiId
+			, attf_seq AS attfSeq
+		FROM
+			KCURE_SVC_TEMP_DATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND PRTI_ID = #{prtiId}
+			AND ATTF_SEQ = #{attfseq}
+		GROUP BY data_aplc_no, prti_id, attf_seq
+	</select>
+
+	<select id="selectDtsList2" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo">
+		SELECT
+			data_aplc_no AS dataAplcNo
+			, prti_id AS prtiId
+			, dts_lcls_cd AS dtsLclsCd
+			, attf_seq AS attfSeq
+		FROM
+			KCURE_SVC_DATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND prti_id NOT in
+			<foreach collection="histDataArrays" item="prtiIds" open="(" close=")" separator=",">
+			    #{prtiIds}
+			</foreach>
+		GROUP BY data_aplc_no, prti_id, dtsLclsCd, attf_seq
+	</select>
+
+	<select id="selectDtsList" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo">
+		SELECT
+			data_aplc_no AS dataAplcNo
+			, prti_id AS prtiId
+		FROM
+			KCURE_SVC_DATA_APLC_DTS
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+		GROUP BY data_aplc_no, prti_id
+	</select>
+
+	<select id="selectDataServiceFileList" parameterType="kcure.portal.cmn.service.DataServiceFileVO" resultType="kcure.portal.cmn.service.DataServiceFileVO">
+		SELECT DATA_APLC_NO
+			, ATTF_SEQ
+			, ATTF_SPCD
+			, ATTD_NM_SPCD
+			, ATTF_OWNR_ID
+			, ATTF_NM
+			, ATTF_STR_NM
+			, ATTF_PTH_NM
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		FROM KCURE_SVC_ATTF
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND ATTF_SPCD =  #{attfSpcd}
+		ORDER BY ATTF_SEQ
+	</select>
+
+	<select id="selectAplDtsListCnt" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="int">
+		SELECT COUNT(AA.*) FROM (	SELECT
+				 A.data_aplc_no AS dataAplcNo
+				, '공공' AS gubun
+				, A.dts_lcls_cd AS dtsLclsCd
+				, A.prti_id AS prtiId
+				, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+				, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd' AND DETL_CD = A.dts_lcls_cd)  AS dtsInfo
+				, B.attf_nm AS attfNm
+				, B.attf_str_nm as attfStrNm
+				, B.attf_pth_nm as attfPthNm
+				, 'x' AS dtsHtml
+				, 'x' AS excelupload
+			FROM ( SELECT
+							DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+						FROM KCURE_SVC_DATA_APLC_DTS
+						WHERE
+							data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN (SELECT DETL_CD FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd')
+						GROUP BY DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+						ORDER BY 3
+						)A, KCURE_SVC_ATTF B
+			WHERE
+				A.data_aplc_no = B.data_aplc_no
+				AND A.prti_id = 'M0019'
+				AND A.attf_seq = B.attf_seq
+				AND B.attf_spcd = '06'
+				AND A.data_aplc_no = #{dataAplcNo}
+			GROUP BY A.data_aplc_no, A.dts_lcls_cd, A.prti_id, B.attf_nm, B.attf_str_nm, B.attf_pth_nm
+
+			UNION ALL
+
+			SELECT
+				A.data_aplc_no AS dataAplcNo
+				, '임상' AS gubun
+				, '02' AS dtsLclsCd
+				, A.prti_id AS prtiId
+				, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+				, ARRAY_TO_STRING(ARRAY_AGG(B.dts_knm || ' ( ' || A.dts_id || ' )'),'<![CDATA[<br/>]]>') AS dtsInfo
+				, C.attf_nm AS attfNm
+				, C.attf_str_nm as attfStrNm
+				, C.attf_pth_nm as attfPthNm
+				, 'x' AS dtsHtml
+				, 'x' AS excelupload
+			FROM ( SELECT
+							DATA_APLC_NO, PRTI_ID, DTS_ID, ATTF_SEQ
+						FROM KCURE_SVC_DATA_APLC_DTS
+						WHERE
+							data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN ('01', '02', '03')
+						GROUP BY DATA_APLC_NO, PRTI_ID, DTS_ID, ATTF_SEQ
+						ORDER BY 3
+						)A, KCURE_COM_DTS_DFND B, KCURE_SVC_ATTF C
+			WHERE
+			    A.dts_id = B.dts_id
+				AND A.prti_id = B.prti_id
+				AND A.data_aplc_no = C.data_aplc_no
+				AND A.attf_seq = C.attf_seq
+				AND C.attf_spcd = '06'
+				AND A.data_aplc_no = #{dataAplcNo}
+			GROUP BY A.data_aplc_no, A.prti_id, C.attf_nm, C.attf_str_nm, C.attf_pth_nm) AA
+	</select>
+
+	<select id="selectAplDtsList" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			(row_number() over()) AS no,
+			MST.*
+		FROM(
+			SELECT
+				 A.data_aplc_no AS dataAplcNo
+				, '공공' AS gubun
+				, A.dts_lcls_cd AS dtsLclsCd
+				, A.prti_id AS prtiId
+				, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+				, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd' AND DETL_CD = A.dts_lcls_cd)  AS dtsInfo
+				, B.attf_nm AS attfNm
+				, B.attf_str_nm as attfStrNm
+				, B.attf_pth_nm as attfPthNm
+				, 'x' AS dtsHtml
+				, 'x' AS excelupload
+			FROM ( SELECT
+							DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+						FROM KCURE_SVC_DATA_APLC_DTS
+						WHERE
+							data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN (SELECT DETL_CD FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd')
+						GROUP BY DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+						ORDER BY 3
+						)A, KCURE_SVC_ATTF B
+			WHERE
+				A.data_aplc_no = B.data_aplc_no
+				AND A.prti_id = 'M0019'
+				AND A.attf_seq = B.attf_seq
+				AND B.attf_spcd = '06'
+				AND A.data_aplc_no = #{dataAplcNo}
+			GROUP BY A.data_aplc_no, A.dts_lcls_cd, A.prti_id, B.attf_nm, B.attf_str_nm, B.attf_pth_nm
+
+			UNION ALL
+
+			SELECT
+				A.data_aplc_no AS dataAplcNo
+				, '임상' AS gubun
+				, '02' AS dtsLclsCd
+				, A.prti_id AS prtiId
+				, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+				, ARRAY_TO_STRING(ARRAY_AGG(B.dts_knm || ' ( ' || A.dts_id || ' )'),'<![CDATA[<br/>]]>') AS dtsInfo
+				, C.attf_nm AS attfNm
+				, C.attf_str_nm as attfStrNm
+				, C.attf_pth_nm as attfPthNm
+				, 'x' AS dtsHtml
+				, 'x' AS excelupload
+			FROM ( SELECT
+							DATA_APLC_NO, PRTI_ID, DTS_ID, ATTF_SEQ
+						FROM KCURE_SVC_DATA_APLC_DTS
+						WHERE
+							data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN ('01', '02', '03')
+						GROUP BY DATA_APLC_NO, PRTI_ID, DTS_ID, ATTF_SEQ
+						ORDER BY 3
+						)A, KCURE_COM_DTS_DFND B, KCURE_SVC_ATTF C
+			WHERE
+			    A.dts_id = B.dts_id
+				AND A.prti_id = B.prti_id
+				AND A.data_aplc_no = C.data_aplc_no
+				AND A.attf_seq = C.attf_seq
+				AND C.attf_spcd = '06'
+				AND A.data_aplc_no = #{dataAplcNo}
+			GROUP BY A.data_aplc_no, A.prti_id, C.attf_nm, C.attf_str_nm, C.attf_pth_nm
+		) MST
+
+		<if test='allListYn == "N"'>
+			LIMIT 20
+		</if>
+
+	</select>
+
+	<select id="selectAplTmpDtsHistList" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			A.data_aplc_no AS dataAplcNo
+			, '공공' AS gubun
+			, A.dts_lcls_cd AS dtsLclsCd
+			, A.prti_id AS prtiId
+			, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+			, '' AS dtsEnm
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd' AND DETL_CD = A.dts_lcls_cd) AS dtsKnm
+			, B.attf_nm AS attfNm
+			, B.attf_seq AS attfSeq
+			, 'Y' AS histDataYn
+		FROM ( SELECT
+						DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+					FROM KCURE_SVC_TEMP_DATA_APLC_DTS
+					WHERE
+						data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN (SELECT DETL_CD FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd')
+					GROUP BY DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+					ORDER BY 3
+				 ) A, KCURE_SVC_ATTF B
+		WHERE
+			A.prti_id = 'M0019'
+			AND A.data_aplc_no = B.data_aplc_no
+			AND A.attf_seq = B.attf_seq
+			AND B.attf_spcd = '06'
+			AND A.data_aplc_no = #{dataAplcNo}
+		GROUP BY A.data_aplc_no, A.dts_lcls_cd, A.prti_id, B.attf_nm, B.attf_seq
+
+		UNION ALL
+
+		SELECT
+			A.data_aplc_no AS dataAplcNo
+			, '임상' AS gubun
+			, A.dts_lcls_cd AS dtsLclsCd
+			, A.prti_id AS prtiId
+			, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+			, ARRAY_TO_STRING(ARRAY_AGG(A.dts_id),'|') AS dtsEnm
+			, ARRAY_TO_STRING(ARRAY_AGG(B.dts_knm),'|') AS dtsKnm
+			, C.attf_nm AS attfNm
+			, C.attf_seq AS attfSeq
+			, 'Y' AS histDataYn
+		FROM ( SELECT
+						DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, DTS_ID, ATTF_SEQ
+					FROM KCURE_SVC_TEMP_DATA_APLC_DTS
+					WHERE
+						data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN ('01', '02', '03')
+					GROUP BY DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, DTS_ID, ATTF_SEQ
+					ORDER BY 3
+				 ) A, KCURE_COM_DTS_DFND B, KCURE_SVC_ATTF C
+		WHERE
+			A.dts_id = B.dts_id
+			AND A.prti_id = B.prti_id
+			AND A.prti_id = B.prti_id
+			AND A.data_aplc_no = C.data_aplc_no
+			AND A.attf_seq = C.attf_seq
+			AND C.attf_spcd = '06'
+			AND A.data_aplc_no = #{dataAplcNo}
+		GROUP BY A.data_aplc_no,  A.prti_id, A.dts_lcls_cd, C.attf_nm, C.attf_seq
+	</select>
+
+	<select id="selectAplDtsHistList" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			A.data_aplc_no AS dataAplcNo
+			, '공공' AS gubun
+			, A.dts_lcls_cd AS dtsLclsCd
+			, A.prti_id AS prtiId
+			, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+			, '' AS dtsEnm
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd' AND DETL_CD = A.dts_lcls_cd) AS dtsKnm
+			, B.attf_nm AS attfNm
+			, B.attf_seq AS attfSeq
+			, 'Y' AS histDataYn
+		FROM ( SELECT
+						DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+					FROM KCURE_SVC_DATA_APLC_DTS
+					WHERE
+						data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN (SELECT DETL_CD FROM KCURE_COM_CD WHERE UP_GRP_CD = 'pbl_dts_spcd')
+					GROUP BY DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, ATTF_SEQ
+					ORDER BY 3
+				 ) A, KCURE_SVC_ATTF B
+		WHERE
+			A.prti_id = 'M0019'
+			AND A.data_aplc_no = B.data_aplc_no
+			AND A.attf_seq = B.attf_seq
+			AND B.attf_spcd = '06'
+			AND A.data_aplc_no = #{dataAplcNo}
+		GROUP BY A.data_aplc_no, A.dts_lcls_cd, A.prti_id, B.attf_nm, B.attf_seq
+
+		UNION ALL
+
+		SELECT
+			A.data_aplc_no AS dataAplcNo
+			, '임상' AS gubun
+			, A.dts_lcls_cd AS dtsLclsCd
+			, A.prti_id AS prtiId
+			, (select prti_nm from kcure_svc_prti where prti_id = A.prti_id and use_yn = 'Y') AS pritNm
+			, ARRAY_TO_STRING(ARRAY_AGG(A.dts_id),'|') AS dtsEnm
+			, ARRAY_TO_STRING(ARRAY_AGG(B.dts_knm),'|') AS dtsKnm
+			, C.attf_nm AS attfNm
+			, C.attf_seq AS attfSeq
+			, 'Y' AS histDataYn
+		FROM ( SELECT
+						DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, DTS_ID, ATTF_SEQ
+					FROM KCURE_SVC_DATA_APLC_DTS
+					WHERE
+						data_aplc_no = #{dataAplcNo} AND DTS_LCLS_CD IN ('01', '02', '03')
+					GROUP BY DATA_APLC_NO, PRTI_ID, DTS_LCLS_CD, DTS_ID, ATTF_SEQ
+					ORDER BY 3
+				 ) A, KCURE_COM_DTS_DFND B, KCURE_SVC_ATTF C
+		WHERE
+			A.dts_id = B.dts_id
+			AND A.prti_id = B.prti_id
+			AND A.prti_id = B.prti_id
+			AND A.data_aplc_no = C.data_aplc_no
+			AND A.attf_seq = C.attf_seq
+			AND C.attf_spcd = '06'
+			AND A.data_aplc_no = #{dataAplcNo}
+		GROUP BY A.data_aplc_no,  A.prti_id, A.dts_lcls_cd, C.attf_nm, C.attf_seq
+	</select>
+
+	<select id="selectAplDtsHistList2" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			data_aplc_no AS dataAplcNo
+			,prti_id AS prtiId
+			, dts_id AS dtsId
+			, col_enm AS colEnm
+			, attf_seq AS attfSeq
+			, frst_regp_id AS userId
+			, last_modp_id AS userId
+		FROM KCURE_SVC_DATA_APLC_DTS
+		WHERE
+		    data_aplc_no = #{dataAplcNo}
+	</select>
+
+	<select id="selectAplAddDtsHistList2" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			data_aplc_no AS dataAplcNo
+			,prti_id AS prtiId
+			, add_data_cont AS addDataCont
+			, frst_regp_id AS userId
+			, last_modp_id AS userId
+		FROM KCURE_SVC_ADDDATA_APLC_DTS
+		WHERE
+		    data_aplc_no = #{dataAplcNo}
+		    AND DATA_TPCD = #{dataTpcd}
+	</select>
+
+	<select id="selectAplDtsStep" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo" resultType="HashMap">
+		SELECT
+			aplc_stp_spcd AS aplcStpSpcd
+		FROM KCURE_SVC_DATA_APLC
+		WHERE
+			data_aplc_no = #{dataAplcNo}
+	</select>
+
+	<delete id="deleteAllDataAplcDts">
+		DELETE FROM
+			KCURE_SVC_DATA_APLC_DTS
+		WHERE
+			data_aplc_no = #{dataAplcNo}
+	</delete>
+
+	<delete id="deleteDataAplcDts">
+		DELETE FROM
+			KCURE_SVC_DATA_APLC_DTS
+		WHERE
+			data_aplc_no = #{dataAplcNo}
+			AND prti_id = #{prtiId}
+	</delete>
+
+	<delete id="deleteAllAddDataAplcDts">
+		DELETE FROM
+			KCURE_SVC_ADDDATA_APLC_DTS
+		WHERE
+			data_aplc_no = #{dataAplcNo}
+			AND DATA_TPCD = #{dataTpcd}
+	</delete>
+
+	<delete id="deleteAddDataAplcDts">
+		DELETE FROM
+			KCURE_SVC_ADDDATA_APLC_DTS
+		WHERE
+			data_aplc_no = #{dataAplcNo}
+			AND prti_id = #{prtiId}
+			AND DATA_TPCD = #{dataTpcd}
+	</delete>
+	
+	<select id="selectNccApiList" resultType="String">
+		SELECT TO_JSON(A) FROM (
+      		SELECT (SELECT TO_JSON(DATA) FROM (
+						SELECT A.DATA_APLC_NO as "kcureKey"
+								,A.RSR_SBJ_NM as "researchTitle"
+								,A.IRB_APRI_NM as "irbApproveAgency"
+								,A.IRB_NO as "irbApproveNumber"
+								,case when A.RSR_SPCD = '01' then 1
+									when A.RSR_SPCD = '02' then 2
+									when A.RSR_SPCD = '03' then 3 else 5 end as "researchCategorySeq"
+								,CASE
+									WHEN A.RSR_SDT <![CDATA[<>]]> '' THEN TO_CHAR(TO_DATE(A.RSR_SDT, 'YYYYMMDD'),'YYYY-MM-DD')
+									ELSE '' END as "irbResearchStartDate"
+								,CASE
+									WHEN A.RSR_EDT <![CDATA[<>]]> '' THEN TO_CHAR(TO_DATE(A.RSR_EDT, 'YYYYMMDD'),'YYYY-MM-DD')
+									ELSE '' END as "irbResearchEndDate"
+								,A.RSR_PRPS_CONT as "researchPurpose"
+								,A.RSR_SBJ_DISS_CONT as "researchTopic"
+								,A.RSR_MTHD_CONF as "researchDesc"
+								,A.EXPC_CONF as "researchEffect"
+								,A.RSRFUN_SPRT_CONF as "researchFunds"
+								,pbl_dts_spcd as "pblDtsSpcd"
+							FROM KCURE_SVC_DATA_APLC A
+							    LEFT OUTER JOIN (
+										SELECT DATA_APLC_NO, DTAP_STAT_SPCD
+										FROM KCURE_SVC_DTAP_STAT_HST
+										WHERE DATA_APLC_NO = #{dataAplcNo}
+										ORDER BY DTAP_STAT_SEQ DESC
+										LIMIT 1
+									 )B ON B.DATA_APLC_NO = A.DATA_APLC_NO
+					 			LEFT OUTER JOIN KCURE_COM_USER C ON C.USER_ID = A.DATA_APLP_ID
+								LEFT OUTER JOIN KCURE_SVC_PRTI D ON D.PRTI_ID = A.PRTI_ID
+							WHERE A.DATA_APLC_NO =  #{dataAplcNo}
+	         			) AS data) as "clcInfReserch",
+	         			(SELECT TO_JSON(DATA) FROM (
+						SELECT
+							B.USER_NM							AS "workerName"
+							,B.USER_MBPH_NO 				AS "workerHp"
+							,B.USER_ID 							AS "workerEmail"
+							,B.prti_nm AS "prtiNm"
+						FROM
+							KCURE_SVC_RSP A, 
+							(select M.*, S.prti_nm from	KCURE_COM_USER M left join kcure_svc_prti S
+							on M.prti_id = S.prti_id ) B
+						WHERE
+							A.RSRP_ID = B.USER_ID
+							AND COALESCE(A.RSR_APLP_YN, 'N') = 'Y'
+							AND	A.DATA_APLC_NO = #{dataAplcNo}
+         			) AS data)as "clcInfRsp",
+      			ARRAY_TO_JSON(ARRAY( 
+	     		 SELECT TO_JSON(DATA) FROM (
+						SELECT
+							B.USER_NM							AS "workerName"
+							, case
+								when A.RSRP_SPCD = '02' then 'M'
+								when A.RSRP_SPCD = '03' then 'J' else 'A' end as "workerType"
+							,A.PINF_CNU_AGR_YN 			AS "pledgeComplicanceAgree"
+							,A.SCR_AGR_YN 					AS "securutyPledgeAgree"
+							,B.USER_MBPH_NO 				AS "workerHp"
+							,B.USER_ID 							AS "workerEmail"
+							,A.VRT_USE_YN     as "vmUseYn"
+							,B.prti_nm AS "prtiNm"
+						FROM
+							KCURE_SVC_RSP A, 
+							(select M.*, S.prti_nm from	KCURE_COM_USER M left join kcure_svc_prti S
+							on M.prti_id = S.prti_id ) B
+						WHERE
+							A.RSRP_ID = B.USER_ID
+							AND COALESCE(A.RSR_APLP_YN, 'N') != 'Y'
+							AND	A.DATA_APLC_NO =#{dataAplcNo}
+         			) AS data
+      			)
+   			)as "clcInfRspList",
+      			ARRAY_TO_JSON(ARRAY( 
+	     		 SELECT TO_JSON(DATA) FROM (
+						SELECT 
+							ATTD_NM_SPCD as "attdNmSpcd"
+							, ATTF_NM  as "originalFileName"
+							, ATTF_STR_NM as "fileName"
+							, ATTF_PTH_NM as "filePath"
+						FROM KCURE_SVC_ATTF
+						WHERE DATA_APLC_NO =#{dataAplcNo}
+						ORDER BY ATTF_SEQ
+         			) AS data
+      			)
+   			)as "fileList",
+	     		 (SELECT TO_JSON(DATA) FROM (
+						SELECT 
+							case 
+								when A.AENV_SPCD = '01' then 'Y' else 'N' end as "analysisYn"
+							,CASE
+								WHEN DSZ_APDT <![CDATA[<>]]>'' THEN TO_CHAR(TO_DATE(DSZ_APDT, 'YYYYMMDD'),'YYYY-MM-DD')
+								ELSE '' END as "useStartDate"
+							, TO_CHAR(TO_DATE(DSZ_APDT, 'YYYYMMDD') + cast(DTAP_USE_DCNT as int) - 1,'YYYY-MM-DD') as "useEndDate"
+							, A.USE_DTRN_MNTH_VL as "useMonth"
+							, A.USE_DTRN_MAIN_VL as "useWeek"
+							, A.USE_DTRN_DAY_VL as "useDay"
+							, case 
+								when A.VRT_ANLS_DVCE_CONT = '01' then 'P'
+								when A.VRT_ANLS_DVCE_CONT = '02' then 'R'
+								when A.VRT_ANLS_DVCE_CONT = '03' then 'S'
+								when A.VRT_ANLS_DVCE_CONT = '04' then 'G' 
+								else 'V' 
+							end as "analysisTools"	
+							, case
+								when A.RDC_RT_SPCD = 'RDRT01' then '1'
+								when A.RDC_RT_SPCD = 'RDRT02' then '2'
+								when A.RDC_RT_SPCD = 'RDRT03' then '3'
+								when A.RDC_RT_SPCD = 'RDRT04' then '4'
+								when A.RDC_RT_SPCD = 'RDRT05' then '5'
+								when A.RDC_RT_SPCD = 'RDRT06' then '6'
+								when A.RDC_RT_SPCD = 'RDRT07' then '7'
+								when A.RDC_RT_SPCD = 'RDRT08' then '8'
+								when A.RDC_RT_SPCD = 'RDRT09' then '9'
+								when A.RDC_RT_SPCD = 'RDRT10' then '10'
+								when A.RDC_RT_SPCD = 'RDRT11' then '11'
+								when A.RDC_RT_SPCD = 'RDRT12' then '12'
+								when A.RDC_RT_SPCD = 'RDRT13' then '13'
+								when A.RDC_RT_SPCD = 'RDRT14' then '14'
+								when A.RDC_RT_SPCD = 'RDRT15' then '15'
+								else '16' end as "discountRate"
+							, B.RDC_RT as "discountRatePercent"
+							FROM PORTAL.KCURE_SVC_DATA_APLC_SMRY A
+							LEFT OUTER JOIN PORTAL.KCURE_SVC_RDRT_ITEM B
+							ON A.RDC_RT_SPCD = B.RDC_RT_SPCD
+							WHERE A.DATA_APLC_NO = #{dataAplcNo}
+         		) AS data) as "dataAplcInfo",
+         		(SELECT TO_JSON(DATA) FROM (
+					select 
+						ARRAY_TO_STRING(ARRAY_AGG
+							(distinct (SELECT DETL_CD_NM
+										FROM KCURE_COM_CD
+										WHERE GRP_CD = 'DTS_LCLS_CD'
+										AND DETL_CD = dts_lcls_cd
+										AND CD_USE_YN = 'Y')),',') as "kcureDtsNm"
+						,ARRAY_TO_STRING(ARRAY_AGG(distinct dts_lcls_cd),',') as "kcureDtsCd"
+					from kcure_svc_data_aplc_dts where DATA_APLC_NO =  #{dataAplcNo}
+				) AS data)as "kcureDtsInfo"
+		)as A 
+	</select>
+	
+	<select id="selectNccApiFileList" parameterType="kcure.portal.cmn.service.DataServiceFileVO" resultType="egovMap">
+		SELECT DATA_APLC_NO
+		      ,ATTF_SEQ
+		      ,ATTF_SPCD
+		      ,ATTD_NM_SPCD
+		      ,ATTF_OWNR_ID
+		      ,ATTF_NM
+		      ,ATTF_STR_NM
+		      ,ATTF_PTH_NM
+		  FROM KCURE_SVC_ATTF
+		 WHERE DATA_APLC_NO = #{dataAplcNo}
+		 <choose>
+		      <when test="attdNmSpcd == '06'">
+				AND attd_nm_spcd = '06'
+		      </when>
+		      <otherwise>
+		        AND attd_nm_spcd <![CDATA[<>]]> '06'
+		   </otherwise>
+		 </choose> 
+	</select>
+
+</mapper>

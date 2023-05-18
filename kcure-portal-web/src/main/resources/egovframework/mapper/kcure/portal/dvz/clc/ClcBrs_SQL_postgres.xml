@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dvzClcBrs">
+    <select id="selectDvzClcTopMnuList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.VSLZ_MENU_ID
+		      ,A.LNKG_MENU_ID
+		      ,A.HGHR_VSLZ_MENU_ID
+		      ,A.VSLZ_MENU_NM
+		      ,A.VSLZ_MENU_EXPL_CONT
+		      ,A.SMRY_STATS_NO
+		      ,A.APRC_AUTH_SPCD
+		      ,A.VSLZ_MENU_ORD
+		      ,A.USE_YN
+		      ,(SELECT CC.VSLZ_MENU_NM
+		          FROM KCURE_SVC_VSLZ_MENU CC
+		         WHERE CC.VSLZ_MENU_ID = A.HGHR_VSLZ_MENU_ID
+		         LIMIT 1
+		       ) AS HGHR_VSLZ_MENU_NM
+		  FROM KCURE_SVC_VSLZ_MENU A
+		 WHERE A.HGHR_VSLZ_MENU_ID = #{topVslzMenuId}
+		   AND A.USE_YN = 'Y'
+		 <if test='menuAuthYn == null or menuAuthYn.equals("N")'>
+		   AND A.APRC_AUTH_SPCD = '00'		--전체권한
+		 </if>
+		 ORDER BY A.VSLZ_MENU_ORD
+    </select>
+    
+    <select id="selectDvzClcLeftMnuList" parameterType="egovMap" resultType="egovMap">
+		WITH RECURSIVE LEFT_MENU(VSLZ_MENU_ID,LNKG_MENU_ID,HGHR_VSLZ_MENU_ID,VSLZ_MENU_NM,VSLZ_MENU_EXPL_CONT,SMRY_STATS_NO,APRC_AUTH_SPCD,USE_YN,DEP_LV,CHILD_CNT)
+		     AS (
+		         --START_QUERY
+				     SELECT A.VSLZ_MENU_ID
+				           ,A.LNKG_MENU_ID
+				           ,A.HGHR_VSLZ_MENU_ID
+				           ,A.VSLZ_MENU_NM
+				           ,A.VSLZ_MENU_EXPL_CONT
+				           ,A.SMRY_STATS_NO
+				           ,A.APRC_AUTH_SPCD
+				           ,A.USE_YN
+				           ,1 AS DEP_LV
+				           ,(SELECT COUNT(1) FROM KCURE_SVC_VSLZ_MENU CC WHERE CC.HGHR_VSLZ_MENU_ID = A.VSLZ_MENU_ID AND CC.USE_YN = 'Y') AS CHILD_CNT
+				           ,ARRAY[A.VSLZ_MENU_ORD::INT] AS VSLZ_MENU_ORD
+				           ,ARRAY[A.VSLZ_MENU_ID::TEXT] AS PATH
+				           ,FALSE AS CYCLE
+				       FROM KCURE_SVC_VSLZ_MENU A
+				      WHERE A.HGHR_VSLZ_MENU_ID = #{subVslzMenuId}
+				        AND A.USE_YN = 'Y'
+		              <if test='menuAuthYn == null or menuAuthYn.equals("N")'>
+		                AND A.APRC_AUTH_SPCD = '00'		--전체권한
+		              </if>
+		         UNION
+		         --REPEAT_QUERY
+				     SELECT A.VSLZ_MENU_ID
+				           ,A.LNKG_MENU_ID
+				           ,A.HGHR_VSLZ_MENU_ID
+				           ,A.VSLZ_MENU_NM
+				           ,A.VSLZ_MENU_EXPL_CONT
+				           ,A.SMRY_STATS_NO
+				           ,A.APRC_AUTH_SPCD
+				           ,A.USE_YN
+				           ,2 AS DEP_LV
+				           ,0 AS CHILD_CNT
+				           ,ARRAY_APPEND(FA.VSLZ_MENU_ORD, A.VSLZ_MENU_ORD::INT) AS VSLZ_MENU_ORD
+				           ,ARRAY_APPEND(FA.PATH, A.VSLZ_MENU_ID::TEXT) AS PATH
+				           ,A.VSLZ_MENU_ID = ANY(FA.PATH) AS CYCLE
+				       FROM KCURE_SVC_VSLZ_MENU A
+				            INNER JOIN LEFT_MENU FA
+				                    ON A.HGHR_VSLZ_MENU_ID = FA.VSLZ_MENU_ID
+				      WHERE A.USE_YN = 'Y'
+		              <if test='menuAuthYn == null or menuAuthYn.equals("N")'>
+		                AND A.APRC_AUTH_SPCD = '00'		--전체권한
+		              </if>
+				        AND NOT CYCLE
+		        )
+		--VIEW_QUERY
+		SELECT A.VSLZ_MENU_ID
+				  ,A.LNKG_MENU_ID
+				  ,A.HGHR_VSLZ_MENU_ID
+				  ,A.VSLZ_MENU_NM
+				  ,A.VSLZ_MENU_EXPL_CONT
+				  ,A.SMRY_STATS_NO
+				  ,A.APRC_AUTH_SPCD
+				  ,A.USE_YN
+				  ,A.DEP_LV
+				  ,A.CHILD_CNT
+		  FROM LEFT_MENU A
+		 WHERE 1=1
+		 ORDER BY A.VSLZ_MENU_ORD
+    </select>
+    
+    <select id="selectDvzClcMnuDtl" parameterType="egovMap" resultType="egovMap">
+		SELECT A.VSLZ_MENU_ID
+		      ,A.LNKG_MENU_ID
+		      ,A.HGHR_VSLZ_MENU_ID
+		      ,A.VSLZ_MENU_NM
+		      ,A.VSLZ_MENU_EXPL_CONT
+		      ,A.SMRY_STATS_NO
+		      ,A.APRC_AUTH_SPCD
+		      ,A.USE_YN
+		  FROM KCURE_SVC_VSLZ_MENU A
+		 WHERE A.VSLZ_MENU_ID = #{srchVslzMenuId}
+		   AND A.USE_YN = 'Y'
+    </select>
+    
+    <select id="selectStsClncCdList" parameterType="egovMap" resultType="egovMap">
+		SELECT STAT_CNCR_CLNC_CD
+		      ,STAT_CNCR_CLNC_CD_NM
+		  FROM CLNC_STS.CNCR_CLNC_STAT_CD
+		 WHERE STAT_CD_CLS_ID = #{statCdClsId}
+		 ORDER BY ARRY_ORD_VL
+    </select>
+    
+    <select id="selectStsClncYrList" parameterType="egovMap" resultType="egovMap">
+		SELECT CRIT_YR
+		  FROM CLNC_STS.CNCR_CLNC_META_STATS
+		 GROUP BY CRIT_YR
+		 ORDER BY CRIT_YR
+    </select>
+    
+    <select id="selectDvzClcStatList" parameterType="egovMap" resultType="egovMap">
+		WITH BASE_QRY AS (
+		                  SELECT A.CATE_GBN_CD
+		                        ,A.CATE_GBN
+		                        ,A.CATE_ORD_VL
+		                        ,B.STAT_CNCR_CLNC_CD
+		                        ,B.STAT_CNCR_CLNC_CD_NM
+		                        ,B.ARRY_ORD_VL
+		                    FROM (
+		                    <choose>
+		                        <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("02")'>
+		                             SELECT STAT_CNCR_CLNC_CD AS CATE_GBN_CD
+		                                   ,STAT_CNCR_CLNC_CD_NM AS CATE_GBN
+		                                   ,ARRY_ORD_VL AS CATE_ORD_VL
+		                               FROM CLNC_STS.CNCR_CLNC_STAT_CD
+		                              WHERE STAT_CD_CLS_ID = '9012'		--연령별
+		                              <if test="ageCdList != null and ageCdList !=''">
+		                                AND STAT_CNCR_CLNC_CD IN (${ageCdList})
+		                              </if>
+		                        </when>
+		                        <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("03")'>
+		                             SELECT STAT_CNCR_CLNC_CD AS CATE_GBN_CD
+		                                   ,STAT_CNCR_CLNC_CD_NM AS CATE_GBN
+		                                   ,ARRY_ORD_VL AS CATE_ORD_VL
+		                               FROM CLNC_STS.CNCR_CLNC_STAT_CD
+		                              WHERE STAT_CD_CLS_ID = '9011'		--성별
+		                              <if test="gndrCdList != null and gndrCdList !=''">
+		                                AND STAT_CNCR_CLNC_CD IN (${gndrCdList})
+		                              </if>
+		                        </when>
+		                        <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("04")'>
+		                             SELECT STAT_CNCR_CLNC_CD AS CATE_GBN_CD
+		                                   ,STAT_CNCR_CLNC_CD_NM AS CATE_GBN
+		                                   ,ARRY_ORD_VL AS CATE_ORD_VL
+		                               FROM CLNC_STS.CNCR_CLNC_STAT_CD
+		                              WHERE STAT_CD_CLS_ID = '9000'		--기관별
+		                                AND STAT_CNCR_CLNC_CD LIKE '0%'
+		                              <if test="prtiCdList != null and prtiCdList !=''">
+		                                AND STAT_CNCR_CLNC_CD IN (${prtiCdList})
+		                              </if>
+		                        </when>
+		                        <otherwise>
+		                             --연도별
+		                             SELECT CRIT_YR AS CATE_GBN_CD
+		                                   ,CRIT_YR AS CATE_GBN
+		                                   ,CRIT_YR AS CATE_ORD_VL
+		                               FROM CLNC_STS.CNCR_CLNC_META_STATS
+		                              GROUP BY CRIT_YR
+		                             <if test="critYrList != null and critYrList !=''">
+		                              HAVING CRIT_YR IN (${critYrList})
+		                             </if>
+		                        </otherwise>
+		                    </choose>
+		                         ) A
+		                         JOIN CLNC_STS.CNCR_CLNC_STAT_CD B
+		                           ON STAT_CD_CLS_ID IN (
+		                                                 SELECT CC.STAT_CD_CLS_ID
+		                                                   FROM CLNC_STS.CNCR_CLNC_SMRY_STATS_MST CC
+		                                                  WHERE CC.SMRY_STATS_NO = #{smryStatsNo}
+		                                                )
+		                 )
+		, STAT_QRY AS (
+		               SELECT A.${groupColNm} AS CATE_GBN_CD
+		                     ,A.STAT_CNCR_CLNC_CD
+		                     ,SUM(A.PT_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_CNT)) OVER(PARTITION BY A.${groupColNm}) AS SUM_COUNT
+		                 FROM CLNC_STS.CNCR_CLNC_META_STATS A
+		                WHERE A.SMRY_STATS_NO = #{smryStatsNo}
+		                <if test="gndrCdList != null and gndrCdList !=''">
+		                  AND A.SEX_CD IN (${gndrCdList})
+		                </if>
+		                <if test="ageCdList != null and ageCdList !=''">
+		                  AND A.STATS_AGE_SPCD IN (${ageCdList})
+		                </if>
+		                <if test="critYrList != null and critYrList !=''">
+		                  AND A.CRIT_YR IN (${critYrList})
+		                </if>
+		                <if test="prtiCdList != null and prtiCdList !=''">
+		                  AND A.HOSP_CD IN (${prtiCdList})
+		                </if>
+		                GROUP BY A.${groupColNm}, A.STAT_CNCR_CLNC_CD
+		              )
+		, MAX_QRY AS (
+		              SELECT A.CATE_GBN_CD
+			                ,MAX(A.COUNT) AS MAX_COUNT
+		                    --,(CASE WHEN MAX(A.COUNT) > 10 THEN (CEIL(MAX(A.COUNT)/POWER(10, (CHAR_LENGTH(MAX(A.COUNT) || '')-1))) * POWER(10, (CHAR_LENGTH(MAX(A.COUNT) || '')-1)))
+		                    --  ELSE 10 END) AS CORR_MAX_COUNT
+		                    ,(CASE WHEN MAX(A.COUNT) >= 100 THEN (CASE WHEN (MAX(A.COUNT)%100) > 0 THEN (CAST(FLOOR(MAX(A.COUNT) + 100) AS INT) / 100 * 100)
+		                                                          ELSE MAX(A.COUNT) END)
+		                           WHEN MAX(A.COUNT) > 10 THEN (CAST(FLOOR(MAX(A.COUNT) + 10) AS INT) / 10 * 10)
+		                      ELSE 10 END)::INTEGER AS CORR_MAX_COUNT
+		                FROM STAT_QRY A
+		               GROUP BY A.CATE_GBN_CD
+		              )
+		, FIN_QRY AS (
+		              SELECT A.STAT_CNCR_CLNC_CD_NM AS ITEM_NM
+		                    ,A.CATE_GBN
+		                    ,A.CATE_ORD_VL
+		                    ,A.ARRY_ORD_VL
+		                    ,COALESCE(B.COUNT, 0) AS COUNT
+		                    ,COALESCE(C.MAX_COUNT, 0) AS MAX_COUNT
+		                    ,COALESCE(C.CORR_MAX_COUNT, 10) AS CORR_MAX_COUNT
+		                    ,((COALESCE(C.CORR_MAX_COUNT, 10)/10) * (CASE WHEN (COALESCE(B.COUNT, 0)%(COALESCE(C.CORR_MAX_COUNT, 10)/10)::INTEGER) > 0
+		                                                                  THEN (TRUNC(COALESCE(B.COUNT, 0)/(COALESCE(C.CORR_MAX_COUNT, 10)/10)) + 1)
+		                                                             ELSE TRUNC(COALESCE(B.COUNT, 0)/(COALESCE(C.CORR_MAX_COUNT, 10)/10)) END)) AS CORR_COUNT
+		                    ,SUM(((COALESCE(C.CORR_MAX_COUNT, 10)/10) * (CASE WHEN (COALESCE(B.COUNT, 0)%(COALESCE(C.CORR_MAX_COUNT, 10)/10)::INTEGER) > 0
+		                                                                      THEN (TRUNC(COALESCE(B.COUNT, 0)/(COALESCE(C.CORR_MAX_COUNT, 10)/10)) + 1)
+		                                                                 ELSE TRUNC(COALESCE(B.COUNT, 0)/(COALESCE(C.CORR_MAX_COUNT, 10)/10)) END))) OVER(PARTITION BY A.CATE_GBN_CD) AS CATE_CORR_COUNT_SUM
+		                    ,SUM(((COALESCE(C.CORR_MAX_COUNT, 10)/10) * (CASE WHEN (COALESCE(B.COUNT, 0)%(COALESCE(C.CORR_MAX_COUNT, 10)/10)::INTEGER) > 0
+		                                                                      THEN (TRUNC(COALESCE(B.COUNT, 0)/(COALESCE(C.CORR_MAX_COUNT, 10)/10)) + 1)
+		                                                                 ELSE TRUNC(COALESCE(B.COUNT, 0)/(COALESCE(C.CORR_MAX_COUNT, 10)/10)) END))) OVER(PARTITION BY A.STAT_CNCR_CLNC_CD) AS ITEM_CORR_COUNT_SUM
+		                FROM BASE_QRY A
+		                     LEFT OUTER JOIN STAT_QRY B
+		                                  ON B.CATE_GBN_CD = A.CATE_GBN_CD
+		                                     AND B.STAT_CNCR_CLNC_CD = A.STAT_CNCR_CLNC_CD
+		                     LEFT OUTER JOIN  MAX_QRY C
+		                                  ON C.CATE_GBN_CD = A.CATE_GBN_CD
+		              )
+		SELECT A.*
+		      ,SUM(A.CORR_COUNT) OVER() AS SUM_CORR_COUNT
+		      ,MAX(A.CATE_CORR_COUNT_SUM) OVER() AS MAX_CATE_CORR_COUNT_SUM
+		      ,MAX(A.ITEM_CORR_COUNT_SUM) OVER() AS MAX_ITEM_CORR_COUNT_SUM
+		  FROM FIN_QRY A
+		 ORDER BY A.CATE_ORD_VL, A.ARRY_ORD_VL
+    </select>
+</mapper>

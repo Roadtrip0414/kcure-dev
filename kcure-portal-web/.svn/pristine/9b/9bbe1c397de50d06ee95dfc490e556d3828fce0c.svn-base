@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=yes" />
+<meta name="title" content="" />
+<meta name="keyword" content="" />
+<meta name="description" content="" />
+<title>분류명 - 페이지명 | Project Name</title>
+
+<link rel="stylesheet" href="../../css/common.css" />
+<link rel="stylesheet" href="../../css/style.css" />
+
+<script src="../../js/jquery-3.6.3.min.js"></script>
+<script src="../../js/plugin/slick.min.js"></script>
+<script src="../../js/plugin/vegas.min.js"></script>
+<script src="../../js/common.js"></script>
+</head>
+<body>
+<div id="wrap">
+	<div id="skipNav">
+		<a href="#content">본문으로 바로가기</a>
+		<a href="#gnb">주메뉴 바로가기</a>
+	</div>
+
+	<!-- header -->
+	<header id="header">
+		<div class="header-wrap">
+			<div class="header-inbox">
+				<h1 class="logo"><a href="/" title="메인페이지로 이동"><span class="blind">K-CURE 운영관리 포털</span></a></h1>
+				<ul class="top-link01">
+					<li><a href="#">로그인</a></li>
+					<li><a href="#">회원가입</a></li>
+				</ul>
+				<div class="top-link02">
+					<div class="sccontrol-box">
+						<span>화면크기</span>
+						<button type="button" class="zoom-plus"><span class="blind">화면확대</span></button>
+						<button type="button" class="zoom-minus"><span class="blind">화면축소</span></button>
+					</div>
+					<button type="button" class="btn-searchopen"><span class="blind">통합검색 열기</span></button>
+					<button type="button" class="btn-allmenuopen">
+						<span class="bar"></span>
+						<span class="bar num02"></span>
+						<span class="bar"></span>
+						<span class="blind">전체메뉴 열기</span>
+					</button>
+				</div>
+			</div>
+			<!-- gnb -->
+			<div id="gnb-bg"></div>
+			<nav id="gnb">
+				<ul class="gnb">
+					<li class="li-num01"><span class="a-depth01"><a href="#">데이터 소개</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">K-CURE 라이브러리</a></li>
+								<li class="yesdepth"><a href="#">임상 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">데이터 모델</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="yesdepth"><a href="#">공공 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">데이터 모델</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">보건복지공공데이터</a></li>
+							</ul>
+						</div>
+					</li>
+					<li class="li-num02"><span class="a-depth01"><a href="#">데이터 시각화</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li class="yesdepth"><a href="#">임상 라이브러리</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">개요</a></li>
+											<li><a href="#">BaselineDB</a></li>
+											<li><a href="#">암공통</a></li>
+											<li><a href="#">암임상_위암</a></li>
+											<li><a href="#">암임상_유방암</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">공공 라이브러리</a></li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num03"><span class="a-depth01"><a href="#">데이터 신청</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">데이터 신청 개요</a></li>
+								<li><a href="#">데이터 활용 신청</a></li>
+								<li><a href="#">안심활용센터예약</a></li>
+								<li><a href="#">데이터 반입출신청</a></li>
+								<li><a href="#">OPEN API 신청</a></li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num04"><span class="a-depth01"><a href="#">이용자 지원</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li class="yesdepth"><a href="#">데이터 교육</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">온라인교육</a></li>
+											<li><a href="#">실습교육</a></li>
+										</ul>
+									</div>
+								</li>
+								<li><a href="#">공지사항</a></li>
+								<li><a href="#">K-CURE소식</a></li>
+								<li><a href="#">데이터 활용사례</a></li>
+								<li class="yesdepth"><a href="#">데이터 중심병원</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">공지사항</a></li>
+											<li><a href="#">FAQ</a></li>
+											<li><a href="#">Q&amp;A</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="yesdepth"><a href="#">문의하기</a>
+									<div class="submenu-wrap02">
+										<ul class="munu-depth02">
+											<li><a href="#">FAQ</a></li>
+											<li><a href="#">Q&amp;A</a></li>
+										</ul>
+									</div>
+								</li>								
+							</ul>
+						</div>
+					</li>
+					<li class="li-num05"><span class="a-depth01"><a href="#">K-CURE 소개</a></span>
+						<div class="submenu-wrap">
+							<ul class="munu-depth01">
+								<li><a href="#">K-CURE 서비스 개요</a></li>
+								<li><a href="#">서비스 유형 및 이용방법</a></li>
+								<li><a href="#">안심활용센터 소개</a></li>
+								<li><a href="#">의료중심데이터 병원</a></li>
+								<li><a href="#">운영조직 및 참여기관</a></li>							
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</nav>
+			<!-- //gnb -->
+		</div>
+	</header>
+	<!-- //header -->
+
+	<div class="subtop-tab">
+		<div class="mo-scrolltab">
+			<ul>
+				<li class="on"><a href="#">임상 라이브러리</a></li>
+				<li><a href="#">공공 라이브러리</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- //subtop-tab -->
+
+	<div class="subtop-infor" id="content">
+		<div class="inbox-wrap">
+			<div class="location">
+				<a href="#" class="home"><span class="blind">홈</span></a>
+				<a href="#"><span>데이터 시각화</span></a>
+				<a href="#"><span>임상 라이브러리</span></a>
+				<a href="#" class="current"><span>BaselineDB</span></a>
+				<div class="locamenu-box">
+					<a href="#" class="lt-openmenu"><span class="blind">메뉴열기</span></a>
+					<div class="location-menu">
+						<ul>
+							<li><a href="#">개요</a></li>
+							<li><a href="#">BaselineDB</a></li>
+							<li><a href="#">암공통</a></li>
+							<li><a href="#">위암</a></li>
+							<li><a href="#">유방암</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<h2>Baseline DB</h2>
+			<p class="txt-infor">의료데이터 중심병원 대상으로 10개 암 등록환자 수(‘10~’23년) 165만명에 대한 데이터를 수집/구축하여 <br>10개의 암을 단계적으로 지속할 예정이며, 암 세부질환별 데이터를 K-CURE에서 통합 및 정제하여 제공합니다.</p>
+		</div>
+	</div>
+	<!-- //subtop-infor -->
+
+	<!-- container -->
+	<div id="container">
+		<div class="subcon-wrap">
+			<div class="inbox-wrap">
+				컨텐츠 내용
+			</div>
+		</div>
+		<!-- //subcon-wrap -->
+	</div>
+	<!-- //container -->
+
+	<!-- footer -->
+	<footer id="footer">
+		<div class="footer-wrap">
+			<div class="footer-link">
+				<div class="footlogo"><a href="/" title="메인페이지로 이동"><span class="blind">K-CURE 운영관리 포털</span></a></div>
+				<ul class="link-ul">
+					<li><a href="#">이용약관</a></li>
+					<li><a href="#">개인정보처리방침</a></li>
+					<li><a href="#">고객의소리</a></li>
+				</ul>
+			</div>
+			<!-- //footer-link -->
+			<div class="footer-site">
+				<button type="button" class="btn-sopen"><span>관련사이트</span></button>
+				<div class="linklist-box">
+					<div class="inbox">
+						<ul>
+							<li><a href="#" target="_blank" title="새창">링크1</a></li>
+							<li><a href="#" target="_blank" title="새창">링크2</a></li>
+							<li><a href="#" target="_blank" title="새창">링크3</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- //footer-site -->
+			<address>(04513) 서울특별시 중구 세종대로 39 11층 한국보건의료정보원 (남대문로4가 45, 서울상공회의소)</address>
+			<p class="txt-copy">COPYRIGHT©By KHIS. All rights Reserved</p>
+			<button type="button" class="btn-wintop"><span class="blind">최상단으로 이동</span></button>
+		</div>
+	</footer>
+	<!-- //footer -->
+</div>
+</body>
+</html>

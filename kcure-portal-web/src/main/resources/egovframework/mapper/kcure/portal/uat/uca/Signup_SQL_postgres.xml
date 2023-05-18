@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SignupUsr">	
+	
+	<!-- 휴대폰 기가입 정보 조회 -->
+	<select id="selectUserByMobile" parameterType="String"  resultType="HashMap">
+		SELECT 
+			user_id AS userid
+			, frst_rgst_dt AS frstrgstdt 
+		FROM 
+			KCURE_COM_USER
+		WHERE 
+			pin = #{sRspNo} 
+		LIMIT 1
+	</select>
+	
+	<select id="selectCntByEmail" parameterType="String"  resultType="int">
+		SELECT 
+			COUNT(1)
+		FROM 
+			KCURE_COM_USER
+		WHERE 
+			user_id = #{email} 
+	</select>
+	
+	<select id="selectCmbPrtiList"  resultType="egovMap">
+		SELECT 
+			PRTI_ID	AS DETL_CD
+		    , PRTI_NM	AS DETL_CD_NM
+		FROM KCURE_SVC_PRTI
+		WHERE INST_CLS_SPCD IN ('01', '02')
+		ORDER BY PRTI_NM collate "ko_KR.utf8"
+	</select>
+	
+	<insert id="insertUser" parameterType="kcure.portal.uat.uca.service.impl.SignupVO">
+		INSERT INTO KCURE_COM_USER
+		(
+			user_id, --사용자id
+		    user_nm, --사용자이름
+		    login_pswd, --패스워드
+		    pin, --개인식별번호
+		    pswd_slt_vl, --비밀번호솔트값
+		    user_stcd, --사용자상태코드
+		    prti_id, --참여기관ID
+		    user_mbph_no, --사용자이동전화번호
+		    trm_agr_yn, --이용약관동의여부
+		    pinf_cnu_agr_yn, --개인정보수집이용동의여부
+		    pinf_sp3p_agr_yn, --개인정보제3자제공동의여부
+		    email_rcv_agr_yn, --이메일수신동의여부
+		    sms_rcv_agr_yn, --SMS수신동의여부
+		    user_ent_medm_cd, --사용자가입매체코드
+		    ent_medm_rcv_id, --가입매체수신ID
+		    user_ent_dt, --사용자가입일시
+		    frst_regp_id, --최초등록자ID
+		    frst_rgst_dt, --최초등록일시
+		    last_modp_id, --최종수정자ID
+		    last_modf_dt  --최종수정일시		    		    		    		    
+		)
+		VALUES
+		(
+			#{userId},
+			#{userNm},
+			#{loginPswd},
+			#{pin},
+			#{pswdSltVl},
+			#{userStcd},
+			#{prtiId},
+			#{userMbphNo},
+			#{trmAgrYn},
+			#{pinfCnuAgrYn},
+			#{pinfSp3pAgrYn},
+			#{emailRcvAgrYn},
+			#{smsRcvAgrYn},
+			#{userEntMedmCd},
+			#{entMedmRcvId},
+			now(),
+			'SYSTEM',
+			now(),
+			'SYSTEM',
+			now()
+		)
+	</insert>
+
+</mapper>

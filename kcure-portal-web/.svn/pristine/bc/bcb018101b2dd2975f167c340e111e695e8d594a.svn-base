@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Ntc">
+	<select id="selectNtcList" parameterType="kcure.portal.bbs.ntc.service.impl.NtcVO" resultType="egovMap">
+		SELECT * FROM (
+			SELECT A.NOTICE_AT, A.NTT_ID, A.BBS_ID, A.NTT_SE_CODE
+			, A.NTT_SJ, A.NTT_CN, A.RDCNT
+			, A.NTCE_BGNDE, A.NTCE_ENDDE, A.NTCR_ID
+			, A.NTCR_NM, B.ATCH_FILE_ID, A.USE_AT
+			, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY.mm.dd')AS FRST_REGIST_DT
+			, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY/mm/dd HH24:MI:SS') AS FRST_REGIST_PNTTM
+			, 'Y' AS TOP_AT
+			FROM PORTAL.KCURE_COM_COMTNBBS A
+			LEFT OUTER JOIN (SELECT ATCH_FILE_ID FROM PORTAL.KCURE_COM_COMTNFILEDETAIL GROUP BY ATCH_FILE_ID) B
+			ON A.ATCH_FILE_ID  = B.ATCH_FILE_ID
+			WHERE A.BBS_ID = #{bbsId}
+			AND A.NOTICE_AT = 'Y'
+			AND A.USE_AT = 'Y'
+			ORDER BY A.NTT_ID DESC
+			LIMIT 5
+		)A
+
+		UNION ALL
+
+		SELECT * FROM (
+			SELECT
+				A.NOTICE_AT, A.NTT_ID, A.BBS_ID, A.NTT_SE_CODE
+				, A.NTT_SJ, A.NTT_CN, A.RDCNT
+				, A.NTCE_BGNDE, A.NTCE_ENDDE, A.NTCR_ID
+				, A.NTCR_NM, B.ATCH_FILE_ID, A.USE_AT
+				, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY.mm.dd') AS FRST_REGIST_DT
+				, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY/mm/dd HH24:MI:SS') AS FRST_REGIST_PNTTM
+				, 'N' AS TOP_AT
+			FROM PORTAL.KCURE_COM_COMTNBBS A
+			LEFT OUTER JOIN (SELECT ATCH_FILE_ID FROM PORTAL.KCURE_COM_COMTNFILEDETAIL GROUP BY ATCH_FILE_ID) B
+			ON A.ATCH_FILE_ID  = B.ATCH_FILE_ID
+			WHERE A.BBS_ID = #{bbsId}
+			AND A.USE_AT = 'Y'
+			<if test="searchKeyword != null and searchKeyword !=''">
+				<if test="searchCondition == 0">
+					AND (UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%') OR UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%'))
+				</if>
+				<if test="searchCondition == 1">
+					AND UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+				</if>
+				<if test="searchCondition == 2">
+					AND UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+				</if>
+			</if>
+			ORDER BY A.NTT_ID DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+		) B
+	</select>
+
+	<select id="selectNtcListTotCnt" parameterType="kcure.portal.bbs.ntc.service.impl.NtcVO" resultType="java.lang.Integer">
+		SELECT
+			COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_COM_COMTNBBS A
+		LEFT OUTER JOIN (SELECT ATCH_FILE_ID FROM PORTAL.KCURE_COM_COMTNFILEDETAIL GROUP BY ATCH_FILE_ID) B
+		ON A.ATCH_FILE_ID  = B.ATCH_FILE_ID
+		WHERE A.BBS_ID = #{bbsId}
+		AND A.USE_AT = 'Y'
+		<if test="searchKeyword != null and searchKeyword !=''">
+			<if test="searchCondition == 0">
+				AND (UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%') OR UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%'))
+			</if>
+			<if test="searchCondition == 1">
+				AND UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+			</if>
+			<if test="searchCondition == 2">
+				AND UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+			</if>
+		</if>
+	</select>
+
+	<select id="selectNtcDetail" parameterType="kcure.portal.bbs.ntc.service.impl.NtcVO" resultType="egovMap">
+		SELECT NTT_ID, BBS_ID
+			, NTT_SE_CODE, NTT_NO
+			, NTT_SJ, NTT_CN
+			, RDCNT, USE_AT
+			, NTCR_ID, NTCR_NM
+			, ATCH_FILE_ID, NOTICE_AT
+			, TO_CHAR(FRST_REGIST_PNTTM,'YYYY-mm-dd') AS FRST_REGIST_PNTTM
+		FROM PORTAL.KCURE_COM_COMTNBBS
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+	</select>
+
+	<select id="selectMaxRdcnt" parameterType="kcure.portal.bbs.ntc.service.impl.NtcVO" resultType="java.lang.Integer">
+		SELECT COALESCE(MAX(RDCNT),0)+1 AS RDCNT FROM KCURE_COM_COMTNBBS
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+ 	</select>
+
+ 	<update id="updateRdcnt" parameterType="kcure.portal.bbs.ntc.service.impl.NtcVO">
+		UPDATE KCURE_COM_COMTNBBS SET
+			RDCNT = #{rdcnt}
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+ 	</update>
+</mapper>

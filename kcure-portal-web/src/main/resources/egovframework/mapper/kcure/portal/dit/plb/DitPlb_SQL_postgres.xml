@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ditPlb">
+	<select id="selectLclsNmList" parameterType="egovMap" resultType="egovMap">
+		SELECT LCLS_NM, MAX(TBL_ORD) tbl_ord, MAX(DTS_LCLS_CD) as DTS_LCLS_CD
+		FROM KCURE_COM_TBL_DFND
+		WHERE DTS_LCLS_CD = #{dtsLclsCd}
+		GROUP BY  LCLS_NM
+		ORDER BY TBL_ORD
+	</select>
+
+	<select id="selectTblEnmList" parameterType="egovMap" resultType="egovMap">
+		SELECT TBL_ENM
+		FROM KCURE_COM_TBL_DFND
+		WHERE DTS_LCLS_CD = #{dtsLclsCd}
+		AND LCLS_NM = #{lclsNm}
+		ORDER BY TBL_ORD
+	</select>
+
+	<select id="selectColKnmList" parameterType="egovMap" resultType="egovMap">
+		SELECT COL_ENM, COL_KNM
+		FROM KCURE_COM_COL_DFND
+		WHERE TBL_ENM = #{tblEnm}
+		ORDER BY COL_ORD
+	</select>
+</mapper>

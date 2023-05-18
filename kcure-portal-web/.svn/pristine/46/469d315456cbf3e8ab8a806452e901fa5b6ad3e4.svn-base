@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- GOOGLE OAuth Configuration -->
+	<bean id="googleAuthVO" class="egovframework.com.ext.oauth.service.OAuthVO">
+		<constructor-arg value="google" /><!-- Service Name -->
+		<constructor-arg value="1044767185911-oev6uo5pkro2n5u3se4lragkb9o8ipg7.apps.googleusercontent.com" /><!-- googleClientID -->
+		<constructor-arg value="5qAMYyDD9CkN3f38w0a8zomn" /><!-- googleClientSecret -->
+		<constructor-arg value="http://localhost:8500/auth/google/callback" /><!-- googleRedirectUrl -->
+	</bean>
+
+	<!-- NAVER OAuth Configuration -->
+	<bean id="naverAuthVO" class="egovframework.com.ext.oauth.service.OAuthVO">
+		<constructor-arg value="naver" /><!-- Service Name -->
+<!-- 		<constructor-arg value="2NUTY4QHkWzCuEA3dNJo" />naverClientID -->
+		<!-- 임시 키 발급 -->
+		<constructor-arg value="1CJ7e0JTW909Z1APMlTc" /><!-- naverClientID -->
+		<constructor-arg value="LQNmbH9Kuf" /><!-- naverClientSecret -->
+<!-- 		<constructor-arg value="http://localhost:8080/portal/uat/uia/auth/naver/callback" />naverRedirectUrl -->
+		<constructor-arg value="portal/uat/uia/auth/naver/callback" />
+		
+	</bean>
+
+	<!-- KAKAO OAuth Configuration -->
+	<bean id="kakaoAuthVO" class="egovframework.com.ext.oauth.service.OAuthVO">
+		<constructor-arg value="kakao" /><!-- Service Name -->
+<!-- 		<constructor-arg value="8fc0e5fc8b29f5224f7ee2101c6e3547" />kakaoClientID -->
+		<!-- 임시 키 발급 -->
+		<constructor-arg value="ece598bd4d0af6ece0f045565b588219" /><!-- kakaoClientID -->
+		<constructor-arg value="trMPrzMA2PDzUvTrsixvFYsNwIbROzzX" /><!-- kakaoClientSecret -->
+<!-- 		<constructor-arg value="http://localhost:8080/portal/uat/uia/auth/kakao/callback" />kakaoRedirectUrl Login -->
+		<constructor-arg value="portal/uat/uia/auth/kakao/callback" /><!-- kakaoRedirectUrl Login -->
+		
+	</bean>
+
+</beans>

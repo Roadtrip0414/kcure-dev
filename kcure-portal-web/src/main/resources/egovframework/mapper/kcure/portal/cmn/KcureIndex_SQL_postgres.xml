@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kcureIndex">
+	<!-- 이전 main
+    <select id="selectBbsNtcListForMain" parameterType="egovMap" resultType="egovMap">
+		SELECT NTT_ID
+		      ,BBS_ID
+		      ,NTT_SE_CODE
+		      ,NTT_SJ
+		      ,NTT_CN
+		      ,RDCNT
+		      ,NTCR_ID
+		      ,NTCR_NM
+		      ,TO_CHAR(FRST_REGIST_PNTTM,'YYYY.mm.dd') AS FRST_REGIST_DT
+		  FROM KCURE_COM_COMTNBBS
+		 WHERE BBS_ID = 'BBSMSTR_000000000001'
+		   AND USE_AT = 'Y'
+		 ORDER BY NTT_ID DESC
+		 LIMIT 3
+    </select>
+     -->
+     <select id="selectBbsNtcListForMain" parameterType="egovMap" resultType="egovMap">
+		WITH B001 AS 
+			(
+				SELECT 
+					NTT_ID
+					, BBS_ID
+					, NTT_SE_CODE
+					, NTT_SJ
+					, NTT_CN
+					, RDCNT
+					, NTCR_ID
+					, NTCR_NM
+					, TO_CHAR(FRST_REGIST_PNTTM,'YYYY.mm.dd') AS FRST_REGIST_DT
+					, (ROW_NUMBER() OVER()) AS ROWNUM
+				FROM KCURE_COM_COMTNBBS
+				WHERE 
+					BBS_ID = 'BBSMSTR_000000000001'
+					AND USE_AT = 'Y'
+				ORDER BY NTT_ID DESC
+				LIMIT 4
+	  )
+	  , B003 AS 
+	  		(
+				SELECT 
+					NTT_ID
+					, BBS_ID
+					, NTT_SE_CODE
+					, NTT_SJ
+					, NTT_CN
+					, RDCNT
+					, NTCR_ID
+					, NTCR_NM
+					, TO_CHAR(FRST_REGIST_PNTTM,'YYYY.mm.dd') AS FRST_REGIST_DT
+					, (ROW_NUMBER() OVER()) AS ROWNUM
+				FROM KCURE_COM_COMTNBBS
+				WHERE 
+					BBS_ID = 'BBSMSTR_000000000003'
+					AND USE_AT = 'Y'
+				ORDER BY NTT_ID DESC
+				LIMIT 4
+	  )
+		SELECT * FROM B001
+		UNION
+		SELECT * FROM B003
+		ORDER BY ROWNUM ASC, BBS_ID ASC
+    </select>
+    
+    <select id="selectBbsFaqListForMain" parameterType="egovMap" resultType="egovMap">
+		SELECT NTT_ID
+		      ,BBS_ID
+		      ,NTT_SE_CODE
+		      ,NTT_SJ
+		      ,NTT_CN
+		      ,RDCNT
+		      ,NTCR_ID
+		      ,NTCR_NM
+		      ,TO_CHAR(FRST_REGIST_PNTTM,'YYYY.mm.dd') AS FRST_REGIST_DT
+		  FROM KCURE_COM_COMTNBBS
+		 WHERE BBS_ID = 'BBSMSTR_000000000002'
+		   AND USE_AT = 'Y'
+		 ORDER BY NTT_ID DESC
+		 LIMIT 3
+    </select>
+</mapper>

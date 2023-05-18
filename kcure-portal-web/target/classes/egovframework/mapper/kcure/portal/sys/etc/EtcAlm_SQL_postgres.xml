@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EtcAlm">
+
+	<select id="selectNtceMsgList" parameterType="egovMap" resultType="egovMap">
+		SELECT NTCE_MSG_NO, NTCE_SPCD, NTCE_MSG_TTL_NM, EMAIL_MSG_TTL_NM
+			, NTCE_MSG_CONT, EMAIL_MSG_CONT, NTCE_DETL_SPCD
+			, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT, FRST_REGP_ID
+		FROM PORTAL.KCURE_SVC_NTCE_MSG
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND (
+				UPPER(NTCE_MSG_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+				OR UPPER(NTCE_MSG_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+				OR UPPER(EMAIL_MSG_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+				OR UPPER(EMAIL_MSG_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+			)
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND NTCE_SPCD = #{searchKeyword1}
+		</if>
+		ORDER BY NTCE_MSG_NO DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectNtceMsgListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) as totcnt
+		FROM PORTAL.KCURE_SVC_NTCE_MSG
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND UPPER(NTCE_MSG_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND NTCE_SPCD = #{searchKeyword1}
+		</if>
+	</select>
+
+	<select id="selectNtceMsgDetail" parameterType="egovMap" resultType="egovMap">
+		SELECT A.NTCE_MSG_NO, A.NTCE_SPCD, A.NTCE_MSG_TTL_NM, A.EMAIL_MSG_TTL_NM
+			, A.NTCE_MSG_CONT, A.EMAIL_MSG_CONT, A.NTCE_DETL_SPCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'NTCE_SPCD' AND DETL_CD = A.NTCE_SPCD) AS	NTCE_SPCD_NM
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'NTCE_DETL_SPCD' AND DETL_CD = A.NTCE_DETL_SPCD) AS	NTCE_DETL_SPCD_NM
+		FROM PORTAL.KCURE_SVC_NTCE_MSG A
+		WHERE A.NTCE_MSG_NO = #{ntceMsgNo}
+	</select>
+
+	<update id="updateNtceMsg" parameterType="egovMap">
+		UPDATE PORTAL.KCURE_SVC_NTCE_MSG
+		SET NTCE_MSG_TTL_NM	= #{ntceMsgTtlNm}
+		, EMAIL_MSG_TTL_NM	= #{emailMsgTtlNm}
+		, NTCE_MSG_CONT		= #{ntceMsgCont}
+		, EMAIL_MSG_CONT	= #{emailMsgCont}
+		, LAST_MODP_ID		= #{userId}
+		, LAST_MODF_DT		= now()
+		WHERE NTCE_MSG_NO = #{ntceMsgNo}
+	</update>
+</mapper>

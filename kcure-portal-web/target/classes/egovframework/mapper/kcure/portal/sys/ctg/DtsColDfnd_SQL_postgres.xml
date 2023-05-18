@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DtsColDfnd">
+
+    <resultMap id="dtsColDfndList" type="kcure.portal.sys.ctg.col.service.impl.CtgColVO">
+		<result property="prtiId" column="PRTI_ID"/>
+		<result property="dtsId" column="DTS_ID"/>
+		<result property="colEnm" column="COL_ENM"/>
+		<result property="colKnm" column="COL_KNM"/>
+		<result property="colExplCont" column="COL_EXPL_CONT"/>
+		<result property="dataTpCont" column="DATA_TP_CONT"/>
+		<result property="dataLnthCont" column="DATA_LNTH_CONT"/>
+		<result property="cdsYn" column="CDS_YN"/>
+		<result property="cdId" column="CD_ID"/>
+		<result property="useYn" column="USE_YN"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="lastModpId" column="LAST_MODP_ID"/>
+		<result property="lastModfDt" column="LAST_MODF_DT"/>
+    </resultMap>
+
+	<select id="selectDtsColDfndList" parameterType="comDefaultVO" resultMap="dtsColDfndList">
+		SELECT	PRTI_ID
+				, DTS_ID
+				, COL_ENM
+				, COL_KNM
+				, COL_EXPL_CONT
+				, DATA_TP_CONT
+				, DATA_LNTH_CONT
+				, CDS_YN
+				, CD_ID
+				, USE_YN
+				, FRST_REGP_ID
+				, TO_CHAR(FRST_RGST_DT, 'YYYY-MM-DD') FRST_RGST_DT
+				, LAST_MODP_ID
+				, TO_CHAR(LAST_MODF_DT, 'YYYY-MM-DD') LAST_MODF_DT
+		FROM	PORTAL.KCURE_COM_DTS_COL_DFND
+		WHERE	1 = 1
+		<if test="prtiId != null and prtiId != ''">
+				AND PRTI_ID = #{prtiId}
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+				AND (COL_ENM LIKE '%' || #{searchKeyword} || '%' OR COL_KNM LIKE '%' || #{searchKeyword} || '%')
+		</if>
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<!-- 총건수 조회 -->
+	<select id="selectDtsColDfndListTotCnt" parameterType="comDefaultVO" resultType="int">
+		SELECT	COUNT(1) AS totCnt
+		FROM	PORTAL.KCURE_COM_DTS_COL_DFND
+		WHERE	1 = 1
+		<if test="prtiId != null and prtiId != ''">
+				AND PRTI_ID = #{prtiId}
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+				AND (COL_ENM LIKE '%' || #{searchKeyword} || '%' OR COL_KNM LIKE '%' || #{searchKeyword} || '%')
+		</if>
+	</select>
+
+	<insert id="insertDtsColDfnd" parameterType="kcure.portal.sys.ctg.col.service.impl.CtgColVO">
+		INSERT INTO PORTAL.KCURE_COM_DTS_COL_DFND
+		(
+			PRTI_ID
+			, DTS_ID
+			, COL_ENM
+			, COL_KNM
+			, COL_EXPL_CONT
+			, DATA_TP_CONT
+			, DATA_LNTH_CONT
+			, CDS_YN
+			, CD_ID
+			, USE_YN
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{prtiId}
+			, #{dtsId}
+			, #{colEnm}
+			, #{colKnm}
+			, #{colExplCont}
+			, #{dataTpCont}
+			, #{dataLnthCont}
+			, #{cdsYn}
+			, #{cdId}
+			, #{useYn}
+			, #{frstRegpId}
+			, NOW()
+			, #{lastModpId}
+			, NOW()
+		)
+		ON CONFLICT (PRTI_ID, DTS_ID, COL_ENM)
+		DO UPDATE
+		SET		COL_KNM = #{colKnm}
+				, COL_EXPL_CONT = #{colExplCont}
+				, DATA_TP_CONT = #{dataTpCont}
+				, DATA_LNTH_CONT = #{dataLnthCont}
+				, CDS_YN = #{cdsYn}
+				, CD_ID = CASE WHEN #{cdsYn} = 'Y' THEN #{cdId} ELSE NULL END
+				, USE_YN = #{useYn}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+	</insert>
+
+	<update id="updateDtsColDfnd" parameterType="kcure.portal.sys.ctg.col.service.impl.CtgColVO">
+		UPDATE	PORTAL.KCURE_COM_DTS_COL_DFND
+		SET		COL_KNM = #{colKnm}
+				, COL_EXPL_CONT = #{colExplCont}
+				, DATA_TP_CONT = #{dataTpCont}
+				, DATA_LNTH_CONT = #{dataLnthCont}
+				, CDS_YN = #{cdsYn}
+				, CD_ID = CASE WHEN #{cdsYn} = 'Y' THEN #{cdId} ELSE NULL END
+				, USE_YN = #{useYn}
+				, LAST_MODP_ID = #{lastModpId}
+				, LAST_MODF_DT = NOW()
+		WHERE	PRTI_ID = #{prtiId} AND DTS_ID = #{dtsId} AND COL_ENM = #{colEnm}
+	</update>
+
+	<delete id="deleteDtsColDfnd" parameterType="kcure.portal.sys.ctg.col.service.impl.CtgColVO">
+		DELETE
+		FROM	PORTAL.KCURE_COM_DTS_COL_DFND
+		WHERE	PRTI_ID = #{prtiId} AND DTS_ID = #{dtsId} AND COL_ENM = #{colEnm}
+	</delete>
+</mapper>

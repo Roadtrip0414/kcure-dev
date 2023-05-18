@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Com">
+
+    <resultMap id="comList" type="kcure.portal.sys.com.service.impl.ComVO">
+		<result property="grpCd" column="GRP_CD"/>
+		<result property="detlCd" column="DETL_CD"/>
+		<result property="detlCdNm" column="DETL_CD_NM"/>
+		<result property="cdExplCont" column="CD_EXPL_CONT"/>
+		<result property="cdOputOrd" column="CD_OPUT_ORD"/>
+		<result property="cdUseYn" column="CD_USE_YN"/>
+		<result property="cdClsTypeNm" column="CD_CLS_TYPE_NM"/>
+		<result property="frstRegpId" column="FRST_REGP_ID"/>
+		<result property="frstRgstDt" column="FRST_RGST_DT"/>
+		<result property="lastModpId" column="LAST_MODP_ID"/>
+		<result property="lastModfDt" column="LAST_MODF_DT"/>
+    </resultMap>
+
+	<select id="selectComList" parameterType="comDefaultVO" resultMap="comList">
+		SELECT	GRP_CD
+				, DETL_CD
+				, DETL_CD_NM
+				, CD_EXPL_CONT
+				, CD_OPUT_ORD
+				, CD_USE_YN
+				, CD_CLS_TYPE_NM
+				, FRST_REGP_ID
+				, TO_CHAR(FRST_RGST_DT, 'YYYY-MM-DD') FRST_RGST_DT
+				, LAST_MODP_ID
+				, TO_CHAR(LAST_MODF_DT, 'YYYY-MM-DD') LAST_MODF_DT
+		FROM	PORTAL.KCURE_COM_CD
+		WHERE	1 = 1
+		AND CD_USE_YN = 'Y'
+		AND GRP_CD = #{grpCd}
+		<if test="detlCd != null and detlCd != ''">
+				AND DETL_CD = #{detlCd}
+		</if>				
+	</select>
+</mapper>

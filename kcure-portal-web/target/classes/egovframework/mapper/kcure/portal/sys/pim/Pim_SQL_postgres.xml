@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Pim">
+
+	<select id="selectPrtiList" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="egovMap">
+		SELECT PRTI_ID, PRTI_NM, INST_CLS_SPCD, INST_TPCD, USE_YN
+			, TO_CHAR(FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+			, CTPV_SPCD, DSZ_YN, DOMN_NM
+		FROM PORTAL.KCURE_SVC_PRTI
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND INST_TPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND UPPER(PRTI_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND INST_CLS_SPCD = #{searchKeyword2}
+		</if>
+		ORDER BY PRTI_ID
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectPrtiListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_SVC_PRTI
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND INST_TPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND UPPER(PRTI_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND INST_CLS_SPCD = #{searchKeyword2}
+		</if>
+	</select>
+
+	<insert id="insertPrti" parameterType="egovMap">
+		INSERT INTO PORTAL.KCURE_SVC_PRTI
+		(
+			PRTI_ID, PRTI_NM, INST_CLS_SPCD, INST_TPCD, USE_YN
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+			, CTPV_SPCD, DSZ_YN, DOMN_NM
+		)
+		VALUES
+		(
+			#{prtiId}
+			, #{prtiNm}
+			, #{instClsSpcd}
+			, #{instTpcd}
+			, #{useYn}
+			, #{frstRegpId}
+			, now()
+			, #{lastModpId}
+			, now()
+			, #{ctpvSpcd}
+			, #{dszYn}
+			, #{domnNm}
+		)
+
+	</insert>
+
+	<update id="updatePrti" parameterType="egovMap">
+		UPDATE KCURE_SVC_PRTI
+		SET
+			PRTI_NM 		= #{prtiNm}
+			, INST_CLS_SPCD = #{instClsSpcd}
+			, INST_TPCD 	= #{instTpcd}
+			, USE_YN 		= #{useYn}
+			, LAST_MODP_ID 	= #{lastModpId}
+			, LAST_MODF_DT 	= now()
+			, CTPV_SPCD		= #{ctpvSpcd}
+			, DSZ_YN		= #{dszYn}
+			, DOMN_NM		= #{domnNm}
+		WHERE PRTI_ID = #{prtiId}
+	</update>
+
+	<delete id="deletePrti" parameterType="egovMap">
+		DELETE FROM KCURE_SVC_PRTI
+		WHERE PRTI_ID = #{prtiId}
+	</delete>
+
+	<select id="selectPrtiAllList" parameterType="String" resultType="egovMap">
+		SELECT PRTI_ID	AS DETL_CD
+		     , PRTI_NM	AS DETL_CD_NM
+		  FROM KCURE_SVC_PRTI
+		 WHERE INST_CLS_SPCD = #{instClsSpcd} <!-- 01: 참여기관, 03: 연구기관 -->
+		 ORDER BY PRTI_ID
+	</select>
+
+	<select id="selectPrtiNm" parameterType="String" resultType="String">
+		SELECT PRTI_NM
+		FROM KCURE_SVC_PRTI
+		WHERE PRTI_ID = #{prtiId}
+	</select>
+</mapper>

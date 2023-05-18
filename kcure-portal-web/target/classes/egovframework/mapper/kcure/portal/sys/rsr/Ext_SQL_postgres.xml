@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Ext">
+
+	<resultMap id="extComList" type="kcure.portal.sys.com.service.impl.ComVO">
+		<result property="detlCd" column="DETL_CD"/>
+		<result property="detlCdNm" column="DETL_CD_NM"/>
+    </resultMap>
+
+	<select id="selectExtComCodeList" parameterType="comDefaultVO" resultMap="extComList">
+	<![CDATA[
+		SELECT
+			DETL_CD
+			, DETL_CD_NM
+		FROM
+			KCURE_COM_CD
+		WHERE 
+			DETL_CD IN (
+				SELECT
+					DISTINCT(DETL_CD) DETL_CD
+				FROM
+					KCURE_SVC_STAT_MST
+				WHERE
+					CD_CLCD = #{grpCd}
+			)
+	]]>
+	</select>
+	
+	<sql id="whereDataExtAplcList">
+		<if test="searchCondition == 'rsrSbjNm' and searchKeyword != null and searchKeyword != ''">
+		AND B.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'userNm' and searchKeyword != null and searchKeyword != ''">
+		AND C.USER_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'extdAplcRsnCont' and searchKeyword != null and searchKeyword != ''">
+		AND A.EXTD_APLC_RSN_CONT LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="dttoAplcDtFrom != null and dttoAplcDtFrom != ''">
+		AND TO_CHAR(A.EXTD_APLC_YMD::date, 'YYYY-MM-DD') BETWEEN #{dttoAplcDtFrom} AND #{dttoAplcDtTo}
+		</if>
+		<if test="extdStcd != null and extdStcd != ''">
+		AND A.EXTD_STCD = #{extdStcd}
+		</if>
+		<if test="extdProgStcd != null and extdProgStcd != ''">
+		AND A.EXTD_PROG_STCD = #{extdProgStcd}
+		</if>
+	</sql>
+	
+	<select id="selectDataExtAplcList" parameterType="kcure.portal.sys.rsr.ext.web.service.impl.RsrDataExtSearchVO"  resultType="egovMap">
+	<![CDATA[
+		SELECT
+			A.RSR_ASMT_NO /* 연구과제번호 */
+			, A.EXTD_APLC_NO /* 연장신청번호 */
+			, A.DATA_APLC_NO /* 데이터신청번호 */
+			, B.RSR_SBJ_NM /* 연구명 */
+			, C.USER_NM /* 연구책임자 */
+			, B.DATA_TPCD /* 유형 */
+			, A.EXTD_STCD /* 연장구분코드(구분) */
+			, TO_CHAR(A.BFR_RSR_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.BFR_RSR_EDT::DATE, 'YYYY.MM.DD') BFR_RSR_DT /* 연구 기간(이전) */
+			, TO_CHAR(A.BFR_DTU_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.BFR_DTU_EDT::DATE, 'YYYY.MM.DD') BFR_DTU_DT /* 가상화 사용기간(데이터 활용)(이전) */
+			, TO_CHAR(A.BFR_DATA_KEP_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.BFR_DATA_KEP_EDT::DATE, 'YYYY.MM.DD') BFR_DATA_KEP_DT /* 보관기간(이전) */	
+			, TO_CHAR(A.EXTD_APLC_YMD::DATE, 'YYYY.MM.DD') EXTD_APLC_YMD /* 연장신청일자(신청일) */
+			, CASE WHEN A.EXTD_PROG_STCD IN ('U02', 'U05') THEN /* 승인/결제완료 */
+				CASE 
+					WHEN A.EXTD_STCD IN ('01', '03') THEN TO_CHAR(A.DTU_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.DTU_EDT::DATE, 'YYYY.MM.DD') /* 가상화(재사용) */
+					WHEN A.EXTD_STCD = '02' THEN TO_CHAR(A.DATA_KEP_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.DATA_KEP_EDT::DATE, 'YYYY.MM.DD') /* 보관 */
+					WHEN A.EXTD_STCD = '04' THEN TO_CHAR(A.RSR_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.RSR_EDT::DATE, 'YYYY.MM.DD') /* 연구유효기간연장 */
+				END 
+			END APLC_DT /* 연장/보관 날짜 */
+			, CASE WHEN B.DATA_TPCD != '03' THEN B.DATA_KEP_EXTD_NT||'' ELSE '' END DATA_KEP_EXTD_NT /* 보관횟수 결합제외 */
+			, CASE WHEN B.DATA_TPCD != '03' THEN A.EXTD_PROG_STCD ELSE '' END EXTD_PROG_STCD /* 진행상태 결합제외 */
+			, CASE WHEN B.DATA_TPCD != '03' THEN D.DATA_SRLB_NM ELSE '' END EXTD_PROG_ST_NM /* 진행상태 명 결합제외 */
+		FROM 
+			KCURE_SVC_EXTD A
+			INNER JOIN KCURE_SVC_DATA_APLC B ON (B.DATA_APLC_NO = A.DATA_APLC_NO)
+			INNER JOIN KCURE_COM_USER C ON (C.USER_ID = B.DATA_APLP_ID)
+			INNER JOIN KCURE_SVC_STAT_MST D ON (D.CD_CLCD = 'EXTD' AND D.DETL_CD = A.EXTD_PROG_STCD AND D.DTAP_STP_SPCD = A.EXTD_STCD)
+		WHERE	1 = 1
+	]]>
+		<include refid="whereDataExtAplcList" />
+		ORDER BY A.FRST_RGST_DT DESC 
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+	
+	<select id="selectDataExtAplcTotCnt" parameterType="kcure.portal.sys.rsr.ext.web.service.impl.RsrDataExtSearchVO" resultType="int">
+	<![CDATA[
+		SELECT
+			COUNT(*) totCnt
+		FROM 
+			KCURE_SVC_EXTD A
+			INNER JOIN KCURE_SVC_DATA_APLC B ON (B.DATA_APLC_NO = A.DATA_APLC_NO)
+			INNER JOIN KCURE_COM_USER C ON (C.USER_ID = B.DATA_APLP_ID)
+			INNER JOIN KCURE_SVC_STAT_MST D ON (D.CD_CLCD = 'EXTD' AND D.DETL_CD = A.EXTD_PROG_STCD AND D.DTAP_STP_SPCD = A.EXTD_STCD)
+		WHERE	1 = 1
+	]]>
+		<include refid="whereDataExtAplcList" />
+	</select>
+	
+	<select id="detailDataExtAplc" parameterType="kcure.portal.sys.rsr.ext.web.service.impl.RsrDataExtSearchVO"  resultType="egovMap">
+	<![CDATA[
+		SELECT
+			A.RSR_ASMT_NO /* 연구과제번호 */
+			, A.EXTD_APLC_NO /* 연장신청번호 */
+			, A.DATA_APLC_NO /* 데이터신청번호 */
+			, B.RSR_SBJ_NM /* 연구명 */
+			, C.USER_NM /* 연구책임자 */
+			, B.DATA_TPCD/* 유형 */
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD CD WHERE CD.GRP_CD = 'DATA_TPCD' AND CD.DETL_CD = B.DATA_TPCD) DATA_TPCD_NM
+			, A.EXTD_STCD /* 연장구분코드(구분) */
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD CD WHERE CD.GRP_CD = 'EXTD_STCD' AND CD.DETL_CD = A.EXTD_STCD) EXTD_STCD_NM
+			, TO_CHAR(A.BFR_RSR_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.BFR_RSR_EDT::DATE, 'YYYY.MM.DD') BFR_RSR_DT /* 연구 기간(이전) */
+			, CASE WHEN DATE_PART('DAY', A.BFR_RSR_EDT::TIMESTAMP - NOW()) > 0 THEN '('||DATE_PART('DAY', A.BFR_RSR_EDT::TIMESTAMP - NOW())||'일 남음)' ELSE '종료' END BFR_RSR_DT_PERIOD /* 재사용기간(일수) */
+			, TO_CHAR(A.BFR_DTU_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.BFR_DTU_EDT::DATE, 'YYYY.MM.DD') BFR_DTU_DT /* 가상화 사용기간(데이터 활용)(이전) */
+			, CASE WHEN DATE_PART('DAY', A.BFR_DTU_EDT::TIMESTAMP - NOW()) > 0 THEN '('||DATE_PART('DAY', A.BFR_DTU_EDT::TIMESTAMP - NOW())||'일 남음)' ELSE '종료' END BFR_DTU_DT_PERIOD /* 가상화 사용기간(일수) */
+			, TO_CHAR(A.BFR_DATA_KEP_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.BFR_DATA_KEP_EDT::DATE, 'YYYY.MM.DD') BFR_DATA_KEP_DT /* 보관기간(이전) */	
+			, CASE WHEN DATE_PART('DAY', A.BFR_DATA_KEP_EDT::TIMESTAMP - NOW()) > 0 THEN '('||DATE_PART('DAY', A.BFR_DATA_KEP_EDT::TIMESTAMP - NOW())||'일 남음)' ELSE '종료' END BFR_DATA_KEP_DT_PERIOD /* 보관기간(일수) */
+			, TO_CHAR(A.EXTD_APLC_YMD::DATE, 'YYYY.MM.DD') EXTD_APLC_YMD /* 연장신청일자(신청일) */
+			, CASE 
+				WHEN A.EXTD_STCD IN ('01', '03') THEN
+					DATE_PART('DAY', A.DTU_EDT::TIMESTAMP-A.DTU_SDT::TIMESTAMP ) ||'일 (' || TO_CHAR(A.DTU_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.DTU_EDT::DATE, 'YYYY.MM.DD') ||')' /* 가상화(재사용) */
+				WHEN A.EXTD_STCD = '02' THEN 
+					DATE_PART('DAY', A.DATA_KEP_EDT::TIMESTAMP-A.DATA_KEP_SDT::TIMESTAMP ) ||'일 (' || TO_CHAR(A.DATA_KEP_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.DATA_KEP_EDT::DATE, 'YYYY.MM.DD') ||')' /* 보관 */
+				WHEN A.EXTD_STCD = '04' THEN
+					DATE_PART('DAY', A.RSR_EDT::TIMESTAMP-A.RSR_SDT::TIMESTAMP ) ||'일 (' || TO_CHAR(A.RSR_SDT::DATE, 'YYYY.MM.DD') || ' ~ ' || TO_CHAR(A.RSR_EDT::DATE, 'YYYY.MM.DD') ||')' /* 연구유효기간연장 */
+			END APLC_DT /* 연장/보관 날짜 */
+			, B.DATA_KEP_EXTD_NT /* 보관횟수 */
+			, A.EXTD_PROG_STCD /* 진행상태 */
+			
+			, A.CLNC_PBL_STLM_AMT /* 임상공공결제금액 */
+			, A.CLNC_PBL_INP_AMT /* 임상공공입력금액 */
+			, A.RDC_RT_SPCD /* 감면비율구분코드 */
+			, (SELECT RDC_RT_ITEM_CONT FROM KCURE_SVC_RDRT_ITEM ITEM WHERE ITEM.RDC_RT_SPCD = A.RDC_RT_SPCD) RDC_RT_SPCD_NM /* 감면비율 구분코드명 */
+			, (SELECT RDC_RT FROM KCURE_SVC_RDRT_ITEM ITEM WHERE ITEM.RDC_RT_SPCD = A.RDC_RT_SPCD) RDC_RT /* 감면비율 */
+			
+			, (SELECT ATT.ATTF_PTH_NM||'|'|| ATT.ATTF_STR_NM||'|'||ATT.ATTF_NM FROM KCURE_SVC_ATTF ATT WHERE ATT.DATA_APLC_NO = A.DATA_APLC_NO AND ATT.ATTF_SEQ = A.RDC_RT_ATTF_SEQ) RDC_RT_ATTF /* 감면율 첨부파일 */
+			, (SELECT ATT.ATTF_PTH_NM||'|'|| ATT.ATTF_STR_NM||'|'||ATT.ATTF_NM FROM KCURE_SVC_ATTF ATT WHERE ATT.DATA_APLC_NO = A.DATA_APLC_NO AND ATT.ATTF_SEQ = A.IRB_RSR_PLAN_ATTF_SEQ) IRB_RSR_PLAN_ATTF /* IRB 연구 계획서 첨부파일 */
+			, (SELECT ATT.ATTF_PTH_NM||'|'|| ATT.ATTF_STR_NM||'|'||ATT.ATTF_NM FROM KCURE_SVC_ATTF ATT WHERE ATT.DATA_APLC_NO = A.DATA_APLC_NO AND ATT.ATTF_SEQ = A.IRB_RSLT_AVTSMT_ATTF_SEQ) IRB_RSLT_AVTSMT_ATTF /* IRB 연구 결과 통지서 첨부파일 */
+			
+			, (SELECT COM.RUS_EXTD_NT-B.RUS_EXTD_NT FROM KCURE_COM_KEP_EXTD COM LIMIT 1) RUS_EXTD_NT /* 재사용신청 남은 횟수 */
+			, (SELECT COM.DATA_KEP_EXTD_NT-B.DATA_KEP_EXTD_NT FROM KCURE_COM_KEP_EXTD COM LIMIT 1) DATA_KEP_EXTD_NT /* 보관연장 남은 횟수 */
+			, (SELECT COM.DTU_EXTD_NT-B.DTU_EXTD_NT FROM KCURE_COM_KEP_EXTD COM LIMIT 1) DTU_EXTD_NT /* 가상화연장 남은 횟수 */
+			
+			, CASE 
+				WHEN A.EXTD_PROG_STCD IN ('U02', 'U05') THEN /* 승인, 결제완료 */
+					CASE
+						WHEN A.EXTD_STCD = '04' AND A.EXTD_PROG_STCD = 'U02' AND DATE_PART('DAY', A.RSR_EDT::TIMESTAMP - NOW()) > 0 THEN '가상화 사용중 - 연장' /* IRB 승인인 경우 */
+						WHEN A.EXTD_STCD != '04' AND A.EXTD_PROG_STCD = 'U05' AND DATE_PART('DAY', A.RSR_EDT::TIMESTAMP - NOW()) > 0 THEN '가상화 사용중 - 연장' /* IRB가 아니고 결제 완료인 경우 */
+						ELSE CASE WHEN DATE_PART('DAY', BFR_DTU_EDT::TIMESTAMP - NOW()) > 0 THEN '가상화 사용중' ELSE '가상화 사용기간 종료' END /* IRB가 아니고 승인인 경우 */
+					END
+				ELSE 
+					CASE WHEN DATE_PART('DAY', BFR_DTU_EDT::TIMESTAMP - NOW()) > 0 THEN '가상화 사용중' ELSE '가상화 사용기간 종료' END /* 신청 / 반려인 경우 */
+			END DTU_STAT /* 상태 */	
+			, A.EXTD_APLC_RSN_CONT /* 사유 */
+			, A.RJC_RSN_CONT /* 반려사유 */
+			
+			, A.RSR_SDT /* 연구시작일자 */
+			, A.RSR_EDT /* 연구종료일자 */
+			, A.DTU_SDT /* 데이터활용시작일자 */
+			, A.DTU_EDT /* 데이터활용종료일자 */
+			, A.DATA_KEP_SDT /* 데이터보관시작일자 */
+			, A.DATA_KEP_EDT /* 데이터보관종료일자 */
+			, A.DATA_RNDM_KEP_SDT /* 데이터임의보관시작일자 */
+			, A.DATA_RNDM_KEP_EDT /* 데이터임의보관종료일자 */
+		FROM
+			KCURE_SVC_EXTD A
+			INNER JOIN KCURE_SVC_DATA_APLC B ON (B.DATA_APLC_NO = A.DATA_APLC_NO)
+			INNER JOIN KCURE_COM_USER C ON (C.USER_ID = B.DATA_APLP_ID)
+		WHERE
+			A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND A.EXTD_APLC_NO = #{extdAplcNo}
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+	]]>
+	</select>
+	
+	<update id="updateDataExtAplc" parameterType="java.util.Map">
+		UPDATE KCURE_SVC_EXTD
+			SET
+				EXTD_PROG_STCD = #{extdProgStcd} /* 진행상태 */
+				, LAST_MODP_ID = #{userId} /* 수정자 */
+				, LAST_MODF_DT = NOW() /* 수정일시 */
+				<if test="bfrExtdProgStcd == 'U01'"> <!-- 신청 상태 일때 -->
+					<choose>
+						<when test="extdProgStcd == 'U03'"> <!-- 반려인 경우 반려사유만 -->
+						, RJC_RSN_CONT = #{rjcRsnCont} /* 반려사유 */
+						</when>
+						<otherwise> <!-- 승인 -->
+							<choose>
+								<when test="extdStcd == '04'"> <!-- IRB인 경우 연구종료 날짜 수정 -->
+								, RSR_EDT = #{rsrEdt} /* 연장일자 */
+								</when>
+								<otherwise> <!-- IRB가 아닌경우(가상화, 보관, 재사용) -->
+								, CLNC_PBL_STLM_AMT = #{clncPblStlmAmt} /* 임상공공결제금액 */
+								, CLNC_PBL_INP_AMT = #{clncPblInpAmt} /* 임상공공입력금액 */
+								</otherwise>
+							</choose>
+						</otherwise>
+					</choose>
+				</if>
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND EXTD_APLC_NO = #{extdAplcNo}
+			AND DATA_APLC_NO = #{dataAplcNo}
+			AND EXTD_PROG_STCD = #{bfrExtdProgStcd}
+	</update>
+	
+	<update id="updateDataExtIrb" parameterType="java.util.Map">
+	<![CDATA[
+		UPDATE KCURE_SVC_DATA_APLC
+			SET
+				RSR_EDT = #{rsrEdt} /* 연구종료일자 */
+				, EXTD_STCD = #{extdStcd} /* 연장구분코드 */
+				, DTU_EXTD_NT = 0 /* 데이터활용 연장 횟수 */
+				, DATA_KEP_EXTD_NT = 0 /* 데이터보관 연장 횟수 */
+				, RUS_EXTD_NT = 0 /* 재사용 연장 횟수 */
+				, RSR_TMVL_EXTD_NT = RSR_TMVL_EXTD_NT + 1 /* 연구유효기간 연장 횟수 */ 
+				, LAST_MODP_ID = #{userId} /* 최종수정자 */
+				, LAST_MODF_DT = NOW() /* 최종수정일 */
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}  
+	]]>
+	</update>
+	
+	<update id="updateDataExtAplcCpl" parameterType="java.util.Map">
+		UPDATE KCURE_SVC_DATA_APLC
+			SET
+				RSR_SDT = #{rsrSdt} /* 연구시작일자 */
+				, RSR_EDT = #{rsrEdt} /* 연구종료일자 */
+				, DATA_KEP_SDT = #{dataKepSdt} /* 데이터보관시작일자 */
+				, DATA_KEP_EDT = #{dataKepEdt} /* 데이터보관종료일자 */
+				, DATA_RNDM_KEP_SDT = #{dataRndmKepSdt} /* 데이터임의보관시작일자 */
+				, DATA_RNDM_KEP_EDT = #{dataRndmKepEdt} /* 데이터임의보관종료일자 */
+				, EXTD_STCD = #{extdStcd} /* 연장구분코드 */
+				, LAST_MODP_ID = #{userId} /* 최종수정자 */
+				, LAST_MODF_DT = NOW() /* 최종수정일*/
+				<choose>
+					<when test="extdStcd == '03'"> <!-- 재사용신청인경우 -->
+					, RUS_SDT = #{dtuSdt} /* 재사용시작일자 */
+					, RUS_EDT = #{dtuEdt} /* 재사용종료일자 */
+					</when>
+					<otherwise> <!-- 가상화연장 / 보관연장일 경우 -->
+					, DTU_SDT = #{dtuSdt} /* 데이터활용시작일자 */
+					, DTU_EDT = #{dtuEdt} /* 데이터활용종료일자 */
+					</otherwise>
+				</choose>
+				
+				<if test="extdStcd == '01'"> <!-- 가상화연장 -->
+				, DTU_EXTD_NT = DTU_EXTD_NT + 1 /* 가상화연장 횟수 */
+				</if>
+				
+				<if test="extdStcd == '02'"> <!-- 보관연장 -->
+				, DATA_KEP_EXTD_NT = DATA_KEP_EXTD_NT + 1 /* 보관연장 횟수 */
+				</if>
+				
+				<if test="extdStcd == '03'"> <!-- 재사용신청 -->
+				, RUS_EXTD_NT = RUS_EXTD_NT + 1 /* 재상요신청 횟수 */
+				</if>
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</update>
+	
+	<insert id="insertDataExtHst" parameterType="java.util.Map">
+	<![CDATA[
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST
+			(
+				DATA_APLC_NO /* 데이터신청번호 */
+				, DTAP_STAT_SEQ /* 데이터신청상태순번 */
+				, DTAP_STAT_SPCD /* 데이터신청상태구분코드 */
+				, FRST_REGP_ID /* 최초등록자ID */ 
+				, FRST_RGST_DT /* 최초등록일시 */
+				, LAST_MODP_ID /* 최종수정자ID */
+				, LAST_MODF_DT /* 최종수정일시 */
+			)
+			VALUES
+			(
+				#{dataAplcNo} /* 데이터신청번호 */
+				, (SELECT COALESCE(MAX(DTAP_STAT_SEQ), 0) + 1 FROM KCURE_SVC_DTAP_STAT_HST WHERE DATA_APLC_NO = #{dataAplcNo}) /* 데이터신청상태순번 */
+				, (SELECT DTAP_STAT_SPCD FROM KCURE_SVC_STAT_MST WHERE CD_CLCD = 'EXTD' AND DTAP_STP_SPCD = #{extdStcd} AND DETL_CD = #{extdProgStcd}) /* 데이터신청상태구분코드 */
+				, #{userId} /* 최초등록자ID */
+				, NOW() /* 최초등록일시 */
+				, #{userId} /* 최종수정자ID */
+				, NOW() /* 최종수정일시 */
+			)
+	]]>
+	</insert>
+</mapper>

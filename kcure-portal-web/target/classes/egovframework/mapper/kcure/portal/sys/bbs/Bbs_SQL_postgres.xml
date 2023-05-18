@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Bbs">
+	<select id="selectNtcList" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO" resultType="egovMap">
+		SELECT * FROM (
+			SELECT NOTICE_AT, NTT_ID, BBS_ID, NTT_SE_CODE
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'NTT_SE_CODE' AND DETL_CD = A.NTT_SE_CODE) AS	NTT_SE_CODE_NM
+			, NTT_SJ, NTT_CN, RDCNT, NTCE_BGNDE
+			, NTCE_ENDDE, NTCR_ID, NTCR_NM, ATCH_FILE_ID
+			, USE_AT, FRST_REGISTER_ID, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY-mm-dd') AS FRST_REGIST_PNTTM
+			, 'Y' AS TOP_AT
+			FROM PORTAL.KCURE_COM_COMTNBBS A
+			WHERE A.BBS_ID IN
+			<foreach collection="bbsIdList" item="item" separator=", " open="(" close=")">
+				#{item}
+			</foreach>
+			AND A.NOTICE_AT = 'Y'
+			<if test="searchKeyword != null and searchKeyword !=''">
+				AND A.NTT_SE_CODE = #{searchKeyword}
+			</if>
+			<if test="searchKeyword1 != null and searchKeyword1 !=''">
+				<if test="searchCondition == 1">
+		 			AND UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		 		</if>
+				<if test="searchCondition == 2">
+					AND (UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+		 		</if>
+				<if test="searchCondition == 3">
+		 			AND UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		 		</if>
+			</if>
+			<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+	        	AND TO_CHAR(A.FRST_REGIST_PNTTM, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+	        </if>
+	        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+	       		AND TO_CHAR(A.FRST_REGIST_PNTTM, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+	        </if>
+			ORDER BY A.FRST_REGIST_PNTTM DESC
+			LIMIT 5
+		)A
+
+		UNION ALL
+
+		SELECT * FROM (
+			SELECT A.NOTICE_AT, A.NTT_ID, A.BBS_ID, A.NTT_SE_CODE
+				, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'NTT_SE_CODE' AND DETL_CD = A.NTT_SE_CODE) AS	NTT_SE_CODE_NM
+				, A.NTT_SJ, A.NTT_CN, A.RDCNT
+				, A.NTCE_BGNDE, A.NTCE_ENDDE, A.NTCR_ID
+				, A.NTCR_NM, A.ATCH_FILE_ID, A.USE_AT
+				, FRST_REGISTER_ID, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY-mm-dd') AS FRST_REGIST_PNTTM
+				, 'N' AS TOP_AT
+			FROM PORTAL.KCURE_COM_COMTNBBS A
+			WHERE BBS_ID IN
+			<foreach collection="bbsIdList" item="item" separator=", " open="(" close=")">
+				#{item}
+			</foreach>
+<!-- 			AND NOTICE_AT = 'N' -->
+			<if test="searchKeyword != null and searchKeyword !=''">
+				AND NTT_SE_CODE = #{searchKeyword}
+			</if>
+			<if test="searchKeyword1 != null and searchKeyword1 !=''">
+				<if test="searchCondition == 1">
+		 			AND UPPER(NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		 		</if>
+				<if test="searchCondition == 2">
+					AND (UPPER(NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+		 		</if>
+				<if test="searchCondition == 3">
+		 			AND UPPER(NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+		 		</if>
+			</if>
+	       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+	        	AND TO_CHAR(FRST_REGIST_PNTTM, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+	        </if>
+	        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+	       		AND TO_CHAR(FRST_REGIST_PNTTM, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+	        </if>
+			ORDER BY A.FRST_REGIST_PNTTM DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+		) B
+	</select>
+
+	<select id="selectBbsList" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO" resultType="egovMap">
+		SELECT A.NTT_ID, A.BBS_ID, A.NTT_SE_CODE
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'NTT_SE_CODE' AND DETL_CD = A.NTT_SE_CODE) AS	NTT_SE_CODE_NM
+			, A.NTT_SJ, A.NTT_CN, A.RDCNT
+			, A.NTCE_BGNDE, A.NTCE_ENDDE, A.NTCR_ID
+			, A.NTCR_NM, A.ATCH_FILE_ID, A.NOTICE_AT, A.USE_AT
+			, A.FRST_REGISTER_ID, B.USER_NM AS FRST_REGISTER_NM, TO_CHAR(A.FRST_REGIST_PNTTM,'YYYY-mm-dd') AS FRST_REGIST_PNTTM
+			, (SELECT STRE_FILE_NM FROM PORTAL.KCURE_COM_COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID AND tmbnl_yn = 'Y' LIMIT 1) AS STRE_FILE_NM
+			, (SELECT FILE_STRE_COURS FROM PORTAL.KCURE_COM_COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID AND tmbnl_yn = 'Y' LIMIT 1) AS FILE_STRE_COURS
+		FROM PORTAL.KCURE_COM_COMTNBBS A INNER JOIN KCURE_COM_USER B ON A.FRST_REGISTER_ID = B.USER_ID
+		WHERE A.BBS_ID IN
+		<foreach collection="bbsIdList" item="item" separator=", " open="(" close=")">
+			#{item}
+		</foreach>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.NTT_SE_CODE = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(A.NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(A.NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	AND TO_CHAR(A.FRST_REGIST_PNTTM, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(A.FRST_REGIST_PNTTM, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+    	ORDER BY A.FRST_REGIST_PNTTM DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectBbsListTotCnt" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO" resultType="int">
+		SELECT count(1) AS totcnt
+		FROM PORTAL.KCURE_COM_COMTNBBS
+		WHERE BBS_ID IN
+		<foreach collection="bbsIdList" item="item" separator=", " open="(" close=")">
+			#{item}
+		</foreach>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND NTT_SE_CODE = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(NTT_SJ) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(NTT_CN) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	AND TO_CHAR(FRST_REGIST_PNTTM, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(FRST_REGIST_PNTTM, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+	</select>
+
+	<select id="selectBbsDetail" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO" resultType="egovMap">
+		SELECT NTT_ID, BBS_ID
+			, NTT_SE_CODE, NTT_NO
+			, NTT_SJ, NTT_CN
+			, RDCNT, USE_AT
+			, NTCR_ID, NTCR_NM
+			, ATCH_FILE_ID, NOTICE_AT
+			, TO_CHAR(FRST_REGIST_PNTTM,'YYYY-mm-dd') AS FRST_REGIST_PNTTM
+		FROM PORTAL.KCURE_COM_COMTNBBS
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+	</select>
+
+	<insert id="insertBbs" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO">
+		<selectKey keyProperty="nttId" resultType="java.lang.Long" order="BEFORE">
+			SELECT COALESCE(MAX(NTT_ID),0)+1 AS NTT_ID  FROM KCURE_COM_COMTNBBS
+			WHERE BBS_ID = #{bbsId}
+		</selectKey>
+		INSERT INTO KCURE_COM_COMTNBBS
+		(
+			NTT_ID
+			, BBS_ID
+			, NTT_SE_CODE
+			, NTT_SJ
+			, NTT_CN
+			, RDCNT
+			, USE_AT
+			, NTCR_ID
+			, NTCR_NM
+			, ATCH_FILE_ID
+			, NOTICE_AT
+			, FRST_REGISTER_ID
+			, FRST_REGIST_PNTTM
+			, LAST_UPDUSR_ID
+			, LAST_UPDT_PNTTM
+		)
+		VALUES
+		(
+			#{nttId}
+			, #{bbsId}
+			, #{nttSeCode}
+			, #{nttSj}
+			, #{nttCn}
+			, 0
+			, #{useAt}
+			, #{ntcrId}
+			, #{ntcrNm}
+			, #{atchFileId}
+			, #{noticeAt}
+			, #{frstRegisterId}
+			, now()
+			, #{lastUpdusrId}
+			, now()
+		)
+	</insert>
+
+	<update id="updateBbs" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO">
+		UPDATE KCURE_COM_COMTNBBS
+		SET NTT_SE_CODE = #{nttSeCode}
+		, NTT_SJ = #{nttSj}
+		, NTT_CN = #{nttCn}
+		, USE_AT = #{useAt}
+		, NOTICE_AT = #{noticeAt}
+		, ATCH_FILE_ID = #{atchFileId}
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		, LAST_UPDT_PNTTM = now()
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+	</update>
+
+	<delete id="deleteBbs" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO">
+		DELETE FROM KCURE_COM_COMTNBBS
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+	</delete>
+
+ 	<select id="selectMaxRdcnt" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO" resultType="java.lang.Integer">
+		SELECT COALESCE(MAX(RDCNT),0)+1 AS RDCNT FROM KCURE_COM_COMTNBBS
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+ 	</select>
+
+ 	<update id="updateRdcnt" parameterType="kcure.portal.sys.bbs.ntc.service.impl.BbsVO">
+		UPDATE KCURE_COM_COMTNBBS SET
+			RDCNT = #{rdcnt}
+		WHERE BBS_ID = #{bbsId}
+		AND NTT_ID = #{nttId}
+ 	</update>
+
+ 	<select id="selectDataUtlcList" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO" resultType="egovMap">
+ 		SELECT UTLC_RGST_SEQ, RSR_PROG_YR, RSR_SPCD, RSR_SPCD_NM
+	 		, RSR_MTCD, RSR_MTCD_NM, RSR_SBJ_NM, RSR_SBJ_CONT
+	 		, RSD_ATTF_ID, RSD_UNLD_LMT_YN, RSD_UNLD_LMT_YCNT, USER_NM
+	 		, TO_CHAR(FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+	 		, RSR_INST_ID
+	 		, RSR_INST_NM
+	 		, VIEW_YN
+	 		, FILE_CNT
+ 		FROM
+ 		(
+	 		SELECT A.UTLC_RGST_SEQ, A.RSR_PROG_YR
+	 			, A.RSR_SPCD
+	 			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSR_SPCD' AND DETL_CD = A.RSR_SPCD) AS RSR_SPCD_NM
+	 			, A.RSR_MTCD
+	 			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSR_MTCD' AND DETL_CD = A.RSR_MTCD) AS RSR_MTCD_NM
+				, A.RSR_SBJ_NM
+				, A.RSR_SBJ_CONT
+				, A.RSD_ATTF_ID
+				, A.RSD_UNLD_LMT_YN
+				, A.RSD_UNLD_LMT_YCNT
+				, A.FRST_REGP_ID
+				, B.USER_NM
+				, A.FRST_RGST_DT
+				, (SELECT STRING_AGG(CAST(RSR_INST_ID AS VARCHAR), '/') as AUTH_ID FROM KCURE_SVC_DATA_UTLC_RSR_INST WHERE UTLC_RGST_SEQ = A.UTLC_RGST_SEQ GROUP BY UTLC_RGST_SEQ) AS RSR_INST_ID
+				, (SELECT STRING_AGG(CAST(RSR_INST_NM AS VARCHAR), '/') as AUTH_ID FROM KCURE_SVC_DATA_UTLC_RSR_INST WHERE UTLC_RGST_SEQ = A.UTLC_RGST_SEQ GROUP BY UTLC_RGST_SEQ) AS RSR_INST_NM
+				, A.VIEW_YN
+				, (SELECT COUNT(1) FROM KCURE_COM_ATTF_UNLD_HST WHERE ATTF_ID = A.RSD_ATTF_ID AND ATTF_ID <![CDATA[<>]]> '') AS FILE_CNT
+			FROM PORTAL.KCURE_SVC_DATA_UTLC A INNER JOIN KCURE_COM_USER B
+			ON A.FRST_REGP_ID = B.USER_ID
+		) A
+		WHERE 1=1
+		<if test="viewYn != null and viewYn != ''">
+			AND A.VIEW_YN = #{viewYn}
+		</if>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.RSR_SPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.RSR_SBJ_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(A.RSR_SBJ_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.RSR_SBJ_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(A.RSR_SBJ_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	AND TO_CHAR(A.FRST_RGST_DT, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(A.FRST_RGST_DT, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND A.RSR_INST_ID LIKE CONCAT('%' , #{searchKeyword2}, '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.RSR_MTCD = #{searchKeyword3}
+		</if>
+		ORDER BY A.UTLC_RGST_SEQ DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+ 	</select>
+
+ 	<select id="selectDataUtlcListTotCnt" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+ 		FROM
+ 		(
+	 		SELECT A.UTLC_RGST_SEQ, A.RSR_PROG_YR
+	 			, A.RSR_SPCD
+	 			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSR_SPCD' AND DETL_CD = A.RSR_SPCD) AS RSR_SPCD_NM
+	 			, A.RSR_MTCD
+	 			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSR_MTCD' AND DETL_CD = A.RSR_MTCD) AS RSR_MTCD_NM
+				, A.RSR_SBJ_NM
+				, A.RSR_SBJ_CONT
+				, A.RSD_ATTF_ID
+				, A.RSD_UNLD_LMT_YN
+				, A.RSD_UNLD_LMT_YCNT
+				, A.FRST_REGP_ID
+				, A.FRST_RGST_DT
+				, (SELECT STRING_AGG(CAST(RSR_INST_ID AS VARCHAR), '/') as AUTH_ID FROM KCURE_SVC_DATA_UTLC_RSR_INST WHERE UTLC_RGST_SEQ = A.UTLC_RGST_SEQ GROUP BY UTLC_RGST_SEQ) AS RSR_INST_ID
+				, A.VIEW_YN = 'Y'
+				, (SELECT STRING_AGG(CAST(RSR_INST_NM AS VARCHAR), '/') as AUTH_ID FROM KCURE_SVC_DATA_UTLC_RSR_INST WHERE UTLC_RGST_SEQ = A.UTLC_RGST_SEQ GROUP BY UTLC_RGST_SEQ) AS RSR_INST_NM
+			FROM PORTAL.KCURE_SVC_DATA_UTLC A
+			WHERE
+				1 = 1
+				<if test="viewYn != null and viewYn != ''">
+				AND A.VIEW_YN = #{viewYn}
+				</if>
+		) A
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.RSR_SPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.RSR_SBJ_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(A.RSR_SBJ_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.RSR_SBJ_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(A.RSR_SBJ_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	AND TO_CHAR(A.FRST_RGST_DT, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(A.FRST_RGST_DT, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND A.RSR_INST_ID LIKE CONCAT('%' , #{searchKeyword2}, '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.RSR_MTCD = #{searchKeyword3}
+		</if>
+ 	</select>
+
+	<select id="selectDataUtlcDetail" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO" resultType="egovMap">
+ 		SELECT A.UTLC_RGST_SEQ, A.RSR_PROG_YR
+ 			, A.RSR_SPCD
+ 			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSR_SPCD' AND DETL_CD = A.RSR_SPCD) AS RSR_SPCD_NM
+ 			, A.RSR_MTCD
+ 			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSR_MTCD' AND DETL_CD = A.RSR_MTCD) AS RSR_MTCD_NM
+			, A.RSR_SBJ_NM
+			, A.RSR_SBJ_CONT
+			, A.RSD_ATTF_ID
+			, A.RSD_UNLD_LMT_YN
+			, A.RSD_UNLD_LMT_YCNT
+			, A.FRST_REGP_ID
+			, TO_CHAR(A.FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+			, A.VIEW_YN
+		FROM PORTAL.KCURE_SVC_DATA_UTLC A
+		WHERE A.UTLC_RGST_SEQ = #{utlcRgstSeq}
+	</select>
+
+	<select id="selectDataUtlcRsrInstDetail" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO" resultType="egovMap">
+ 		SELECT A.UTLC_RGST_SEQ
+			, STRING_AGG(CAST(RSR_INST_ID AS VARCHAR), ',') as RSR_INST_ID
+			, STRING_AGG(CAST(RSR_INST_NM AS VARCHAR), ',') as RSR_INST_NM
+		FROM PORTAL.KCURE_SVC_DATA_UTLC_RSR_INST A
+		WHERE A.UTLC_RGST_SEQ = #{utlcRgstSeq}
+		GROUP BY A.UTLC_RGST_SEQ
+	</select>
+
+	<select id="selectUtlcRgstSeq" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO" resultType="int">
+			SELECT COALESCE(MAX(UTLC_RGST_SEQ),0)+1 AS utlcRgstSeq  FROM KCURE_SVC_DATA_UTLC
+	</select>
+
+ 	<insert id="insertDataUtlc" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO">
+	 	INSERT INTO PORTAL.KCURE_SVC_DATA_UTLC
+	 	(
+			UTLC_RGST_SEQ			, RSR_PROG_YR			, RSR_SPCD			, RSR_MTCD
+			, RSR_SBJ_NM			, RSR_SBJ_CONT			, RSD_ATTF_ID		, RSD_UNLD_LMT_YN
+			, RSD_UNLD_LMT_YCNT		, VIEW_YN
+			, FRST_REGP_ID			, FRST_RGST_DT		, LAST_MODP_ID			, LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{utlcRgstSeq}			, #{rsrProgYr}			, #{rsrSpcd}		, #{rsrMtcd}
+			, #{rsrSbjNm}			, #{rsrSbjCont}			, #{rsdAttfId}		, #{rsdUnldLmtYn}
+			, #{rsdUnldLmtYcnt}		, #{viewYn}
+			, #{frstRegpId}			, now()				, #{lastModpId}			, now()
+		)
+ 	</insert>
+
+ 	<update id="updateDataUtlc" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO">
+		UPDATE PORTAL.KCURE_SVC_DATA_UTLC
+		SET
+			RSR_PROG_YR			 	= #{rsrProgYr}
+			, RSR_SPCD           	= #{rsrSpcd}
+			, RSR_MTCD            	= #{rsrMtcd}
+			, RSR_SBJ_NM           	= #{rsrSbjNm}
+			, RSR_SBJ_CONT         	= #{rsrSbjCont}
+			, RSD_ATTF_ID          	= #{rsdAttfId}
+			, RSD_UNLD_LMT_YN       = #{rsdUnldLmtYn}
+			, RSD_UNLD_LMT_YCNT     = #{rsdUnldLmtYcnt}
+			, VIEW_YN 				= #{viewYn}
+			, LAST_MODP_ID         	= #{lastModpId}
+			, LAST_MODF_DT         	= now()
+		WHERE UTLC_RGST_SEQ = #{utlcRgstSeq}
+ 	</update>
+
+ 	<delete id="deleteDataUtlc" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO">
+ 		DELETE FROM PORTAL.KCURE_SVC_DATA_UTLC
+ 		WHERE UTLC_RGST_SEQ = #{utlcRgstSeq}
+ 	</delete>
+
+	<insert id="insertDataUtlcInst" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO">
+		<selectKey keyProperty="rsrInstSeq" resultType="int" order="BEFORE">
+			SELECT COALESCE(MAX(RSR_INST_SEQ),0)+1 AS RSR_INST_SEQ  FROM KCURE_SVC_DATA_UTLC_RSR_INST
+			WHERE UTLC_RGST_SEQ = #{utlcRgstSeq}
+		</selectKey>
+		INSERT INTO PORTAL.KCURE_SVC_DATA_UTLC_RSR_INST
+		(
+			UTLC_RGST_SEQ, RSR_INST_SEQ, RSR_INST_ID, RSR_INST_NM
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{utlcRgstSeq}
+			, #{rsrInstSeq}
+			, #{rsrInstId}
+			, #{rsrInstNm}
+			, #{frstRegpId}
+			, now()
+			, #{lastModpId}
+			, now()
+		)
+	</insert>
+
+	<delete id="deleteDataUtlcInst" parameterType="kcure.portal.sys.bbs.dur.service.impl.DataUtlcVO">
+		DELETE FROM PORTAL.KCURE_SVC_DATA_UTLC_RSR_INST
+		WHERE UTLC_RGST_SEQ = #{utlcRgstSeq}
+	</delete>
+
+	<select id="selectQnaList" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO" resultType="egovMap">
+		SELECT A.QSTN_ID, A.QSTN_TTL_NM, A.QSTN_CONT
+		, A.QSTN_ACTP_ID, B.USER_NM AS FRST_REGP_NM, A.DSGN_ANSP_ID, A.QSTN_OPN_YN
+		, A.WTR_PSWD, A.QSTN_CLS_SPCD, A.QSTN_DLN_STCD
+		, A.FRST_REGP_ID, TO_CHAR(A.FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+		, (SELECT TO_CHAR(FRST_RGST_DT,'YYYY-mm-dd') FROM PORTAL.KCURE_COM_QNA_ANS WHERE QSTN_ID = A.QSTN_ID) AS ANS_DT
+		, A.ATTF_ID
+		, A.INST_GNR_SPCD
+		, (SELECT PRTI_NM FROM PORTAL.KCURE_SVC_PRTI WHERE PRTI_ID = A.PRTI_ID) AS PRTI_NM
+		FROM PORTAL.KCURE_COM_QNA_QSTN A INNER JOIN KCURE_COM_USER B ON A.FRST_REGP_ID = B.USER_ID
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND QSTN_CLS_SPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(A.QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(A.QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	AND TO_CHAR(A.FRST_RGST_DT, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(A.FRST_RGST_DT, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+        <if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND A.QSTN_CLS_SPCD LIKE CONCAT('%' , #{searchKeyword2}, '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND A.QSTN_DLN_STCD = #{searchKeyword3}
+		</if>
+		ORDER BY A.QSTN_ID DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectQnaListTotCnt" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_COM_QNA_QSTN
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND QSTN_CLS_SPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+       	<if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	AND TO_CHAR(FRST_RGST_DT, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		AND TO_CHAR(FRST_RGST_DT, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+        <if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND QSTN_CLS_SPCD LIKE CONCAT('%' , #{searchKeyword2}, '%')
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND QSTN_DLN_STCD = #{searchKeyword3}
+		</if>
+	</select>
+
+	<select id="selectQnaDetail" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO" resultType="egovMap">
+		SELECT A.QSTN_ID, A.QSTN_TTL_NM, A.QSTN_CONT
+			, A.QSTN_ACTP_ID, B.USER_NM AS FRST_REGP_NM, A.DSGN_ANSP_ID, C.USER_NM AS DSGN_ANSP_NM, A.QSTN_OPN_YN
+			, A.WTR_PSWD, A.QSTN_CLS_SPCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'QSTN_CLS_SPCD' AND DETL_CD = A.QSTN_CLS_SPCD) AS QSTN_CLS_SPCD_NM
+			, A.QSTN_DLN_STCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'QSTN_DLN_STCD' AND DETL_CD = A.QSTN_DLN_STCD) AS QSTN_DLN_STCD_NM
+			, A.FRST_REGP_ID, TO_CHAR(A.FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+			, B.USER_MBPH_NO
+			, D.ANS_SEQ
+			, D.ANS_CONT
+			, TO_CHAR(D.FRST_RGST_DT,'YYYY-mm-dd') AS ANS_DT
+			, A.ATTF_ID
+			, A.INST_GNR_SPCD
+			, (SELECT PRTI_NM FROM PORTAL.KCURE_SVC_PRTI WHERE PRTI_ID = A.PRTI_ID) AS PRTI_NM
+		FROM PORTAL.KCURE_COM_QNA_QSTN A INNER JOIN KCURE_COM_USER B ON A.FRST_REGP_ID = B.USER_ID
+		LEFT OUTER JOIN KCURE_COM_USER C ON A.DSGN_ANSP_ID = C.USER_ID
+		LEFT OUTER JOIN KCURE_COM_QNA_ANS D ON A.QSTN_ID = D.QSTN_ID
+		WHERE A.QSTN_ID = #{qstnId}
+	</select>
+
+	<update id="updateQnaQstn" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO">
+		UPDATE PORTAL.KCURE_COM_QNA_QSTN
+		SET
+		LAST_MODP_ID = #{lastModpId}
+		, LAST_MODF_DT = now()
+		<if test="qstnActpId != null and qstnActpId !=''">
+		, QSTN_ACTP_ID = #{qstnActpId}
+		</if>
+		<if test="dsgnAnspId != null and dsgnAnspId !=''">
+		, DSGN_ANSP_ID = #{dsgnAnspId}
+		</if>
+		, QSTN_DLN_STCD = #{qstnDlnStcd}
+		WHERE QSTN_ID = #{qstnId}
+	</update>
+
+	<insert id="insertQnaAns" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaAnsVO">
+		<selectKey keyProperty="ansSeq" resultType="int" order="BEFORE">
+			SELECT COALESCE(MAX(ANS_SEQ),0)+1 AS ANS_SEQ  FROM KCURE_COM_QNA_ANS
+			WHERE QSTN_ID = #{qstnId}
+		</selectKey>
+		INSERT INTO PORTAL.KCURE_COM_QNA_ANS
+		VALUES
+		(
+			#{qstnId}, #{ansSeq}, #{ansCont}, #{frstRegpId}, now(), #{lastModpId}, now()
+		)
+	</insert>
+
+	<update id="updateQnaAns" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaAnsVO">
+		UPDATE PORTAL.KCURE_COM_QNA_ANS
+		SET ANS_CONT = #{ansCont}
+		, LAST_MODP_ID = #{lastModpId}
+		, LAST_MODF_DT = now()
+		WHERE QSTN_ID = #{qstnId}
+		AND  ANS_SEQ = #{ansSeq}
+	</update>
+
+	<delete id="deleteQnaQstn" parameterType="String">
+		DELETE FROM PORTAL.KCURE_COM_QNA_QSTN
+		WHERE QSTN_ID = #{qstnId}
+	</delete>
+
+	<delete id="deleteQnaAns" parameterType="String">
+		DELETE FROM PORTAL.KCURE_COM_QNA_ANS
+		WHERE QSTN_ID = #{qstnId}
+	</delete>
+</mapper>

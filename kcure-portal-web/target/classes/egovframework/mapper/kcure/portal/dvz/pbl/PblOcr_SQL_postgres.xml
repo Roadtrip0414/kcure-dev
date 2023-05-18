@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dvzPblOcr">
+    <select id="selectDvzPblLeftMnuList" parameterType="egovMap" resultType="egovMap">
+		SELECT STAT_CD_CLS_ID
+		      ,STAT_CD_CLNM
+		      ,STAT_CNCR_PBL_CD
+		      ,STAT_CNCR_PBL_CD_NM
+		      ,ARRY_ORD_VL
+		  FROM PUB_STS.CNCR_PBL_STATS_CD
+		 WHERE STAT_CD_CLS_ID = '1005'
+		 ORDER BY ARRY_ORD_VL
+    </select>
+    
+    <select id="selectDvzPblOcrGenderStatList" parameterType="egovMap" resultType="egovMap">
+		WITH BASE_QRY AS (
+		                  SELECT A.CATE_GBN_CD
+		                        ,A.CATE_GBN
+		                        ,A.CATE_ORD_VL
+		                    FROM (		--성별
+		                          SELECT STAT_CNCR_PBL_CD AS CATE_GBN_CD
+		                                ,STAT_CNCR_PBL_CD_NM AS CATE_GBN
+		                                ,ARRY_ORD_VL AS CATE_ORD_VL
+		                            FROM PUB_STS.CNCR_PBL_STATS_CD
+		                           WHERE STAT_CD_CLS_ID = '1001'
+		                         ) A
+		                 )
+		, STAT_QRY AS (
+		               SELECT A.SEX_CD AS CATE_GBN_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.SEX_CD
+		              )
+		SELECT A.CATE_GBN
+		      ,COALESCE(B.SUM_COUNT, 0) AS SUM_COUNT
+		  FROM BASE_QRY A
+		       LEFT OUTER JOIN STAT_QRY B
+		                    ON B.CATE_GBN_CD = A.CATE_GBN_CD
+		 ORDER BY A.CATE_ORD_VL
+    </select>
+    
+    <select id="selectDvzPblOcrStatList" parameterType="egovMap" resultType="egovMap">
+		WITH BASE_QRY AS (
+		                  SELECT A.CATE_GBN_CD
+		                        ,A.CATE_GBN
+		                        ,A.CATE_ORD_VL
+		                        ,B.STAT_CNCR_PBL_CD
+		                        ,B.STAT_CNCR_PBL_CD_NM
+		                        ,B.ARRY_ORD_VL
+		            <choose>
+		                <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("01")'>
+		                    FROM (		--연도별
+		                          SELECT CRIT_YR AS CATE_GBN_CD
+		                                ,CRIT_YR AS CATE_GBN
+		                                ,CRIT_YR AS CATE_ORD_VL
+		                            FROM PUB_STS.CNCR_PT_OCRN_STATS
+		                           GROUP BY CRIT_YR
+		                         ) A
+		                         CROSS JOIN (
+		                                     SELECT STAT_CNCR_PBL_CD
+		                                           ,STAT_CNCR_PBL_CD_NM
+		                                           ,ARRY_ORD_VL
+		                                       FROM PUB_STS.CNCR_PBL_STATS_CD
+		                                      WHERE STAT_CD_CLS_ID = '1001'		--성별
+		                                     UNION ALL	--전체
+		                                     SELECT '0' AS STAT_CNCR_PBL_CD
+		                                           ,'전체' AS STAT_CNCR_PBL_CD_NM
+		                                           ,0 AS ARRY_ORD_VL
+		                                    ) B
+		                </when>
+		                <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("02")'>
+		                    FROM (		--연령별
+		                          SELECT STAT_CNCR_PBL_CD AS CATE_GBN_CD
+		                                ,STAT_CNCR_PBL_CD_NM AS CATE_GBN
+		                                ,ARRY_ORD_VL AS CATE_ORD_VL
+		                            FROM PUB_STS.CNCR_PBL_STATS_CD
+		                           WHERE STAT_CD_CLS_ID = '1002'
+		                         ) A
+		                         CROSS JOIN (
+		                                     SELECT STAT_CNCR_PBL_CD
+		                                           ,STAT_CNCR_PBL_CD_NM
+		                                           ,ARRY_ORD_VL
+		                                       FROM PUB_STS.CNCR_PBL_STATS_CD
+		                                      WHERE STAT_CD_CLS_ID = '1001'		--성별
+		                                     UNION ALL	--전체
+		                                     SELECT '3' AS STAT_CNCR_PBL_CD
+		                                           ,'전체' AS STAT_CNCR_PBL_CD_NM
+		                                           ,3 AS ARRY_ORD_VL
+		                                    ) B
+		                </when>
+		                <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("06")'>
+		                    FROM (		--연도별
+		                          SELECT CRIT_YR AS CATE_GBN_CD
+		                                ,CRIT_YR AS CATE_GBN
+		                                ,CRIT_YR AS CATE_ORD_VL
+		                            FROM PUB_STS.CNCR_PT_OCRN_STATS
+		                           GROUP BY CRIT_YR
+		                         ) A
+		                         CROSS JOIN (
+		                                     SELECT STAT_CNCR_PBL_CD
+		                                           ,STAT_CNCR_PBL_CD_NM
+		                                           ,ARRY_ORD_VL
+		                                       FROM PUB_STS.CNCR_PBL_STATS_CD
+		                                      WHERE STAT_CD_CLS_ID = '1003'		--요약병기별
+		                                    ) B
+		                </when>
+		                <otherwise>
+		                    FROM (		--암종류별
+		                          SELECT STAT_CNCR_PBL_CD AS CATE_GBN_CD
+		                                ,STAT_CNCR_PBL_CD_NM AS CATE_GBN
+		                                ,ARRY_ORD_VL AS CATE_ORD_VL
+		                            FROM PUB_STS.CNCR_PBL_STATS_CD
+		                           WHERE STAT_CD_CLS_ID = '1005'
+		                         ) A
+		                         CROSS JOIN (
+		                                     --해당 암 전체
+		                                     SELECT '00' AS STAT_CNCR_PBL_CD
+		                                           ,'전체' AS STAT_CNCR_PBL_CD_NM
+		                                           ,0 AS ARRY_ORD_VL
+		                                    ) B
+		                </otherwise>
+		            </choose>
+		                 )
+		, STAT_QRY AS (
+		       <choose>
+		           <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("01")'>
+		               SELECT A.CRIT_YR AS CATE_GBN_CD
+		                     ,A.SEX_CD AS STAT_CNCR_PBL_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_OCRN_CNT)) OVER(PARTITION BY A.CRIT_YR) AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.CRIT_YR, A.SEX_CD
+		               UNION ALL	--전체
+		               SELECT A.CRIT_YR AS CATE_GBN_CD
+		                     ,'0' AS STAT_CNCR_PBL_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_OCRN_CNT)) OVER(PARTITION BY A.CRIT_YR) AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.CRIT_YR
+		           </when>
+		           <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("02")'>
+		               SELECT A.STATS_AGE_SPCD AS CATE_GBN_CD
+		                     ,A.SEX_CD AS STAT_CNCR_PBL_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_OCRN_CNT)) OVER(PARTITION BY A.STATS_AGE_SPCD) AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.STATS_AGE_SPCD, A.SEX_CD
+		               UNION ALL	--전체
+		               SELECT A.STATS_AGE_SPCD AS CATE_GBN_CD
+				             ,'3' AS STAT_CNCR_PBL_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_OCRN_CNT)) OVER(PARTITION BY A.STATS_AGE_SPCD) AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.STATS_AGE_SPCD
+		           </when>
+		           <when test='vslzDataStatTpcd != null and vslzDataStatTpcd.equals("06")'>
+		               SELECT A.CRIT_YR AS CATE_GBN_CD
+		                     ,A.SMRY_STAG_CD AS STAT_CNCR_PBL_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_OCRN_CNT)) OVER(PARTITION BY A.CRIT_YR) AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.CRIT_YR, A.SMRY_STAG_CD
+		           </when>
+		           <otherwise>
+		               SELECT A.STATS_PBI_CNCR_KNCD AS CATE_GBN_CD
+		                     ,'00' AS STAT_CNCR_PBL_CD
+		                     ,SUM(A.PT_OCRN_CNT) AS COUNT
+		                     ,SUM(SUM(A.PT_OCRN_CNT)) OVER() AS SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.STATS_PBI_CNCR_KNCD
+		           </otherwise>
+		       </choose>
+		              )
+		SELECT A.STAT_CNCR_PBL_CD_NM AS ITEM_NM
+		      ,COALESCE(B.COUNT, 0) AS COUNT
+		      ,A.CATE_GBN
+		      ,COALESCE(B.SUM_COUNT, 0) AS SUM_COUNT
+		  FROM BASE_QRY A
+		       LEFT OUTER JOIN STAT_QRY B
+		                    ON B.CATE_GBN_CD = A.CATE_GBN_CD
+		                       AND B.STAT_CNCR_PBL_CD = A.STAT_CNCR_PBL_CD
+		 ORDER BY A.CATE_ORD_VL, A.ARRY_ORD_VL
+    </select>
+    
+    <select id="selectDvzPblOcrStatSidoList" parameterType="egovMap" resultType="egovMap">
+		WITH BASE_QRY AS (
+		                  SELECT A.CATE_GBN_CD
+		                        ,A.CATE_GBN
+		                        ,A.CATE_ORD_VL
+		                        ,B.STAT_CNCR_PBL_CD
+		                        ,B.STAT_CNCR_PBL_CD_NM
+		                        ,B.ARRY_ORD_VL
+		                    FROM (		--시도별
+		                          SELECT STAT_CNCR_PBL_CD AS CATE_GBN_CD
+		                                ,STAT_CNCR_PBL_CD_NM AS CATE_GBN
+		                                ,ARRY_ORD_VL AS CATE_ORD_VL
+		                            FROM PUB_STS.CNCR_PBL_STATS_CD
+		                           WHERE STAT_CD_CLS_ID = '1004'
+		                             AND STAT_CNCR_PBL_CD != '99'	-- 기타 지역 제외
+		                          UNION ALL	--전국
+		                          SELECT '00' AS CATE_GBN_CD
+		                                ,'전국' AS CATE_GBN
+		                                ,0 AS CATE_ORD_VL
+		                         ) A
+		                         CROSS JOIN (
+		                                     SELECT STAT_CNCR_PBL_CD
+		                                           ,STAT_CNCR_PBL_CD_NM
+		                                           ,ARRY_ORD_VL
+		                                       FROM PUB_STS.CNCR_PBL_STATS_CD
+		                                      WHERE STAT_CD_CLS_ID = '1002'		--연령별
+		                                    ) B
+		                 )
+		, STAT_QRY AS (
+		               SELECT A.STATS_CTPV_CD AS CATE_GBN_CD
+		                     ,A.STATS_AGE_SPCD AS STAT_CNCR_PBL_CD
+		                     ,SUM(CASE WHEN A.SEX_CD = '1' THEN A.PT_OCRN_CNT ELSE 0 END) AS M_COUNT
+		                     ,SUM(CASE WHEN A.SEX_CD = '2' THEN A.PT_OCRN_CNT ELSE 0 END) AS FE_COUNT
+		                     ,SUM(SUM(CASE WHEN A.SEX_CD = '1' THEN A.PT_OCRN_CNT ELSE 0 END)) OVER(PARTITION BY A.STATS_CTPV_CD) AS M_SUM_COUNT
+		                     ,SUM(SUM(CASE WHEN A.SEX_CD = '2' THEN A.PT_OCRN_CNT ELSE 0 END)) OVER(PARTITION BY A.STATS_CTPV_CD) AS FE_SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                  AND A.STATS_CTPV_CD != '99'	-- 기타 지역 제외
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.STATS_CTPV_CD, A.STATS_AGE_SPCD
+		               UNION ALL	--전국
+		               SELECT '00' AS CATE_GBN_CD
+		                     ,A.STATS_AGE_SPCD AS STAT_CNCR_PBL_CD
+		                     ,SUM(CASE WHEN A.SEX_CD = '1' THEN A.PT_OCRN_CNT ELSE 0 END) AS M_COUNT
+		                     ,SUM(CASE WHEN A.SEX_CD = '2' THEN A.PT_OCRN_CNT ELSE 0 END) AS FE_COUNT
+		                     ,SUM(SUM(CASE WHEN A.SEX_CD = '1' THEN A.PT_OCRN_CNT ELSE 0 END)) OVER() AS M_SUM_COUNT
+		                     ,SUM(SUM(CASE WHEN A.SEX_CD = '2' THEN A.PT_OCRN_CNT ELSE 0 END)) OVER() AS FE_SUM_COUNT
+		                 FROM PUB_STS.CNCR_PT_OCRN_STATS A
+		                WHERE 1 = 1
+		                  AND A.STATS_CTPV_CD != '99'	-- 기타 지역 제외
+		                <if test="statsPbiCncrKncd != null and statsPbiCncrKncd !=''">
+		                  AND A.STATS_PBI_CNCR_KNCD = ${statsPbiCncrKncd} || ''
+		                </if>
+		                GROUP BY A.STATS_AGE_SPCD
+		              )
+		SELECT A.STAT_CNCR_PBL_CD_NM AS ITEM_NM
+		      ,A.CATE_GBN_CD
+		      ,COALESCE(B.M_COUNT, 0) AS M_COUNT
+		      ,COALESCE(B.FE_COUNT, 0) AS FE_COUNT
+		      ,COALESCE(B.M_SUM_COUNT, 0) AS M_SUM_COUNT
+		      ,COALESCE(B.FE_SUM_COUNT, 0) AS FE_SUM_COUNT
+		  FROM BASE_QRY A
+		       LEFT OUTER JOIN STAT_QRY B
+		                    ON B.CATE_GBN_CD = A.CATE_GBN_CD
+		                       AND B.STAT_CNCR_PBL_CD = A.STAT_CNCR_PBL_CD
+		 ORDER BY A.CATE_ORD_VL, A.ARRY_ORD_VL
+    </select>
+</mapper>

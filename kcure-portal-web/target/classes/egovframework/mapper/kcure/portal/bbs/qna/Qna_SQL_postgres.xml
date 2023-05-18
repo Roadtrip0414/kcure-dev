@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Qna">
+	<select id="selectQnaList" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO" resultType="egovMap">
+		SELECT A.QSTN_ID, A.QSTN_TTL_NM, A.QSTN_CONT
+		, A.QSTN_ACTP_ID, B.USER_NM AS FRST_REGP_NM, A.DSGN_ANSP_ID, A.QSTN_OPN_YN
+		, A.WTR_PSWD, A.QSTN_CLS_SPCD, A.QSTN_DLN_STCD
+		, A.FRST_REGP_ID, TO_CHAR(A.FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+		, (SELECT TO_CHAR(FRST_RGST_DT,'YYYY-mm-dd') FROM PORTAL.KCURE_COM_QNA_ANS WHERE QSTN_ID = A.QSTN_ID) AS ANS_DT
+		, (SELECT PRTI_NM FROM PORTAL.KCURE_SVC_PRTI WHERE PRTI_ID = A.PRTI_ID) AS PRTI_NM
+		FROM PORTAL.KCURE_COM_QNA_QSTN A INNER JOIN KCURE_COM_USER B ON A.FRST_REGP_ID = B.USER_ID
+		WHERE 1=1
+		<if test="instGnrSpcd != null and instGnrSpcd !=''">
+			AND INST_GNR_SPCD = #{instGnrSpcd}
+		</if>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.QSTN_CLS_SPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND A.QSTN_OPN_YN = 'Y'
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(A.QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(A.QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+		ORDER BY A.QSTN_ID DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectQnaListTotCnt" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		FROM PORTAL.KCURE_COM_QNA_QSTN A
+		WHERE 1=1
+		<if test="instGnrSpcd != null and instGnrSpcd !=''">
+			AND INST_GNR_SPCD = #{instGnrSpcd}
+		</if>
+		<if test="searchKeyword != null and searchKeyword !=''">
+			AND A.QSTN_CLS_SPCD = #{searchKeyword}
+		</if>
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND A.QSTN_OPN_YN = 'Y'
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+				AND (UPPER(A.QSTN_TTL_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%') OR UPPER(A.QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%'))
+	 		</if>
+			<if test="searchCondition == 3">
+	 			AND UPPER(A.QSTN_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword1}), '%')
+	 		</if>
+		</if>
+	</select>
+
+	<select id="selectQnaDetail" parameterType="kcure.portal.sys.bbs.qna.service.impl.QnaQstnVO" resultType="egovMap">
+		SELECT A.QSTN_ID, A.QSTN_TTL_NM, A.QSTN_CONT
+			, A.QSTN_ACTP_ID, B.USER_NM AS FRST_REGP_NM, A.DSGN_ANSP_ID, C.USER_NM AS DSGN_ANSP_NM, A.QSTN_OPN_YN
+			, A.WTR_PSWD, A.QSTN_CLS_SPCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'QSTN_CLS_SPCD' AND DETL_CD = A.QSTN_CLS_SPCD) AS QSTN_CLS_SPCD_NM
+			, A.QSTN_DLN_STCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'QSTN_DLN_STCD' AND DETL_CD = A.QSTN_DLN_STCD) AS QSTN_DLN_STCD_NM
+			, A.FRST_REGP_ID, TO_CHAR(A.FRST_RGST_DT,'YYYY-mm-dd') AS FRST_RGST_DT
+			, B.USER_MBPH_NO
+			, D.ANS_SEQ
+			, D.ANS_CONT
+			, TO_CHAR(D.FRST_RGST_DT,'YYYY-mm-dd') AS ANS_DT
+			, A.ATTF_ID
+			, (SELECT PRTI_NM FROM PORTAL.KCURE_SVC_PRTI WHERE PRTI_ID = A.PRTI_ID) AS PRTI_NM
+		FROM PORTAL.KCURE_COM_QNA_QSTN A INNER JOIN KCURE_COM_USER B ON A.FRST_REGP_ID = B.USER_ID
+		LEFT OUTER JOIN KCURE_COM_USER C ON A.DSGN_ANSP_ID = C.USER_ID
+		LEFT OUTER JOIN KCURE_COM_QNA_ANS D ON A.QSTN_ID = D.QSTN_ID
+		WHERE A.QSTN_ID = #{qstnId}
+	</select>
+
+	<insert id="insertQna">
+		<selectKey keyProperty="qstnId" resultType="String" order="BEFORE">
+			SELECT 'QNA-'||to_char(now(), 'YYYYMMDD')||'-'|| (
+				SELECT LPAD( (
+					SELECT COALESCE(MAX(CAST(REPLACE(QSTN_ID, 'QNA-'||to_char(now(), 'YYYYMMDD')||'-', '') AS INT)+1)||'', '01')
+						FROM KCURE_COM_QNA_QSTN
+						WHERE QSTN_ID like 'QNA-'||to_char(now(), 'YYYYMMDD')||'%'
+						),2,'0')
+			)
+		</selectKey>
+		INSERT INTO PORTAL.KCURE_COM_QNA_QSTN(
+			QSTN_ID, QSTN_TTL_NM, QSTN_CONT, QSTN_ACTP_ID
+			, DSGN_ANSP_ID, QSTN_OPN_YN, WTR_PSWD, QSTN_CLS_SPCD
+			, QSTN_DLN_STCD, ATTF_ID, INST_GNR_SPCD, PRTI_ID
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)
+		VALUES (
+			#{qstnId}, #{qstnTtlNm}, #{qstnCont}, #{qstnActpId}
+			, #{dsgnAnspId}, #{qstnOpnYn}, #{wtrPswd}, #{qstnClsSpcd}
+			, #{qstnDlnStcd}, #{attfId}, #{instGnrSpcd}, #{prtiId}
+			, #{userId}, now(), #{userId}, now()
+		)
+	</insert>
+</mapper>

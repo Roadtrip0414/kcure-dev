@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RsrSmn">
+	<select id="selectSbjMemoList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO
+			, A.RSR_SBJ_NM
+			, to_char(to_date(A.RSR_SDT,'yyyyMMdd'),'yyyy.MM.dd') as RSR_SDT
+			, to_char(to_date(A.RSR_EDT,'yyyyMMdd'),'yyyy.MM.dd') as RSR_EDT
+			, B.MEMO_CONT
+		FROM PORTAL.KCURE_SVC_DATA_APLC A LEFT OUTER JOIN PORTAL.KCURE_SVC_DATA_APLC_MEMO B
+		ON A.DATA_APLC_NO = B.DATA_APLC_NO
+		WHERE (A.RSR_SBJ_NM IS NOT NULL AND A.RSR_SBJ_NM <![CDATA[<>]]> '')
+		<if test="searchKeyword != null and searchKeyword !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.RSR_SBJ_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+	 			AND UPPER(B.MEMO_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+	 		</if>
+		</if>
+        <if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	 AND (A.RSR_SDT >= REPLACE(#{searchKeywordFrom},'-','') OR A.RSR_EDT >= REPLACE(#{searchKeywordFrom},'-',''))
+        </if> 
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		 AND (A.RSR_EDT &lt;= REPLACE(#{searchKeywordTo},'-','') OR A.RSR_SDT &lt;= REPLACE(#{searchKeywordTo},'-',''))
+        </if>
+		ORDER BY A.DATA_APLC_NO DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectSbjMemoListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) as totcnt
+		FROM PORTAL.KCURE_SVC_DATA_APLC A LEFT OUTER JOIN PORTAL.KCURE_SVC_DATA_APLC_MEMO B
+		ON A.DATA_APLC_NO = B.DATA_APLC_NO
+		WHERE (A.RSR_SBJ_NM IS NOT NULL AND A.RSR_SBJ_NM <![CDATA[<>]]> '')
+		<if test="searchKeyword != null and searchKeyword !=''">
+			<if test="searchCondition == 1">
+	 			AND UPPER(A.RSR_SBJ_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+	 		</if>
+			<if test="searchCondition == 2">
+	 			AND UPPER(B.MEMO_CONT) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+	 		</if>
+		</if>
+	 	 <if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        	 AND (A.RSR_SDT >= REPLACE(#{searchKeywordFrom},'-','') OR A.RSR_EDT >= REPLACE(#{searchKeywordFrom},'-',''))
+        </if> 
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+       		 AND (A.RSR_EDT &lt;=  REPLACE(#{searchKeywordTo},'-','') OR A.RSR_SDT &lt;= REPLACE(#{searchKeywordTo},'-',''))
+        </if>
+	</select>
+
+	<select id="selectSbjMemoDetail" parameterType="egovMap" resultType="egovMap">
+		SELECT A.DATA_APLC_NO, A.RSR_SBJ_NM
+			 , to_char(to_date(A.RSR_SDT,'yyyyMMdd'),'yyyy.MM.dd') as RSR_SDT
+			, to_char(to_date(A.RSR_EDT,'yyyyMMdd'),'yyyy.MM.dd') as RSR_EDT
+			, B.MEMO_CONT
+		FROM PORTAL.KCURE_SVC_DATA_APLC A LEFT OUTER JOIN PORTAL.KCURE_SVC_DATA_APLC_MEMO B
+		ON A.DATA_APLC_NO = B.DATA_APLC_NO
+		WHERE A.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<insert id="insertSbjMeno" parameterType="egovMap">
+		INSERT INTO PORTAL.KCURE_SVC_DATA_APLC_MEMO(
+			DATA_APLC_NO, MEMO_CONT, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT, FRST_REGP_ID
+		)
+		VALUES (
+			#{dataAplcNo}, #{memoCont}, now(), #{userId}, now(), #{userId}
+		)
+		ON CONFLICT (DATA_APLC_NO)
+		DO UPDATE
+		SET		MEMO_CONT = #{memoCont}
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+	</insert>
+</mapper>

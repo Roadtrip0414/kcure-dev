@@ -294,6 +294,16 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</div>
+<script type="text/javascript">
+$("#input_main_search").keydown(function (event) {
+	if (event.keyCode === 13) {
+		event.preventDefault();
+		let elemInputMainSearch = document.getElementById("input_main_search");
+		$("#searchKeyword").val(elemInputMainSearch.value);
+		$("#searchFrm").submit();
+	}
+});
+</script>	
 <!-- //container -->
 
 <!-- gony -->

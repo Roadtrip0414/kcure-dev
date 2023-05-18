@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Rvw">
+
+    <select id="selectRevPrtiList" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="egovMap">
+		SELECT
+			(ROW_NUMBER() OVER()) AS no
+			,A.DATA_APLC_NO AS dataAplcNo
+			,A.PRTI_ID AS prtiId
+			,(SELECT PRTI_NM FROM KCURE_SVC_PRTI WHERE PRTI_ID = A.PRTI_ID AND USE_YN = 'Y') AS prtiNm
+			,B.USER_ID AS email --이메일
+			,B.USER_NM AS userNm
+			,B.RVW_PRNC_PST_NM AS rvwPrncPstNm --직위명
+			,REGEXP_REPLACE(B.USER_MBPH_NO, '(.{3})(.*)(.{4})', '\1-\2-\3') AS userMbphNo --핸드폰 번호
+			,REGEXP_REPLACE(B.RVW_PST_PN, '(.{3})(.*)(.{4})', '\1-\2-\3') AS rvwPstPn --근무처 전화번호
+			,CASE WHEN  D.DATA_APLC_NO IS NOT NULL THEN 'Y' ELSE 'N' END  AS isWcmplteYn
+			,'N' AS wCmplte
+			,'x' AS htmlStr
+		FROM
+			KCURE_SVC_DATA_PRVD_INST A
+			LEFT OUTER JOIN
+			(
+				SELECT B.* 
+				FROM
+				KCURE_COM_USER B
+				,(SELECT US.PRTI_ID,MAX(US.USER_ID) AS user_id , AU.auth_id
+				FROM KCURE_COM_USER US
+				,KCURE_COM_USER_AUTH AU
+				WHERE US.user_id = AU.user_id AND AU.auth_id = 'AU002'
+				GROUP BY US.PRTI_ID ,AU.auth_id)C
+				WHERE B.user_id = C.user_id 
+			)B
+			ON A.prti_id = B.prti_id
+			<!-- 
+		LEFT OUTER JOIN
+			KCURE_COM_USER B
+			ON A.PRTI_ID = B.PRTI_ID
+		LEFT OUTER JOIN
+			KCURE_COM_USER_AUTH C
+			ON B.USER_ID = C.USER_ID AND C.AUTH_ID = 'AU002' -->
+		LEFT OUTER JOIN KCURE_SVC_PRVD_RVW D
+			ON A.DATA_APLC_NO = D.DATA_APLC_NO AND A.PRTI_ID = D.PRTI_ID
+		WHERE
+			A.DATA_APLC_NO = #{dataAplcNo}
+			<if test="prtiId != null and prtiId !=''">
+				AND A.PRTI_ID = #{prtiId}
+			</if>
+		ORDER BY 1
+    </select>
+
+    <select id="viewRevPrtiTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			KCURE_SVC_DATA_PRVD_INST A, KCURE_COM_USER B, KCURE_COM_USER_AUTH C
+		WHERE
+			A.PRTI_ID = B.PRTI_ID
+			AND B.USER_ID = C.USER_ID
+			AND C.AUTH_ID = 'AU002'
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+    </select>
+
+    <select id="selectDataServiceFileList" parameterType="kcure.portal.cmn.service.DataServiceFileVO" resultType="kcure.portal.cmn.service.DataServiceFileVO">
+		SELECT	ATTF.DATA_APLC_NO
+				, ATTF.ATTF_SEQ
+				, ATTF.ATTF_SPCD
+				, ATTF.ATTD_NM_SPCD
+				, ATTF.ATTF_OWNR_ID
+				, ATTF.ATTF_NM
+				, CD.DETL_CD_NM ATTF_CDNM
+				, ATTF.ATTF_STR_NM
+				, ATTF.ATTF_PTH_NM
+				, ATTF.FRST_REGP_ID
+				, ATTF.FRST_RGST_DT
+				, ATTF.LAST_MODP_ID
+				, ATTF.LAST_MODF_DT
+		FROM	KCURE_SVC_ATTF ATTF
+				RIGHT JOIN KCURE_COM_CD CD
+				ON CD.DETL_CD = ATTF.ATTD_NM_SPCD
+				AND ATTF.ATTF_SPCD = #{attfSpcd}
+				AND ATTF.DATA_APLC_NO = #{dataAplcNo}
+		WHERE	CD.GRP_CD = 'ATTD_NM_SPCD'
+				/*
+				04	연구계획서
+				07	연구자 동의서류
+				12	IRB 결과통지서
+				13	감면율 첨부파일
+				 */
+				AND CD.DETL_CD IN ('04', '07', '12', '13')
+		ORDER BY CD.CD_OPUT_ORD
+	</select>
+
+	<select id="selectDetailDataAplcRvw" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		SELECT RVW.DATA_APLC_NO AS DATA_APLC_NO
+					,MST.DTAP_STP_SPCD AS RVW_STP_SPCD
+					,RVW.RVW_TMP_ID AS RVW_TMP_ID
+					,TMP.RVW_STP_SEQ AS RVW_STP_SEQ
+					,MST.DETL_CD AS RVW_STP_STCD
+					,RVW.RJC_RSN_CONT AS RJC_RSN_CONT
+					,RVW.RVW_STDT AS RVW_STDT
+					,RVW.RVW_EDDT AS RVW_EDDT
+					,RVW.DATA_TPCD
+					,RVW.RVW_STP_STCD AS RJC_STP_STCD
+					,RVW.RJC_RSN_CONT
+		FROM KCURE_SVC_DATA_APLC_RVW RVW
+			,(
+			SELECT A.DATA_APLC_NO,B.*
+			FROM (
+				SELECT ROW_NUMBER() OVER( PARTITION BY DATA_APLC_NO ORDER BY DTAP_STAT_SEQ DESC  ) AS RNUM
+						,DTAP_STAT_SPCD
+						,DATA_APLC_NO
+				FROM KCURE_SVC_DTAP_STAT_HST
+			) A
+			,KCURE_SVC_STAT_MST B
+			WHERE A.RNUM = 1
+			AND A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+			AND CD_CLCD = 'RVW'
+			) MST
+			,(SELECT A.RVW_TMP_ID
+							, A.RVW_STP_SEQ
+							,B.DTAP_STP_SPCD
+						FROM KCURE_SVC_RVW_TMP A
+							,KCURE_SVC_STAT_MST B
+						WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD )TMP
+		WHERE RVW.DATA_APLC_NO = MST.DATA_APLC_NO
+		AND RVW.RVW_TMP_ID = TMP.RVW_TMP_ID
+		AND MST.DTAP_STP_SPCD = TMP.DTAP_STP_SPCD
+		AND RVW.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectDetailDataAplcRvw_backup" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		SELECT	RVW.DATA_APLC_NO
+				,CD.DTAP_STP_SPCD RVW_STP_SPCD
+				,CD.DETL_CD RVW_STP_STCD
+				,RVW.RVW_TMP_ID
+				,RVW.RJC_RSN_CONT
+				,RVW.RVW_STDT
+				,RVW.RVW_EDDT
+		FROM	KCURE_SVC_DATA_APLC_RVW RVW
+				,
+				(
+					SELECT	DTAP_STP_SPCD,
+							DETL_CD
+					FROM	KCURE_SVC_STAT_MST
+					WHERE	1 = 1
+							/*AND CD_CLCD = 'RVW'*/
+							AND DTAP_STAT_SPCD = (
+								SELECT	DTAP_STAT_SPCD
+								FROM	KCURE_SVC_DTAP_STAT_HST
+								WHERE	DATA_APLC_NO = #{dataAplcNo}
+								ORDER BY DTAP_STAT_SEQ DESC
+								LIMIT 1
+							)
+				) CD
+		WHERE	RVW.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectDetailDataAplcRvw2" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		SELECT	RVW.DATA_APLC_NO
+				,CD.DTAP_STP_SPCD RVW_STP_SPCD
+				,CD.DETL_CD RVW_STP_STCD
+				,RVW.RVW_TMP_ID
+				,RVW.RJC_RSN_CONT
+				,RVW.RVW_STDT
+				,RVW.RVW_EDDT
+		FROM	KCURE_SVC_DATA_APLC_RVW RVW
+				,
+				(
+					SELECT	DTAP_STP_SPCD,
+							DETL_CD
+					FROM	KCURE_SVC_STAT_MST
+					WHERE	1 = 1
+							/*AND CD_CLCD = 'RVW'*/
+							AND DTAP_STAT_SPCD = (
+								SELECT	DTAP_STAT_SPCD
+								FROM	KCURE_SVC_DTAP_STAT_HST
+								WHERE	DATA_APLC_NO = #{dataAplcNo}
+								ORDER BY DTAP_STAT_SEQ DESC
+								LIMIT 1
+							)
+				) CD
+		WHERE	RVW.DATA_APLC_NO = #{dataAplcNo}
+				AND CD.DTAP_STP_SPCD = #{rvwStpSpcd}
+	</select>
+
+	<select id="selectDetailDataAplcRvwList" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		<!-- SELECT
+			DATA_APLC_NO AS dataAplcNo
+			,RVW_STP_SPCD AS rvwStpSpcd
+			,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RVW_STP_SPCD' AND DETL_CD = RVW_STP_SPCD) AS rvwStpSpcdNm
+			,RVW_TMP_ID AS rvwTmpId
+			,RVW_STP_SEQ AS rvwStpSeq
+
+			,RVW_STP_STCD AS rvwStpStcd
+			,RJC_RSN_CONT AS rjcRsnCont
+			,RVW_STDT AS rvwStdt
+			,RVW_EDDT AS rvwEddt
+			,CASE
+				WHEN
+					RVW_STP_SEQ = (SELECT MAX(RVW_STP_SEQ) FROM KCURE_SVC_DATA_APLC_RVW WHERE DATA_APLC_NO = #{dataAplcNo})
+				THEN 'C'
+			 	ELSE 'P'
+			 END AS stpSts
+		FROM KCURE_SVC_DATA_APLC_RVW
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		ORDER BY RVW_STP_SEQ ASC -->
+	WITH TARGET AS   (
+	 	SELECT A.DATA_APLC_NO,B.DATA_TPCD,B.DTAP_STP_SPCD,C.RVW_TMP_ID,D.DTAP_STP_SPCD,D.RVW_STP_SEQ
+		FROM (
+			SELECT ROW_NUMBER() OVER( PARTITION BY DATA_APLC_NO ORDER BY DTAP_STAT_SEQ DESC  ) AS RNUM
+					,DTAP_STAT_SPCD
+					,DATA_APLC_NO
+			FROM KCURE_SVC_DTAP_STAT_HST
+			WHERE DATA_APLC_NO = #{dataAplcNo}
+		) A
+		,KCURE_SVC_STAT_MST B
+		,KCURE_SVC_DATA_APLC_RVW C
+
+		,(
+			SELECT A.RVW_TMP_ID
+				, A.RVW_STP_SEQ
+				,B.DTAP_STP_SPCD
+			FROM KCURE_SVC_RVW_TMP A
+				,KCURE_SVC_STAT_MST B
+			WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+		) D
+
+		WHERE A.RNUM = 1
+		AND A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+		AND A.DATA_APLC_NO = C.DATA_APLC_NO
+		AND CD_CLCD = 'RVW'
+		AND D.RVW_TMP_ID = C.RVW_TMP_ID
+		AND B.DTAP_STP_SPCD = D.DTAP_STP_SPCD
+	 )
+	 SELECT RVW.DATA_APLC_NO 
+			,TMP.DTAP_STP_SPCD RVW_STP_SPCD
+		    ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RVW_STP_SPCD' AND DETL_CD = TMP.DTAP_STP_SPCD) AS RVW_STP_SPCD_NM
+			,RVW.RVW_TMP_ID
+			,TMP.RVW_STP_SEQ
+			,CASE WHEN #{rvwStpSpcd} =  TMP.DTAP_STP_SPCD THEN 'C'
+				  WHEN  TMP.RVW_STP_SEQ <![CDATA[ <= ]]> TARGET.RVW_STP_SEQ   THEN 'P'
+				  ELSE ''
+				END  AS STP_STS
+			,
+			<!-- 			임상 연구접수 일때  -->
+				CASE WHEN RVW.DATA_TPCD = '01' AND TMP.DTAP_STP_SPCD = 'R01' AND #{prtiId} !=  'M0000' THEN 'N'
+<!-- 			공공 연구접수 -->
+				WHEN RVW.DATA_TPCD = '02' AND TMP.DTAP_STP_SPCD = 'R01' AND #{prtiId} =  'M0000' THEN 'N'
+<!-- 			 공공 결재정보입력 -->
+				WHEN RVW.DATA_TPCD = '02' AND TMP.DTAP_STP_SPCD = 'R09' AND #{prtiId}  =  'M0000' THEN 'N'
+<!-- 			 결합 연구접수 -->
+				WHEN RVW.DATA_TPCD = '03' AND #{prtiId} !=  'M0000' THEN 'N'
+<!-- 			 전체 의정원이 아닌경우 -->
+				WHEN #{prtiId} !=  'M0000' AND  ( SELECT COUNT(*) FROM KCURE_SVC_DATA_PRVD_INST INST WHERE  PRTI_ID = #{prtiId} AND DATA_APLC_NO = RVW.DATA_APLC_NO) = 0 THEN 'N'
+				ELSE 'Y'
+			END MOVE_URI_YN
+		FROM KCURE_SVC_DATA_APLC_RVW RVW
+			,(SELECT A.RVW_TMP_ID
+					, A.RVW_STP_SEQ
+					,B.DTAP_STP_SPCD
+				FROM KCURE_SVC_RVW_TMP A
+					,KCURE_SVC_STAT_MST B
+				WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+			 ) TMP
+			 ,TARGET TARGET
+		WHERE 1=1
+		AND RVW.RVW_TMP_ID = TMP.RVW_TMP_ID
+		AND RVW.DATA_APLC_NO = #{dataAplcNo}
+		ORDER BY 	TMP.RVW_STP_SEQ ASC
+		
+		
+		<!-- WITH TARGET AS   (
+	 	SELECT A.DATA_APLC_NO,B.DATA_TPCD,B.DTAP_STP_SPCD,C.RVW_TMP_ID,D.DTAP_STP_SPCD,D.RVW_STP_SEQ
+		FROM (
+			SELECT ROW_NUMBER() OVER( PARTITION BY DATA_APLC_NO ORDER BY DTAP_STAT_SEQ DESC  ) AS RNUM
+					,DTAP_STAT_SPCD
+					,DATA_APLC_NO
+			FROM KCURE_SVC_DTAP_STAT_HST
+			WHERE DATA_APLC_NO = #{dataAplcNo}
+		) A
+		,KCURE_SVC_STAT_MST B
+		,KCURE_SVC_DATA_APLC_RVW C
+
+		,(
+			SELECT A.RVW_TMP_ID
+				, A.RVW_STP_SEQ
+				,B.DTAP_STP_SPCD
+			FROM KCURE_SVC_RVW_TMP A
+				,KCURE_SVC_STAT_MST B
+			WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+		) D
+
+		WHERE A.RNUM = 1
+		AND A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+		AND A.DATA_APLC_NO = C.DATA_APLC_NO
+		AND CD_CLCD = 'RVW'
+		AND D.RVW_TMP_ID = C.RVW_TMP_ID
+		AND B.DTAP_STP_SPCD = D.DTAP_STP_SPCD
+	 ) 
+	 SELECT RVW.DATA_APLC_NO
+		,TMP.DTAP_STP_SPCD RVW_STP_SPCD
+		,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RVW_STP_SPCD' AND DETL_CD = TMP.DTAP_STP_SPCD) AS RVW_STP_SPCD_NM
+		,RVW.RVW_TMP_ID
+		,TMP.RVW_STP_SEQ
+		,CASE WHEN TMP.RVW_STP_SEQ <![CDATA[ = ]]> TARGET.RVW_STP_SEQ THEN 'C'
+			ELSE 'P'
+		END AS STP_STS
+	FROM KCURE_SVC_DATA_APLC_RVW RVW
+		,(SELECT A.RVW_TMP_ID
+				, A.RVW_STP_SEQ
+				,B.DTAP_STP_SPCD
+			FROM KCURE_SVC_RVW_TMP A
+				,KCURE_SVC_STAT_MST B
+			WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+		 ) TMP
+		 ,TARGET TARGET
+	WHERE 1=1
+	AND RVW.RVW_TMP_ID = TMP.RVW_TMP_ID
+	AND RVW.DATA_APLC_NO =  #{dataAplcNo}
+	ORDER BY 	TMP.RVW_STP_SEQ ASC -->
+	</select>
+
+	<select id="selectHistDetailDataAplcRvw" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		SELECT
+			DATA_APLC_NO AS dataAplcNo
+			,RVW_STP_SPCD AS rvwStpSpcd
+			,RVW_TMP_ID AS rvwTmpId
+			,RVW_STP_SEQ AS rvwStpSeq
+			,RVW_STP_STCD AS rvwStpStcd
+			,RJC_RSN_CONT AS rjcRsnCont
+			,RVW_STDT AS rvwStdt
+			,RVW_EDDT AS rvwEddt
+		FROM KCURE_SVC_DATA_APLC_RVW
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND RVW_STP_SPCD = #{histRvwStpSpcd}
+	</select>
+
+	<select id="selectAcptAprpCnt"  parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM KCURE_SVC_RSR_ACPT_APRP
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectRvwTmplt"  parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo">
+		SELECT
+			DATA_APLC_NO AS dataAplcNo
+			,OVP_SPCD AS ovpSpcd
+			,OVP_CONT AS ovpCont
+			,APLD_SBST_CONT AS apldSbstCont
+			,DATA_CMB_NCS_CONT AS dataCmbNcsCont
+			,DETL_CMP_CONT AS detlCmpCont
+			,ETC_CONF_CONT AS etcConfCont
+		FROM KCURE_SVC_RSR_ACPT_APRP
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectStpRvw" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		<!-- SELECT *
+			FROM (
+				SELECT
+					RVW_STP_SPCD AS rvwStpSpcd
+					,RVW_STP_SEQ AS rvwStpSeq
+					,LEAD(RVW_STP_SPCD, -2) OVER(PARTITION BY RVW_TMP_ID ORDER BY RVW_STP_SEQ) AS beforePreSpcd
+					,LEAD(RVW_STP_SPCD, -1) OVER(PARTITION BY RVW_TMP_ID ORDER BY RVW_STP_SEQ) AS preSpcd
+					,LEAD(RVW_STP_SPCD, 1) OVER(PARTITION BY RVW_TMP_ID ORDER BY RVW_STP_SEQ) AS nextSpcd
+					,LEAD(RVW_STP_SPCD, 2) OVER(PARTITION BY RVW_TMP_ID ORDER BY RVW_STP_SEQ) AS afterNextSpcd
+					,MAX(RVW_STP_SEQ) OVER(PARTITION BY RVW_TMP_ID) AS maxStep
+				FROM KCURE_SVC_RVW_TMP
+				WHERE
+					RVW_TMP_ID = #{rvwTmpId}
+			)A
+		WHERE A.rvwStpSpcd = #{rvwStpSpcd} -->
+
+		SELECT *
+			FROM (
+				SELECT
+					B.DTAP_STP_SPCD AS RVW_STP_SPCD
+					,A.RVW_STP_SEQ AS RVW_STP_SEQ
+					,LEAD(B.DTAP_STP_SPCD, -2) OVER(PARTITION BY A.RVW_TMP_ID ORDER BY A.RVW_STP_SEQ) AS BEFOREPRESPCD
+					,LEAD(B.DTAP_STP_SPCD, -1) OVER(PARTITION BY A.RVW_TMP_ID ORDER BY A.RVW_STP_SEQ) AS PRE_SPCD
+					,LEAD(B.DTAP_STP_SPCD, 1) OVER(PARTITION BY A.RVW_TMP_ID ORDER BY A.RVW_STP_SEQ) AS NEXTSPCD
+					,LEAD(B.DTAP_STP_SPCD, 2) OVER(PARTITION BY A.RVW_TMP_ID ORDER BY A.RVW_STP_SEQ) AS AFTERNEXTSPCD
+					,MAX(A.RVW_STP_SEQ) OVER(PARTITION BY RVW_TMP_ID) AS MAXSTEP
+				FROM KCURE_SVC_RVW_TMP A
+					,KCURE_SVC_STAT_MST B
+				WHERE A.DTAP_STAT_SPCD = B.DTAP_STAT_SPCD
+				AND RVW_TMP_ID = #{rvwTmpId}
+			)A
+		WHERE A.RVW_STP_SPCD = #{rvwStpSpcd}
+	</select>
+
+	<update id="insertDacRvwCurrStep" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		INSERT INTO KCURE_SVC_DATA_APLC_RVW(
+				DATA_APLC_NO
+				,RVW_STP_SPCD
+				,RVW_TMP_ID
+				,RVW_STP_SEQ
+				,RVW_STP_STCD
+				,RJC_RSN_CONT
+				,RVW_STDT
+				,RVW_EDDT
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+				,FRST_RGST_DT
+				,LAST_MODF_DT
+			)VALUES(
+				#{dataAplcNo}
+				,#{rvwStpSpcd}
+				,#{rvwTmpId}
+				,(SELECT COALESCE(MAX(RVW_STP_SEQ),0)+1 FROM KCURE_SVC_DATA_APLC_RVW WHERE DATA_APLC_NO=#{dataAplcNo})
+				,#{rvwStpStcd}
+				,#{rjcRsnCont}
+				,TO_TIMESTAMP(#{rvwStdt}, 'YYYYmmddHH24MISS')
+				,TO_TIMESTAMP(#{rvwEddt}, 'YYYYmmddHH24MISS')
+				,#{userId}
+				,#{userId}
+				,NOW()
+				,NOW()
+			)
+	</update>
+
+	<update id="updateDacRvwStat" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		UPDATE  KCURE_SVC_DATA_APLC_RVW
+			SET RJC_RSN_CONT = #{rjcRsnCont}
+				,RVW_STP_STCD =  #{rvwStpStcd}
+		WHERE DATA_APLC_NO =  #{dataAplcNo}
+	</update>
+
+	<insert id="insertRsrAcptAprp" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		INSERT INTO KCURE_SVC_RSR_ACPT_APRP(
+				DATA_APLC_NO
+				,OVP_SPCD
+				,OVP_CONT
+				,APLD_SBST_CONT
+				,DATA_CMB_NCS_CONT
+				,DETL_CMP_CONT
+				,ETC_CONF_CONT
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataAplcNo}
+				,#{ovpSpcd}
+				,#{ovpCont}
+				,#{apldSbstCont}
+				,#{dataCmbNcsCont}
+				,#{detlCmpCont}
+				,#{etcConfCont}
+				,#{userId}
+				,#{userId}
+			)
+	</insert>
+
+	<update id="updateRsrAcptAprp" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		UPDATE KCURE_SVC_RSR_ACPT_APRP
+			SET
+				OVP_SPCD = #{ovpSpcd}
+				,OVP_CONT = #{ovpCont}
+				,APLD_SBST_CONT = #{apldSbstCont}
+				,DATA_CMB_NCS_CONT = #{dataCmbNcsCont}
+				,DETL_CMP_CONT = #{detlCmpCont}
+				,ETC_CONF_CONT = #{etcConfCont}
+				,LAST_MODP_ID = #{userId}
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+	</update>
+
+	<insert id="insertPrvdRvw" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		INSERT INTO KCURE_SVC_PRVD_RVW(
+				DATA_APLC_NO
+				,PRTI_ID
+				,OVP_SPCD
+				,OVP_CONT
+				,DATA_CMB_NCS_CONT
+				,REQ_RANG_CONT
+				,REQ_VAR_CONT
+				,ETC_CONF_CONT
+				,FRST_REGP_ID
+				,LAST_MODP_ID
+			)VALUES(
+				#{dataAplcNo}
+				,#{prtiId}
+				,#{ovpSpcd}
+				,#{ovpCont}
+				,#{dataCmbNcsCont}
+				,#{reqRangCont}
+				,#{reqVarCont}
+				,#{etcConfCont}
+				,#{userId}
+				,#{userId}
+			)
+	</insert>
+
+	<select id="selectPrvdRvw" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		SELECT
+			DATA_APLC_NO AS dataAplcNo
+			,PRTI_ID AS prtiId
+			,OVP_SPCD AS ovpSpcd
+			,OVP_CONT AS ovpCont
+			,DATA_CMB_NCS_CONT AS dataCmbNcsCont
+			,REQ_RANG_CONT AS reqRangCont
+			,REQ_VAR_CONT AS reqVarCont
+			,ETC_CONF_CONT AS etcConfCont
+		FROM KCURE_SVC_PRVD_RVW
+		WHERE
+			DATA_APLC_NO = #{dataAplcNo}
+			AND PRTI_ID = #{prtiId}
+	</select>
+
+	<select id="selectRjcRsnContView" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		SELECT
+			RJC_RSN_CONT
+			,RVW_STP_STCD
+		FROM KCURE_SVC_DATA_APLC_RVW
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<select id="selectRevAplcRschCheck" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="int" >
+		SELECT COUNT(*)
+		FROM KCURE_SVC_RSR_ACPT_APRP
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND PRTI_ID = #{prtiId}
+
+	</select>
+
+
+	<insert id="insertRevAplcRsch" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo">
+		INSERT INTO KCURE_SVC_RSR_ACPT_APRP(
+			DATA_APLC_NO, PRTI_ID, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)VALUES (
+			#{dataAplcNo}, #{prtiId}, #{userId}, NOW(), #{userId}, NOW()
+		)
+	</insert>
+	<!-- 의정원 승인이 된것인지 여부 확인   -->
+	<select id="checkAplcRschDataTpcd01" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="java.lang.String" >
+		SELECT CASE WHEN  COUNT(*) > 0 THEN 'Y' ELSE 'N' END CHEKCYN
+		FROM KCURE_SVC_RSR_ACPT_APRP
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND PRTI_ID = 'M0000'
+	</select>
+
+	<!-- 공공/결합의 경우 제공기관 전부 승인되어야만 진행됨. 	 -->
+	<select id="checkAplcRschDataTpcdOther" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="java.lang.String" >
+		SELECT CASE WHEN  COUNT(*) > 0 THEN 'N' ELSE 'Y' END CHEKCYN
+		FROM KCURE_SVC_DATA_PRVD_INST
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND PRTI_ID NOT IN (
+			SELECT PRTI_ID FROM KCURE_SVC_RSR_ACPT_APRP
+			WHERE DATA_APLC_NO = #{dataAplcNo}
+		)
+	</select>
+
+<insert id="insertDtapStatHst" parameterType="egovMap">
+		<selectKey keyProperty="dtapStatSeq" resultType="java.lang.Long" order="BEFORE">
+			SELECT COALESCE(MAX(DTAP_STAT_SEQ),0)+1 AS DTAP_STAT_SEQ
+			FROM KCURE_SVC_DTAP_STAT_HST
+			WHERE DATA_APLC_NO = #{dataAplcNo}
+		</selectKey>
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+			DATA_APLC_NO
+			, DTAP_STAT_SEQ
+			, DTAP_STAT_SPCD
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		)
+		VALUES (
+			#{dataAplcNo}
+			, #{dtapStatSeq}
+			, (SELECT DTAP_STAT_SPCD
+				FROM KCURE_SVC_STAT_MST
+				WHERE CD_CLCD 		= 'RVW'
+				AND DATA_TPCD 		= #{dataTpcd}
+				AND DTAP_STP_SPCD	= #{dtapStpSpcd}
+				AND DETL_CD = #{detlCd}
+				)
+			, #{userId}
+			, now()
+			, #{userId}
+			, now()
+		)
+	</insert>
+
+	<select id="selectDetailDataAplcSendPay" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" resultType="egovMap" >
+		SELECT	APLC.DATA_APLC_NO
+				,APLC.PBL_INP_AMT
+				,APLC.PBL_STLM_AMT
+				,APLC.PBL_DTS_SPCD
+				,APLC.DATA_TPCD
+				,(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'PBL_DTS_SPCD'
+							AND DETL_CD = APLC.PBL_DTS_SPCD
+				) PBL_DTS_SPNM
+				,SMRY.AENV_SPCD
+				,(
+					SELECT	DETL_CD_NM
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'AENV_SPCD'
+							AND DETL_CD = SMRY.AENV_SPCD
+				) AENV_SPNM
+				,TO_CHAR(TO_DATE(SMRY.DSZ_APDT, 'YYYYMMDD'), 'YYYY.MM.DD') DSZ_APDT
+				,TO_CHAR(
+					TO_DATE(SMRY.DSZ_APDT, 'YYYYMMDD')
+					+ INTERVAL '1 MONTHS' * CAST(CASE WHEN SMRY.USE_DTRN_MNTH_VL IS NULL OR SMRY.USE_DTRN_MNTH_VL = '' THEN '0' ELSE SMRY.USE_DTRN_MNTH_VL END AS INT)
+					+ INTERVAL '1 WEEKS' * CAST(CASE WHEN SMRY.USE_DTRN_MAIN_VL IS NULL OR SMRY.USE_DTRN_MAIN_VL = '' THEN '0' ELSE SMRY.USE_DTRN_MAIN_VL END AS INT)
+					+ INTERVAL '1 DAYS' * CAST(CASE WHEN SMRY.USE_DTRN_DAY_VL IS NULL OR SMRY.USE_DTRN_DAY_VL = '' THEN '0' ELSE SMRY.USE_DTRN_DAY_VL END AS INT)
+					, 'YYYY.MM.DD'
+				) DSZ_APDT_END
+				,SMRY.USE_DTRN_MNTH_VL
+				,SMRY.USE_DTRN_MAIN_VL
+				,SMRY.USE_DTRN_DAY_VL
+				,SMRY.VRT_ANLS_DVCE_CONT
+				,(
+					SELECT	STRING_AGG(DETL_CD_NM, ', ')
+					FROM	KCURE_COM_CD
+					WHERE	GRP_CD = 'VRT_ANLS_DVCE_SPCD'
+							AND DETL_CD IN (SELECT UNNEST(STRING_TO_ARRAY(SMRY.VRT_ANLS_DVCE_CONT, ',')))
+				) VRT_ANLS_DVCE_NM
+				,SMRY.RDC_RT_SPCD
+				,RDRT.RDC_RT_ITEM_CONT
+				,RDRT.RDC_RT
+		FROM	KCURE_SVC_DATA_APLC APLC
+				INNER JOIN KCURE_SVC_DATA_APLC_SMRY SMRY
+				ON SMRY.DATA_APLC_NO = APLC.DATA_APLC_NO
+				LEFT JOIN KCURE_SVC_RDRT_ITEM RDRT
+				ON RDRT.RDC_RT_SPCD = SMRY.RDC_RT_SPCD
+		WHERE	APLC.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<update id="updateClcInfPblAmt" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		UPDATE	KCURE_SVC_DATA_APLC
+		SET		PBL_INP_AMT		= #{pblInpAmt}
+				,PBL_STLM_AMT	= #{pblStlmAmt}
+				,LAST_MODP_ID	= #{userId}
+				,LAST_MODF_DT	= NOW()
+		WHERE	DATA_APLC_NO = #{dataAplcNo}
+	</update>
+	
+	<update id="updateDataAplcInfo" parameterType="kcure.portal.sys.dac.rvw.service.impl.DacRvwVo" >
+		UPDATE	KCURE_SVC_DATA_APLC
+		SET		APLC_PROG_STCD		= #{aplcProgStcd}
+				,LAST_MODP_ID	= #{userId}
+				,LAST_MODF_DT	= NOW()
+		WHERE	DATA_APLC_NO = #{dataAplcNo}
+	</update>
+	
+	
+	
+	
+	
+	
+</mapper>

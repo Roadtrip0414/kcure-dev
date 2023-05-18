@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Tkin">
+	<sql id="whereSvcTkinAplcList">
+		<if test="searchCondition == 'rsrSbjNm' and searchKeyword != null and searchKeyword != ''">
+			AND DT.RSR_SBJ_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="searchCondition == 'userNm' and searchKeyword != null and searchKeyword != ''">
+			AND USR.USER_NM LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="tkinAplcDtFrom != null and tkinAplcDtFrom != ''">
+			AND TO_CHAR(TKIN.TKIN_DTAP_YMD::date, 'YYYY-MM-DD') BETWEEN #{tkinAplcDtFrom} AND #{tkinAplcDtTo}
+		</if>
+		<if test="searchCondition == 'tkinDataNmCont' and searchKeyword != null and searchKeyword != ''">
+			AND TKIN.TKIN_DATA_NM_CONT LIKE '%' || #{searchKeyword} || '%'
+		</if>
+		<if test="tkinDataProgStcd != null and tkinDataProgStcd != ''">
+			AND TKIN.TKIN_DATA_PROG_STCD = #{tkinDataProgStcd}
+		</if>
+	</sql>
+
+	<select id="selectSvcTkinAplcList" parameterType="kcure.portal.sys.rsr.tkin.service.impl.RsrTkinSearchVO" resultType="egovMap">
+		SELECT 
+			TKIN.RSR_ASMT_NO
+			,TKIN.DATA_APLC_NO
+			,TKIN.TKIN_DTAP_NO
+			,DT.RSR_SBJ_NM
+			,TKIN.TKIN_DATA_NM_CONT
+			,DATA_TPCD
+			,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DATA_TPCD' AND DETL_CD = DT.DATA_TPCD) AS DATA_TPCD_NM
+			,USR.USER_NM
+			,TO_CHAR(TKIN.TKIN_DTAP_YMD::date, 'YYYY.MM.DD') AS TKIN_DTAP_YMD -- 신청일자
+			, TKIN.TKIN_DATA_PROG_STCD
+			,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = TKIN.TKIN_DATA_PROG_STCD) AS TKIN_DATA_PROG_STCD_NM
+		FROM KCURE_SVC_TKIN TKIN
+		INNER JOIN KCURE_SVC_DATA_APLC DT
+			ON DT.DATA_APLC_NO = TKIN.DATA_APLC_NO
+		INNER JOIN KCURE_COM_USER USR
+			ON USR.USER_ID = TKIN.FRST_REGP_ID
+		WHERE	1 = 1
+				<include refid="whereSvcTkinAplcList" />
+		ORDER BY TKIN.TKIN_DTAP_YMD DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectSvcTkinAplcListTotCnt" parameterType="kcure.portal.sys.rsr.tkin.service.impl.RsrTkinSearchVO" resultType="int">
+		SELECT	
+			COUNT(1) totCnt
+		FROM KCURE_SVC_TKIN TKIN
+		INNER JOIN KCURE_SVC_DATA_APLC DT
+			ON DT.DATA_APLC_NO = TKIN.DATA_APLC_NO
+		INNER JOIN KCURE_COM_USER USR
+			ON USR.USER_ID = TKIN.FRST_REGP_ID
+		WHERE	1 = 1
+				<include refid="whereSvcTkinAplcList" />
+	</select>
+	
+	<select id="selectSvcTkinAplcDetail" parameterType="egovMap" resultType="egovMap">
+    	SELECT A.RSR_ASMT_NO	--- 연구과제번호
+		       ,A.TKIN_DTAP_NO	--- 반입데이터신청번호
+			   ,A.DATA_APLC_NO  -- 데이터신청번호
+			   ,A.TKIN_DATA_NM_CONT
+			   ,A.TKIN_DATA_PRPS_CONT
+			   ,A.TKIN_DTAP_YMD -- 신청일자
+			   ,A.FRST_REGP_ID	--- 등록자ID
+			   ,A.TKIN_DATA_PROG_STCD  --- 상태코드
+			   ,B.ATTF_SEQ
+			   ,B.ATTF_NM
+			   ,B.ATTF_STR_NM
+			   ,B.ATTF_PTH_NM
+			   ,C.RSR_SBJ_NM
+			   ,C.DATA_TPCD
+			   ,TO_CHAR(TO_DATE(C.RSR_SDT,'YYYYMMDD'), 'YYYY.MM.DD') || ' ~ ' ||TO_CHAR(TO_DATE(C.RSR_EDT,'YYYYMMDD'), 'YYYY.MM.DD') AS RSR_DT_TERM
+			   ,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DATA_TPCD' AND DETL_CD = C.DATA_TPCD)AS DATA_TPCD_NM
+			   ,D.USER_NM
+		FROM KCURE_SVC_TKIN A
+		INNER JOIN (
+				SELECT
+					A.RSR_ASMT_NO, A.TKIN_DTAP_NO, A.DATA_APLC_NO, A.ATTF_SEQ, B.ATTF_NM, B.ATTF_STR_NM, B.ATTF_PTH_NM
+				FROM KCURE_SVC_TKIN_PROG A, KCURE_SVC_ATTF B
+				WHERE
+					A.DATA_APLC_NO = B.DATA_APLC_NO
+					AND A.ATTF_SEQ = B.ATTF_SEQ
+					AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+					AND A.DATA_APLC_NO = #{dataAplcNo}
+					AND TKIN_DTAP_NO = #{tkinDtapNo}
+					AND TKIN_FILE_STTM_YN = 'Y'
+				) B ON A.RSR_ASMT_NO = B.RSR_ASMT_NO AND A.TKIN_DTAP_NO = B.TKIN_DTAP_NO AND A.DATA_APLC_NO = B.DATA_APLC_NO
+		INNER JOIN KCURE_SVC_DATA_APLC C
+			ON A.DATA_APLC_NO = C.DATA_APLC_NO
+		INNER JOIN KCURE_COM_USER D
+			ON C.DATA_APLP_ID = D.USER_ID
+			
+		WHERE A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND   A.DATA_APLC_NO = #{dataAplcNo}
+			AND   A.TKIN_DTAP_NO = #{tkinDtapNo}
+    </select>
+    
+    <select id="selectSvcTkinAplcFileList" parameterType="egovMap" resultType="egovMap">
+    	SELECT
+    		A.RSR_ASMT_NO
+    		,A.TKIN_DTAP_NO
+    		,A.DATA_APLC_NO
+    		,A.TKIN_DATA_PROG_STCD
+    		,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'DTU_APLC_PROG_STCD' AND DETL_CD = A.TKIN_DATA_PROG_STCD) AS TKIN_DATA_PROG_STCD_NM
+			,A.RJC_RSN_CONT
+    		,A.ATTF_SEQ
+    		,B.ATTF_NM
+    		,B.ATTF_STR_NM
+    		,B.ATTF_PTH_NM
+		FROM KCURE_SVC_TKIN_PROG A, KCURE_SVC_ATTF B
+		WHERE
+			A.DATA_APLC_NO = B.DATA_APLC_NO
+			AND A.ATTF_SEQ = B.ATTF_SEQ
+			AND A.RSR_ASMT_NO = #{rsrAsmtNo}
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			AND A.TKIN_DTAP_NO = #{tkinDtapNo}
+			AND A.TKIN_FILE_STTM_YN = 'N'
+    </select>
+
+
+	<select id="selectSvcDttoAplc" parameterType="kcure.portal.sys.rsr.tkin.service.impl.RsrTkinSearchVO" resultType="egovMap">
+		SELECT	DT.DATA_APLC_NO,
+				DT.RSR_SBJ_NM, DT.PRTI_ID, PRTI.PRTI_NM,
+				DTTO.DTTO_APLC_ID, USR.USER_NM DTTO_APLC_NM,
+				TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDD') DTTO_APLC_DT,
+				DTTO.DTTO_APLC_PROG_STCD, CD.DETL_CD_NM DTTO_APLC_PROG_STNM,
+				DTTO.RJC_RSN_CONT,
+				COALESCE(
+					(
+					SELECT	STRING_AGG(ATTF_PTH_NM || ATTF_NM, '|' ORDER BY ATTF_SEQ)
+					FROM	KCURE_SVC_ATTF
+					WHERE	DATA_APLC_NO = DTTO.DATA_APLC_NO
+							AND ATTF_OWNR_ID = DTTO.DTTO_APLC_ID
+							AND TO_CHAR(FRST_RGST_DT, 'YYYYMMDD') = TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDD')
+					), ''
+				) ATTF_FULL_PATH
+		FROM	KCURE_SVC_DTTO_APLC DTTO
+				INNER JOIN KCURE_SVC_DATA_APLC DT
+				ON DT.DATA_APLC_NO = DTTO.DATA_APLC_NO
+				INNER JOIN KCURE_SVC_PRTI PRTI
+				ON PRTI.PRTI_ID = DT.PRTI_ID
+				INNER JOIN KCURE_COM_USER USR
+				ON USR.USER_ID = DTTO.DTTO_APLC_ID
+				INNER JOIN KCURE_COM_CD CD
+				ON CD.GRP_CD = 'DTTO_APLC_PROG_STCD'
+				AND CD.DETL_CD = DTTO.DTTO_APLC_PROG_STCD
+		WHERE	(DT.DATA_APLC_NO, TO_CHAR(DTTO.DTTO_APLC_DT, 'YYYYMMDD'), DTTO.DTTO_APLC_ID) IN
+				((#{dataAplcNo}, #{dttoAplcDt}, #{dttoAplcId}))
+	</select>
+
+	<update id="updateTkinAplcFileProgStcd" parameterType="egovMap">
+		UPDATE	KCURE_SVC_TKIN_PROG
+			SET	TKIN_DATA_PROG_STCD = #{tkinDataProgStcd}
+			   <if test="tkinDataProgStcd == 'U03'">
+			   	, RJC_RSN_CONT = #{rjcRsnCont}
+			   </if>
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND TKIN_DTAP_NO = #{tkinDtapNo}
+			AND DATA_APLC_NO = #{dataAplcNo}
+			AND ATTF_SEQ = #{attfSeq}
+	</update>
+	
+	<update id="updateTkinAplcProgStcd" parameterType="egovMap">
+		UPDATE	KCURE_SVC_TKIN
+			SET	TKIN_DATA_PROG_STCD = #{tkinDataProgStcd}
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND TKIN_DTAP_NO = #{tkinDtapNo}
+	</update>
+	
+	<insert id="insertDtapStatHst" parameterType="egovMap" >
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+				DATA_APLC_NO
+				,DTAP_STAT_SEQ
+				,DTAP_STAT_SPCD
+				,FRST_REGP_ID
+				,FRST_RGST_DT
+				,LAST_MODP_ID
+				,LAST_MODF_DT
+			)VALUES(
+				#{dataAplcNo}
+				,(SELECT COUNT(1) + 1 FROM KCURE_SVC_DTAP_STAT_HST)
+				,#{datpStatSpcd}
+				,#{userId}
+				,now()
+				,#{userId}
+				,now()
+			)
+	</insert>
+	
+</mapper>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Pay">
+	<parameterMap type="java.util.HashMap" id="hashMap"></parameterMap>
+
+	<insert id="insertNicePayment" parameterType="hashMap">
+		INSERT INTO PAYMENT.CDP_NICE_PAYMENT (
+			  TID
+			, PAY_METHOD
+			, RESULT_CODE
+			, RESULT_MSG
+			, AMT
+			, GOODS_NAME
+			, MID
+			, MOID
+			, SIGNATURE
+			, BUYER_EMAIL
+			, BUYER_TEL
+			, BUYER_NAME
+			, AUTH_CODE
+			, AUTH_DATE
+			, INSERT_DATE
+			, INSERT_ID
+			, GOODS_TYPE
+		) VALUES (
+			  #{TID}
+			, #{PayMethod}
+			, #{ResultCode}
+			, #{ResultMsg}
+			, #{Amt}
+			, #{GoodsName}
+			, #{MID}
+			, #{Moid}
+			, #{Signature}
+			, #{BuyerEmail}
+			, #{BuyerTel}
+			, #{BuyerName}
+			, #{AuthCode}
+			, #{AuthDate}
+			, NOW()
+			, #{userId}
+			, #{goodsType}
+		)
+	</insert>
+
+	<insert id="insertNicePaymentDetail" parameterType="hashMap">
+		INSERT INTO PAYMENT.CDP_NICE_PAYMENT_DETAIL (
+			  TID
+			, CARD_CODE
+			, CARD_NAME
+			, BANK_CODE
+			, BANK_NAME
+			, CARD_NO
+			, CARD_QUOTA
+			, CARD_INTEREST
+			, ACQU_CARD_CODE
+			, ACQU_CARD_NAME
+			, CARD_CI
+			, CC_CARD_CI
+			, CLICK_PAY_CI
+			, COUPON_AMT
+			, COUPON_MIN_AMT
+			, POINT_APP_AMT
+			, MULTI_CI
+			, MULTI_CARD_ACQU_AMT
+			, MULTI_POINT_AMT
+			, MULTI_COUPON_AMT
+			, RCPT_TYPE
+			, RCPT_TID
+			, RCPT_AUTH_CODE
+			, INSERT_DATE
+			, INSERT_ID
+			, VBANK_BANK_CODE
+			, VBANK_BANK_NAME
+			, VBANK_NUM
+			, VBANK_EXP_DATE
+			, VBANK_EXP_TIME
+		) VALUES (
+			  #{TID}
+			, #{CardCode}
+			, #{CardName}
+			, #{BankCode}
+			, #{BankName}
+			, #{CardNo}
+			, #{CardQuota}
+			, #{CardInterest}
+			, #{AcquCardCode}
+			, #{AcquCardName}
+			, #{CardCi}
+			, #{CcCardCi}
+			, #{ClickPayCi}
+			, #{CouponAmt}
+			, #{CouponMinAmt}
+			, #{PointAppAmt}
+			, #{MultiCi}
+			, #{MultiCardAcquAmt}
+			, #{MultiPointAmt}
+			, #{MultiCouponAmt}
+			, #{RcptType}
+			, #{RcptTID}
+			, #{RcptAuthCode}
+			, NOW()
+			, #{userId}
+			, #{VbankBankCode}
+			, #{VbankBankName}
+			, #{VbankNum}
+			, #{VbankExpDate}
+			, #{VbankExpTime}
+		)
+	</insert>
+
+	<insert id="insertPaymentDataAplc" parameterType="kcure.portal.sys.pay.pay.service.impl.PaymentVO">
+		WITH INSERTED AS (
+			INSERT INTO PAYMENT.CDP_PAYMENT(
+				  DATA_APLC_NO
+				, TID
+				, ACCOUNT_SEQ
+				, PAYMENT_TYPE
+				, PAYMENT_DATE
+				, PAYMENT_AMOUNT
+				, DEPOSIT_DATE
+				, DEPOSIT_AMOUNT
+				, ERROR_CODE
+				, ERROR_DESC
+				, INSERT_ID
+			) VALUES (
+				  #{dataAplcNo}
+				, #{tid}
+				, #{accountSeq}
+				, #{paymentType}
+				, NOW()
+				, #{paymentAmount}
+				, NOW()
+				, #{depositAmount}
+				, #{errorCode}
+				, #{errorDesc}
+				, #{userId}
+			)
+			RETURNING PBL_STLM_CMPT_ID
+		)
+		UPDATE	KCURE_SVC_DATA_APLC
+		SET		PBL_STLM_CMPT_ID = INSERTED.PBL_STLM_CMPT_ID
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+		FROM	INSERTED
+		WHERE	DATA_APLC_NO = #{dataAplcNo}
+	</insert>
+
+	<insert id="insertPaymentExtd" parameterType="kcure.portal.sys.pay.pay.service.impl.PaymentVO">
+		WITH INSERTED AS (
+			INSERT INTO PAYMENT.CDP_PAYMENT(
+				RSR_ASMT_NO
+				, EXTD_APLC_NO
+				, TID
+				, ACCOUNT_SEQ
+				, PAYMENT_TYPE
+				, PAYMENT_DATE
+				, PAYMENT_AMOUNT
+				, DEPOSIT_DATE
+				, DEPOSIT_AMOUNT
+				, ERROR_CODE
+				, ERROR_DESC
+				, INSERT_ID
+			) VALUES (
+				#{rsrAsmtNo}
+				, #{extdAplcNo}
+				, #{tid}
+				, #{accountSeq}
+				, #{paymentType}
+				, NOW()
+				, #{paymentAmount}
+				, NOW()
+				, #{depositAmount}
+				, #{errorCode}
+				, #{errorDesc}
+				, #{userId}
+			)
+			RETURNING PBL_STLM_CMPT_ID
+		)
+		UPDATE	KCURE_SVC_EXTD
+		SET		PBL_STLM_CMPT_ID = INSERTED.PBL_STLM_CMPT_ID
+				, LAST_MODP_ID = #{userId}
+				, LAST_MODF_DT = NOW()
+		FROM	INSERTED
+		WHERE	RSR_ASMT_NO = #{rsrAsmtNo}
+				AND EXTD_APLC_NO = #{extdAplcNo}
+	</insert>
+
+	<insert id="insertPaymentFail" parameterType="kcure.portal.sys.pay.pay.service.impl.PaymentVO">
+		INSERT INTO PAYMENT.CDP_PAYMENT_FAIL(
+			  TID
+			, GOODS_NAME
+			, ACCOUNT_SEQ
+			, PAYMENT_TYPE
+			, PAYMENT_DATE
+			, PAYMENT_AMOUNT
+			, DEPOSIT_DATE
+			, DEPOSIT_AMOUNT
+			, ERROR_CODE
+			, ERROR_DESC
+			, INSERT_ID
+			, DATA_APLC_NO
+			, GOODS_TYPE
+		) VALUES (
+			  #{tid}
+			, #{goodsName}
+			, #{accountSeq}
+			, #{paymentType}
+			, NOW()
+			, #{paymentAmount}
+			, NOW()
+			, #{depositAmount}
+			, #{errorCode}
+			, #{errorDesc}
+			, #{userId}
+			, #{dataAplcNo}
+			, #{goodsType}
+		)
+	</insert>
+
+	<select id="selectPaymentResultDataAplc" parameterType="hashMap" resultType="kcure.portal.sys.pay.pay.service.impl.PaymentResultVO">
+		SELECT	*
+		FROM
+		(
+			SELECT	1 SUCCESS,
+					P.PAYMENT_AMOUNT,
+					'' ERROR_CODE,
+					'' ERROR_DESC
+			FROM	PAYMENT.CDP_PAYMENT P
+					LEFT JOIN PAYMENT.CDP_NICE_PAYMENT NP ON NP.TID = P.TID
+					LEFT JOIN PAYMENT.CDP_NICE_PAYMENT_DETAIL ND ON ND.TID = NP.TID
+			WHERE	P.DATA_APLC_NO = #{dataAplcNo}
+			ORDER BY P.PBL_STLM_CMPT_ID DESC
+		) P
+		UNION ALL
+		SELECT	*
+		FROM
+		(
+			SELECT	0 SUCCESS,
+					P.PAYMENT_AMOUNT,
+					P.ERROR_CODE,
+					P.ERROR_DESC
+			FROM	PAYMENT.CDP_PAYMENT_FAIL P
+			WHERE	P.DATA_APLC_NO = #{dataAplcNo}
+			ORDER BY P.FAIL_SEQ DESC
+		) P
+		LIMIT 1
+	</select>
+	
+	<select id="selectPaymentResultExtd" parameterType="hashMap" resultType="kcure.portal.sys.pay.pay.service.impl.PaymentResultVO">
+		SELECT	*
+		FROM
+		(
+			SELECT	1 SUCCESS,
+					P.PAYMENT_AMOUNT,
+					'' ERROR_CODE,
+					'' ERROR_DESC,
+					P.RSR_ASMT_NO,
+					P.EXTD_APLC_NO
+			FROM	PAYMENT.CDP_PAYMENT P
+					LEFT JOIN PAYMENT.CDP_NICE_PAYMENT NP ON NP.TID = P.TID
+					LEFT JOIN PAYMENT.CDP_NICE_PAYMENT_DETAIL ND ON ND.TID = NP.TID
+			WHERE	P.RSR_ASMT_NO = #{rsrAsmtNo}
+					AND P.EXTD_APLC_NO = #{extdAplcNo}
+			ORDER BY P.PBL_STLM_CMPT_ID DESC
+		) P
+		UNION ALL
+		SELECT	*
+		FROM
+		(
+			SELECT	0 SUCCESS,
+					P.PAYMENT_AMOUNT,
+					P.ERROR_CODE,
+					P.ERROR_DESC,
+					P.RSR_ASMT_NO,
+					P.EXTD_APLC_NO
+			FROM	PAYMENT.CDP_PAYMENT_FAIL P
+			WHERE	P.RSR_ASMT_NO = #{rsrAsmtNo}
+					AND P.EXTD_APLC_NO = #{extdAplcNo}
+			ORDER BY P.FAIL_SEQ DESC
+		) P
+		LIMIT 1
+	</select>
+	
+	<update id="updateExtdProgStcd" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo">
+		UPDATE
+			KCURE_SVC_EXTD
+		SET
+			EXTD_PROG_STCD = #{extdProgStcd},
+			LAST_MODP_ID = #{userId},
+			LAST_MODF_DT = NOW()
+		WHERE
+			RSR_ASMT_NO = #{rsrAsmtNo}
+			AND EXTD_APLC_NO = #{extdAplcNo} 
+	</update>
+	
+	<insert id="insertDtapStatHst" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo" >
+		INSERT INTO KCURE_SVC_DTAP_STAT_HST(
+				DATA_APLC_NO
+				,DTAP_STAT_SEQ
+				,DTAP_STAT_SPCD
+				,FRST_REGP_ID
+				,FRST_RGST_DT
+				,LAST_MODP_ID
+				,LAST_MODF_DT
+			)VALUES(
+				#{dataAplcNo}
+				,(SELECT COALESCE(MAX(DTAP_STAT_SEQ), 0) + 1 FROM KCURE_SVC_DTAP_STAT_HST WHERE DATA_APLC_NO = #{dataAplcNo})
+				,#{extdStcd}
+				,#{userId}
+				,now()
+				,#{userId}
+				,now()
+			)
+	</insert>	
+</mapper>

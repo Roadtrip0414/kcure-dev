@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Dsz">	
+	
+	
+	<insert id="insertReserve" parameterType="kcure.portal.cmn.api.dsz.service.impl.ResvVO">
+		INSERT INTO KCURE_SVC_DSZ_RSV
+		(
+			prti_id, --의료기관ID
+		    seat_rsv_id, --좌석예약ID
+			rsv_seat_no, --예약좌석번호
+		    rsv_dt, --예약일자
+		    api_rcv_dt, --API수신일자
+		    api_yn,
+		    frst_regp_id, --최초등록자ID
+		    frst_rgst_dt, --최초등록일시
+		    last_modp_id, --최종수정자ID
+		    last_modf_dt --최종수정일시		  		    		   
+		)
+		VALUES
+		(
+			#{prtiId},
+			#{seatRsvId},
+			#{rsvSeatNo},
+			#{rsvDt},
+			#{apiRsvDt},
+			'Y',
+			'SYSTEM',
+			now(),
+			'SYSTEM',
+			now()
+		)
+	</insert>
+	
+	<select id="checkPrtiIdValid" parameterType="String" resultType="int">
+		SELECT 
+			COUNT(1) 
+		FROM KCURE_SVC_PRTI
+		WHERE
+			PRTI_ID = #{prtiId}
+			AND USE_YN = 'Y'
+	</select>
+
+</mapper>

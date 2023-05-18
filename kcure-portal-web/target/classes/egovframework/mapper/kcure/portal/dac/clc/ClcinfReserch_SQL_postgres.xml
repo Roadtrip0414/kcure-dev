@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ClcinfReserch">
+	<sql id="select-rsr-id">
+		SELECT 'KC'||to_char(now(), 'YYYYMM')||(
+		SELECT LPAD( (
+					select CAST(COALESCE(MAX(CAST(RIGHT(DATA_APLC_NO, 3) AS INT)),0) +1 AS TEXT)
+					from KCURE_SVC_DATA_APLC
+					where DATA_APLC_NO like 'KC'||to_char(now(), 'YYYYMM')||'%'
+				 ),3,'0')
+		)
+	</sql>
+	<select id="selectDataAplcNo" resultType="java.lang.String">
+		<include refid="select-rsr-id" />
+	</select>
+	<insert id="insertClcInfReserch">
+		INSERT INTO KCURE_SVC_DATA_APLC(
+			DATA_APLC_NO
+			,DATA_APLC_YMD
+			,DATA_APLP_ID
+			,DATA_TPCD
+			,PINF_CNU_AGR_YN
+			,PINF_SP3P_AGR_YN
+			,PRTI_ID
+			,RSR_SBJ_NM
+			,IRB_APRI_NM
+			,IRB_NO
+			,CLNT_ACNT_NM
+			,RSR_SPCD
+			,RSR_SDT
+			,RSR_EDT
+			,RSR_PRPS_CONT
+			,RSR_SBJ_CONT
+			,KYW_CONT
+			,APLC_STP_SPCD
+			,APLC_PROG_STCD
+			,ADD_RVW_APLP_ID
+			,ADD_RVW_APLC_YMD
+			,DATA_APLC_APRV_NO
+			,FRST_REGP_ID
+			,FRST_RGST_DT
+			,LAST_MODP_ID
+			,LAST_MODF_DT
+		)VALUES(
+			#{dataAplcNo}
+			,to_char(now(),'YYYYMMDD')
+			,#{userId}
+<!-- 			,'01' -->
+			,#{dataTpcd} <!-- 데이터유형코드 -->
+			<!-- ,#{pinfCnuAgrYn}
+			,#{pinfSp3pAgrYn} -->
+			,'Y'
+			,'Y'
+			,#{prtiId}
+			,#{rsrSbjNm}
+			,#{irbApriNm}
+			,#{irbNo}
+			,#{clntAcntNm}
+			,#{rsrSpcd}
+			,REPLACE(#{rsrSdt} , '-' , '')
+			,REPLACE(#{rsrEdt} , '-' , '')
+			,#{rsrPrpsCont}
+			,#{rsrSbjCont}
+			,#{kywCont}
+			<!-- ,#{aplcStpSpcd}  신청단계구분코드-->
+			<!-- ,#{aplcProgStcd} 신청진행상태코드 -->
+			,'01'
+			,'01'
+			,#{addRvwAplpId}
+			,#{addRvwAplcYmd}
+			,#{dataAplcAprvNo}
+			,#{userId}
+			,now()
+			,#{userId}
+			,now()
+		)
+
+	</insert>
+
+	<select id="selectDetailClcInfReserch" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo" >
+		SELECT A.DATA_APLC_NO
+			,TO_CHAR(A.DATA_APLC_YMD::TIMESTAMP, 'YYYY-MM-DD') AS DATA_APLC_YMD
+			,A.DATA_APLP_ID
+			,A.DATA_TPCD
+			,(SELECT DETL_CD_NM
+				FROM KCURE_COM_CD
+				WHERE GRP_CD = 'DATA_TPCD'
+					AND DETL_CD = A.DATA_TPCD
+					AND CD_USE_YN = 'Y'
+			 ) AS DATA_TPCD_NM
+			,A.PINF_CNU_AGR_YN
+			,A.PINF_SP3P_AGR_YN
+			,A.PRTI_ID
+			,A.RSR_SBJ_NM
+			,A.IRB_APRI_NM
+			,A.IRB_NO
+			,A.CLNT_ACNT_NM
+			,A.RSR_SPCD
+			,(
+				SELECT DETL_CD_NM
+				FROM KCURE_COM_CD
+				WHERE GRP_CD = 'RSR_SPCD'
+					AND DETL_CD = A.RSR_SPCD
+					AND CD_USE_YN = 'Y'
+			 ) AS RSR_SPCD_NM
+			,CASE
+				WHEN A.RSR_SDT <![CDATA[<>]]> '' THEN TO_CHAR(TO_DATE(A.RSR_SDT, 'YYYYMMDD'),'YYYY-MM-DD')
+				ELSE '' END RSR_SDT
+			,CASE
+				WHEN A.RSR_EDT <![CDATA[<>]]> '' THEN TO_CHAR(TO_DATE(A.RSR_EDT, 'YYYYMMDD'),'YYYY-MM-DD')
+				ELSE '' END RSR_EDT
+			,A.RSR_PRPS_CONT
+			,A.RSR_SBJ_CONT
+			,A.KYW_CONT
+			,A.APLC_STP_SPCD
+			,A.APLC_PROG_STCD
+			,A.ADD_RVW_APLP_ID
+			,A.ADD_RVW_APLC_YMD
+			,A.DATA_APLC_APRV_NO
+			,A.FRST_REGP_ID
+			,A.FRST_RGST_DT
+			,A.LAST_MODP_ID
+			,A.LAST_MODF_DT
+			,C.USER_NM AS DATA_APLP_NM
+			,D.PRTI_NM
+			,A.APLP_TYPE_SPCD
+			,(
+				SELECT DETL_CD_NM
+				FROM KCURE_COM_CD
+				WHERE GRP_CD = 'APLP_TYPE_SPCD'
+					AND DETL_CD = A.APLP_TYPE_SPCD
+					AND CD_USE_YN = 'Y'
+			 ) AS APLP_TYPE_SPCD_NM
+			,A.RSR_SBJ_DISS_CONT
+			,A.TRPR_CONF
+			,A.RSR_MTHD_CONF
+			,A.EXPC_CONF
+			,A.RSRFUN_SPRT_YN
+			,A.RSRFUN_SPRT_CONF
+			,A.RSR_INF_EXNT_CONT
+			,A.PBL_DTS_SPCD
+			,B.DTAP_STAT_SPCD
+			,A.PLCRSR_INST_NM
+			,A.PLCRSR_DEPT_NM
+		FROM KCURE_SVC_DATA_APLC A
+		    LEFT OUTER JOIN (
+					SELECT DATA_APLC_NO, DTAP_STAT_SPCD
+					FROM KCURE_SVC_DTAP_STAT_HST
+					WHERE DATA_APLC_NO = #{dataAplcNo}
+					ORDER BY DTAP_STAT_SEQ DESC
+					LIMIT 1
+				 )B ON B.DATA_APLC_NO = A.DATA_APLC_NO
+ 			LEFT OUTER JOIN KCURE_COM_USER C ON C.USER_ID = A.DATA_APLP_ID
+			LEFT OUTER JOIN KCURE_SVC_PRTI D ON D.PRTI_ID = A.PRTI_ID
+		WHERE A.DATA_APLC_NO =  #{dataAplcNo}
+	</select>
+
+	<update id="updateClcInfReserch">
+		UPDATE  KCURE_SVC_DATA_APLC SET
+			RSR_SBJ_NM = #{rsrSbjNm}
+			,RSR_SBJ_DISS_CONT = #{rsrSbjDissCont}
+			,RSR_PRPS_CONT = #{rsrPrpsCont}
+			,TRPR_CONF = #{trprConf}
+			,RSR_SBJ_CONT = #{rsrSbjCont}
+			,RSR_MTHD_CONF = #{rsrMthdConf}
+			,EXPC_CONF = #{expcConf}
+			,RSRFUN_SPRT_YN = #{rsrfunSprtYn}
+			,RSRFUN_SPRT_CONF = #{rsrfunSprtConf}
+			,RSR_INF_EXNT_CONT = #{rsrInfExntCont}
+			,LAST_MODP_ID = #{userId}
+			,LAST_MODF_DT = now()
+		WHERE DATA_APLC_NO =  #{dataAplcNo}
+	</update>
+
+	<update id="updateClcInfReserch01">
+		UPDATE  KCURE_SVC_DATA_APLC SET
+			CLNT_ACNT_NM = #{clntAcntNm}
+			,APLP_TYPE_SPCD = #{aplpTypeSpcd}
+			,PLCRSR_DEPT_NM = #{plcrsrDeptNm}
+			,PLCRSR_INST_NM = #{plcrsrInstNm}
+			,IRB_APRI_NM = #{irbApriNm}
+			,IRB_NO = #{irbNo}
+			,RSR_SDT = REPLACE(#{rsrSdt} , '-' , '')
+			,RSR_EDT = REPLACE(#{rsrEdt} , '-' , '')
+			,RSR_SPCD = #{rsrSpcd}
+			,PBL_DTS_SPCD = #{pblDtsSpcd}
+			,LAST_MODP_ID = #{userId}
+			,LAST_MODF_DT = now()
+		WHERE DATA_APLC_NO =  #{dataAplcNo}
+	</update>
+
+	<update id="changeClcinfStep">
+		UPDATE  KCURE_SVC_DATA_APLC SET
+			APLC_STP_SPCD  = #{aplcStpSpcd}
+		WHERE DATA_APLC_NO =  #{dataAplcNo}
+	</update>
+
+
+	<select id="selectClcInfRsp" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfRspVo">
+		SELECT
+			A.DATA_APLC_NO
+			,A.RSRP_SPCD
+			,(SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'RSRP_SPCD' AND DETL_CD = A.RSRP_SPCD) RSRP_SPCD_NM
+			,A.RSRP_ID
+			,B.USER_NM AS RSRP_NM
+			,A.RSR_APLP_YN
+			,B.USER_ID AS EMAIL
+			,B.USER_MBPH_NO
+			,REGEXP_REPLACE(B.USER_MBPH_NO, '(.{3})(.+)(.{4})', '\1') USER_MBPH_NO1
+			,REGEXP_REPLACE(B.USER_MBPH_NO, '(.{3})(.+)(.{4})', '\2') USER_MBPH_NO2
+			,REGEXP_REPLACE(B.USER_MBPH_NO, '(.{3})(.+)(.{4})', '\3') USER_MBPH_NO3
+			,A.VRT_USE_YN
+			,C.ATTF_STR_NM AS FILE07_ATTF_STR_NM
+			,C.ATTF_PTH_NM AS FILE07_ATTF_PTH_NM
+			,C.ATTF_NM AS FILE07_ATTF_NM
+			,APLC.APLC_STP_SPCD
+		FROM KCURE_SVC_RSP A
+			LEFT OUTER JOIN KCURE_COM_USER B ON B.USER_ID = A.RSRP_ID
+			LEFT OUTER JOIN KCURE_SVC_ATTF C ON C.DATA_APLC_NO = A.DATA_APLC_NO
+				AND C.ATTF_SPCD = '01' AND C.ATTD_NM_SPCD = '07'
+			LEFT OUTER JOIN KCURE_SVC_DATA_APLC APLC ON APLC.DATA_APLC_NO = A.DATA_APLC_NO
+		WHERE A.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+
+	<select id="getPrtiList" parameterType="java.lang.String" resultType="egovMap">
+		SELECT PRTI_ID AS COM_CD, PRTI_NM COM_NM
+		FROM KCURE_SVC_PRTI
+		<if test="inst_cls_spcd != null and inst_cls_spcd != ''">
+		WHERE INST_CLS_SPCD = #{inst_cls_spcd}
+		</if>
+		ORDER BY PRTI_NM collate "ko_KR.utf8"
+	</select>
+
+
+	<select id="selectUserPopUp"  resultType="egovMap">
+		SELECT USER_ID		, USER_NM			, USER_STCD			,PRTI_ID	, PRTI_NM
+			, INST_TPCD		, USER_MBPH_NO		, USER_ENT_MEDM_CD		, USER_ENT_DT
+			, USER_APRV_DT	, DRMT_STAT_CHAN_DT	, USER_WTHD_DT			, LAST_LOGIN_DT
+			, AUTH_ID		, USER_STCD_NM
+<!-- 			, STAT_CHAN_RSN_CONT	 -->
+			, INST_TPCD_NM
+		FROM
+		(
+			SELECT A.USER_ID	, A.USER_NM
+			, A.USER_STCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'USER_STCD' AND DETL_CD = A.USER_STCD) AS USER_STCD_NM
+			, A.PRTI_ID
+			, B.PRTI_NM
+			, B.INST_TPCD
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'INST_TPCD' AND DETL_CD = B.INST_TPCD) AS	INST_TPCD_NM
+			, A.USER_MBPH_NO
+			, (SELECT DETL_CD_NM FROM KCURE_COM_CD WHERE GRP_CD = 'USER_ENT_MEDM_CD' AND DETL_CD = A.USER_ENT_MEDM_CD) AS	USER_ENT_MEDM_CD
+			, TO_CHAR(A.USER_ENT_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_ENT_DT
+			, TO_CHAR(A.USER_APRV_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_APRV_DT
+			, TO_CHAR(A.DRMT_STAT_CHAN_DT,'YYYY-mm-dd HH24:MI:SS') AS DRMT_STAT_CHAN_DT
+			, TO_CHAR(A.USER_WTHD_DT,'YYYY-mm-dd HH24:MI:SS') AS USER_WTHD_DT
+			, TO_CHAR(A.LAST_LOGIN_DT,'YYYY-mm-dd HH24:MI:SS') AS LAST_LOGIN_DT
+			, (SELECT STRING_AGG(CAST(AUTH_ID AS VARCHAR), ',') as AUTH_ID FROM KCURE_COM_USER_AUTH WHERE USER_ID = A.USER_ID GROUP BY USER_ID) AS AUTH_ID
+<!-- 			, C.STAT_CHAN_RSN_CONT -->
+			FROM PORTAL.KCURE_COM_USER A
+			LEFT OUTER JOIN KCURE_SVC_PRTI B ON A.PRTI_ID = B.PRTI_ID
+<!-- 			LEFT OUTER JOIN (SELECT USER_ID, STAT_CHAN_RSN_CONT FROM KCURE_COM_USER_STAT_HST WHERE AFCHG_STCD = '99') C ON A.USER_ID = C.USER_ID -->
+			WHERE 1=1
+			<if test="name != null and name != ''">
+				AND A.USER_NM  LIKE CONCAT ('%', #{name},'%')
+			</if>
+			<if test="userMbphNo != null and userMbphNo != ''">
+				AND A.USER_MBPH_NO LIKE CONCAT ('%', #{userMbphNo},'%')
+			</if>
+			<if test="prtiId != null and prtiId != ''">
+				AND A.PRTI_ID =  #{prtiId}
+			</if>
+		)A
+
+
+</select>
+
+
+	<delete id="deleteClcInfRsp">
+		DELETE FROM KCURE_SVC_RSP
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND (RSRP_SPCD, RSRP_ID) IN
+		<foreach collection="deleteSpcdIdList" item="item" index="index" open="(" close=")" separator=",">
+			(SUBSTRING(#{item}, 1, 2), SUBSTRING(#{item}, 3))
+		</foreach>
+	</delete>
+
+	<insert id="insertClcInfRsp">
+		INSERT INTO KCURE_SVC_RSP(
+			DATA_APLC_NO
+			,RSRP_SPCD
+			,RSRP_ID
+			,RSR_APLP_YN
+			,PINF_CNU_AGR_YN
+			,SCR_AGR_YN
+			,VRT_USE_YN
+			,FRST_REGP_ID
+			,FRST_RGST_DT
+			,LAST_MODP_ID
+			,LAST_MODF_DT
+		)VALUES(
+			#{dataAplcNo}
+			,#{rsrpSpcd}
+			,#{rsrpId}
+			,#{rsrAplpYn}
+			,#{pinfCnuAgrYn}
+			,#{scrAgrYn}
+			,#{vrtUseYn}
+			,#{userId}
+			,now()
+			,#{userId}
+			,now()
+		)
+		ON CONFLICT (DATA_APLC_NO, RSRP_SPCD, RSRP_ID)
+		DO UPDATE
+		SET	RSR_APLP_YN			= #{rsrAplpYn}
+			,VRT_USE_YN			= #{vrtUseYn}
+			, LAST_MODP_ID		= #{userId}
+			, LAST_MODF_DT		= now()
+	</insert>
+
+	<update id="updateClcInfRsp">
+		UPDATE KCURE_SVC_RSP
+		SET	VRT_USE_YN = #{vrtUseYn}
+			,LAST_MODP_ID = #{userId}
+			,LAST_MODF_DT = now()
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		AND RSRP_ID = #{rsrpId}
+		AND RSRP_SPCD = #{rsrpSpcd}
+	</update>
+
+
+
+	<delete id="deleteTmpDataAplcDts">
+		DELETE FROM KCURE_SVC_TEMP_DATA_APLC_DTS
+		WHERE DATA_APLC_NO = #{dataAplcNo}
+		<if test="prtiId != null and prtiId != ''">
+			AND prti_id = #{prtiId}
+		</if>
+	</delete>
+
+	<select id="selectRdrtItemList" resultType="egovMap">
+		SELECT RDC_RT_SPCD, RDC_RT_ITEM_CONT, RDC_RT
+		FROM PORTAL.KCURE_SVC_RDRT_ITEM
+	</select>
+
+	<select id="selectDataAplcSmry" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo" resultType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo">
+		SELECT A.DATA_APLC_NO
+		, A.AENV_SPCD
+		,(
+			SELECT DETL_CD_NM
+			FROM KCURE_COM_CD
+			WHERE GRP_CD = 'AENV_SPCD'
+				AND DETL_CD = A.AENV_SPCD
+				AND CD_USE_YN = 'Y'
+		 ) AS AENV_SPCD_NM
+		, A.ACNT_SPCD
+		,(
+			SELECT DETL_CD_NM
+			FROM KCURE_COM_CD
+			WHERE GRP_CD = 'ACNT_SPCD'
+				AND DETL_CD = A.ACNT_SPCD
+				AND CD_USE_YN = 'Y'
+		 ) AS ACNT_SPCD_NM
+		,CASE
+			WHEN DSZ_APDT <![CDATA[<>]]> '' THEN TO_CHAR(TO_DATE(DSZ_APDT, 'YYYYMMDD'),'YYYY-MM-DD')
+			ELSE '' END DSZ_APDT
+		, A.USE_DTRN_MNTH_VL
+		, A.USE_DTRN_MAIN_VL
+		, A.USE_DTRN_DAY_VL
+		, A.VRT_ANLS_DVCE_CONT
+		, (SELECT STRING_AGG ( B.DETL_CD_NM, ', ' order by B.CD_OPUT_ORD)
+			FROM
+			(SELECT DATA_APLC_NO, unnest(string_to_array(VRT_ANLS_DVCE_CONT, ','))  as VRT_ANLS_DVCE
+			FROM KCURE_SVC_DATA_APLC_SMRY A
+			 WHERE VRT_ANLS_DVCE_CONT <![CDATA[<>]]> ''
+			 )A, KCURE_COM_CD B
+			WHERE A.VRT_ANLS_DVCE = B.DETL_CD
+			AND B.GRP_CD = 'VRT_ANLS_DVCE_SPCD'
+			AND B.CD_USE_YN ='Y'
+			AND A.DATA_APLC_NO = #{dataAplcNo}
+			GROUP BY A.DATA_APLC_NO
+		) AS VRT_ANLS_DVCE_NM
+		, A.RDC_RT_SPCD
+		, B.RDC_RT_ITEM_CONT
+		, B.RDC_RT
+		, A.DTAP_USE_DCNT
+		FROM PORTAL.KCURE_SVC_DATA_APLC_SMRY A
+		LEFT OUTER JOIN PORTAL.KCURE_SVC_RDRT_ITEM B
+		ON A.RDC_RT_SPCD = B.RDC_RT_SPCD
+		WHERE A.DATA_APLC_NO = #{dataAplcNo}
+	</select>
+
+	<insert id="insertDataAplcSmryv" parameterType="kcure.portal.dac.clc.inf.service.impl.ClcInfReserchVo">
+		INSERT INTO portal.kcure_svc_data_aplc_smry(
+			DATA_APLC_NO, AENV_SPCD, ACNT_SPCD, DSZ_APDT
+			, USE_DTRN_MNTH_VL, USE_DTRN_MAIN_VL, USE_DTRN_DAY_VL, VRT_ANLS_DVCE_CONT
+			, RDC_RT_SPCD, DTAP_USE_DCNT
+			, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT)
+		VALUES (
+			#{dataAplcNo}, #{aenvSpcd}, #{acntSpcd}, REPLACE(#{dszApdt} , '-' , '')
+			, #{useDtrnMnthVl}, #{useDtrnMainVl}, #{useDtrnDayVl}, #{vrtAnlsDvceCont}
+			, #{rdcRtSpcd}, #{dtapUseDcnt}
+			, #{userId}, now(), #{userId}, now()
+		)
+		ON CONFLICT (DATA_APLC_NO)
+		DO UPDATE
+		SET	AENV_SPCD             = #{aenvSpcd}
+			, ACNT_SPCD           = #{acntSpcd}
+			, DSZ_APDT            = REPLACE(#{dszApdt} , '-' , '')
+			, USE_DTRN_MNTH_VL    = #{useDtrnMnthVl}
+			, USE_DTRN_MAIN_VL    = #{useDtrnMainVl}
+			, USE_DTRN_DAY_VL     = #{useDtrnDayVl}
+			, VRT_ANLS_DVCE_CONT  = #{vrtAnlsDvceCont}
+			, RDC_RT_SPCD         = #{rdcRtSpcd}
+			, DTAP_USE_DCNT       = #{dtapUseDcnt}
+			, LAST_MODP_ID        = #{userId}
+			, LAST_MODF_DT        = now()
+	</insert>
+
+	<insert id="insertDtapStatHst" parameterType="egovMap">
+		<selectKey keyProperty="dtapStatSeq" resultType="java.lang.Long" order="BEFORE">
+			SELECT COALESCE(MAX(DTAP_STAT_SEQ),0)+1 AS DTAP_STAT_SEQ  
+			FROM PORTAL.KCURE_SVC_DTAP_STAT_HST
+			WHERE DATA_APLC_NO = #{dataAplcNo}
+		</selectKey>
+		INSERT INTO PORTAL.KCURE_SVC_DTAP_STAT_HST(
+			DATA_APLC_NO
+			, DTAP_STAT_SEQ
+			, DTAP_STAT_SPCD
+			, FRST_REGP_ID
+			, FRST_RGST_DT
+			, LAST_MODP_ID
+			, LAST_MODF_DT
+		)
+		VALUES (
+			#{dataAplcNo}
+			, #{dtapStatSeq}
+			, (SELECT DTAP_STAT_SPCD
+				FROM PORTAL.KCURE_SVC_STAT_MST
+				WHERE CD_CLCD 		= #{cdClcd}
+				<if test="dataTpcd != null and dataTpcd != ''">
+					AND DATA_TPCD 		= #{dataTpcd}
+				</if>
+				<if test="detlCd != null and detlCd != ''">
+					AND DETL_CD 		= #{detlCd}
+				</if>
+				AND DTAP_STP_SPCD	= #{dtapStpSpcd}
+				)
+			, #{userId}
+			, now()
+			, #{userId}
+			, now()
+		)
+	</insert>
+</mapper>

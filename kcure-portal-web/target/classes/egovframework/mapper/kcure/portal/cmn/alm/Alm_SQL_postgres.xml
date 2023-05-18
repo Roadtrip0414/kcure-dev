@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Alm">
+
+	
+	<insert id="insertSvcNtce" parameterType="kcure.portal.cmn.alm.service.impl.AlmVO">
+		<selectKey keyProperty="ntceNo" resultType="String" order="BEFORE">
+		  	SELECT 'M0001'||'-NTCE-'||TO_CHAR(now(), 'YYYYMMDD')||'-'||(
+				SELECT LPAD( (
+							SELECT CAST((count(*)+1)  AS TEXT)
+							FROM KCURE_SVC_NTCE
+							WHERE NTCE_NO LIKE  'M0001'||'-NTCE-'||TO_CHAR(NOW(), 'YYYYMMDD')||'%'
+						 ),3,'0')
+				)
+		</selectKey>
+  
+		INSERT INTO KCURE_SVC_NTCE
+		(
+			NTCE_NO
+			,NTCE_TRGT_USER_ID
+			,NTCE_SPCD
+			,MVMN_URI_ADDR
+			,NTCE_MSG_CONT
+			,CNFR_YN
+			,MVMN_BTN_CLCK_YN
+			,MVMN_BTN_CRTN_YN
+			,FRST_REGP_ID
+			,FRST_RGST_DT
+			,LAST_MODP_ID
+			,LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{ntceNo}
+			,#{ntceTrgtUserId}
+			,#{ntceSpcd}
+			,#{mvmnUriAddr}
+			,#{ntceMsgCont}
+			,#{cnfrYn}
+			,#{mvmnBtnClckYn}
+			,#{mvmnBtnCrtnYn}
+			,'SYSTEM'
+			,NOW()
+			,'SYSTEM'
+			,NOW()
+		)
+	</insert>
+	
+	<select id="selectNtceMessage" parameterType="kcure.portal.cmn.alm.service.impl.AlmVO" resultType="kcure.portal.cmn.alm.service.impl.MsgVO" >
+		SELECT 
+			NTCE_MSG_NO AS ntceMsgNo
+			,NTCE_SPCD AS ntceSpcd
+			,NTCE_DETL_SPCD AS ntceDetlSpcd
+			,NTCE_MSG_TTL_NM AS ntceMsgTtlNm
+			,EMAIL_MSG_TTL_NM AS emailMsgTtlNm
+			,NTCE_MSG_CONT AS ntceMsgCont
+			,EMAIL_MSG_CONT AS emailMsgCont
+		FROM KCURE_SVC_NTCE_MSG
+		WHERE 
+			NTCE_SPCD = #{ntceSpcd} 
+			AND NTCE_DETL_SPCD = #{ntceDetlSpcd}
+	</select>
+	
+	<select id="selectAuthNm" parameterType="String" resultType="kcure.portal.cmn.alm.service.impl.AlmVO" >
+		SELECT 
+			AUTH_ID AS authId
+			,AUTH_NM AS authNm
+		FROM KCURE_COM_AUTH 
+		WHERE 
+			AUTH_ID = #{authId} 
+			AND AUTH_USE_YN = 'Y'
+	</select>
+	
+	<select id="selectDataAplcInfo" parameterType="String" resultType="kcure.portal.cmn.alm.service.impl.AlmVO" >
+		SELECT 
+			DATA_APLC_NO AS dataAplcNo
+			,DATA_APLP_ID AS dataAplpId
+			,PRTI_ID AS prtiId
+		FROM KCURE_SVC_DATA_APLC 
+		WHERE 
+			DATA_APLC_NO = #{dataAplcNo} 
+	</select>
+	
+	<select id="selectUserInfo" parameterType="String" resultType="kcure.portal.cmn.alm.service.impl.AlmVO" >
+		SELECT 
+			a.USER_ID AS userId 
+			, a.PRTI_ID AS prtiId
+			, B.STAT_CHAN_RSN_CONT as statChanRsnCont
+		FROM KCURE_COM_USER a
+		LEFT JOIN (SELECT * FROM KCURE_COM_USER_STAT_HST WHERE USER_ID = #{userId} ORDER BY USER_STAT_HST_DT DESC LIMIT 1) b
+		ON a.USER_ID =b.USER_ID 
+		WHERE 1=1
+			AND a.USER_ID = #{userId} 
+	</select>
+	
+	<select id="selectDataAplc" parameterType="String" resultType="kcure.portal.cmn.alm.service.impl.MsgVO">
+		SELECT 
+			B.user_nm as "userNm"
+			,A.data_aplp_id as "dataAplpId"
+			,B.user_id as "userId" 
+			,A.rsr_sbj_nm as "rsrSbjNm"
+			,concat(to_char(to_date(rsr_sdt,'YYYYMMDD'), 'YYYY.MM.DD' ),' ~ ', to_char(to_date(rsr_edt,'YYYYMMDD'), 'YYYY.MM.DD' )) as "rsrDt"
+			,(SELECT c.detl_cd_nm FROM kcure_com_cd C WHERE A.data_tpcd = C.detl_cd AND grp_cd= 'DATA_TPCD') as "dataTpcdNm"
+			,c.rjc_rsn_cont as "rjcRsnCont"
+		FROM KCURE_SVC_DATA_APLC  A
+		INNER JOIN KCURE_COM_USER B ON A.DATA_APLP_ID = B.USER_ID
+		INNER JOIN KCURE_SVC_DATA_APLC_RVW C on A.DATA_APLC_NO =C.DATA_APLC_NO
+		WHERE A.DATA_APLC_NO = #{dataAplcNo} 
+	</select>
+	
+	<select id="selectRvwPrncList" parameterType="String" resultType="egovMap">
+		SELECT 
+			A.USER_ID AS "userId"
+			,A.USER_NM AS "userNm"
+		FROM kcure_com_user a
+		LEFT JOIN KCURE_SVC_DATA_PRVD_INST  b
+		ON a.prti_id = b.prti_id 
+		WHERE a.rvw_prnc_yn ='Y'
+		AND b.DATA_APLC_NO = #{dataAplcNo} 
+		GROUP BY a.user_id,a.user_nm
+	</select>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mypSvcAlm">
+
+    <select id="selectMypSvcAlmCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		  FROM KCURE_SVC_NTCE
+		 WHERE NTCE_TRGT_USER_ID = #{loginId}
+		   AND CNFR_YN = 'N'
+    </select>
+
+    <select id="selectMypSvcAlmListTotCnt" parameterType="egovMap" resultType="int">
+		SELECT COUNT(1) AS totcnt
+		  FROM KCURE_SVC_NTCE
+		 WHERE NTCE_TRGT_USER_ID = #{userId}
+    </select>
+
+    <select id="selectMypSvcAlmList" parameterType="egovMap" resultType="egovMap">
+		SELECT A.*
+		      ,(
+		        CASE WHEN DATE_PART('DAY', NOW() - A.FRST_RGST_DT) > 1 THEN TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD')
+		             WHEN DATE_PART('DAY', NOW() - A.FRST_RGST_DT) = 1 THEN '1일전'
+		             WHEN (DATE_PART('HOUR', NOW() - A.FRST_RGST_DT) BETWEEN 1 AND 23) THEN DATE_PART('HOUR', NOW() - A.FRST_RGST_DT) || '시간 전'
+		             WHEN DATE_PART('MINUTES', NOW() - A.FRST_RGST_DT) <![CDATA[<]]> 60 THEN DATE_PART('MINUTES', NOW() - A.FRST_RGST_DT) || '분전'
+		        ELSE TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD') END
+		       ) AS FRST_RGST_DT_FMT
+		      ,(
+		        CASE WHEN DATE_PART('DAY', NOW() - A.FRST_RGST_DT) > 30 THEN 'Y'
+		        ELSE 'N' END
+		       ) AS CLCK_EXPR_YN  -- 30일경과 여부
+		  FROM (
+		        SELECT A.NTCE_NO
+		              ,A.NTCE_TRGT_USER_ID
+		              ,A.NTCE_SPCD
+		              ,A.MVMN_URI_ADDR
+		              ,A.NTCE_MSG_CONT
+		              ,A.CNFR_YN
+		              ,A.MVMN_BTN_CLCK_YN
+		              ,A.MVMN_BTN_CRTN_YN
+		              ,A.FRST_RGST_DT
+		          FROM KCURE_SVC_NTCE A
+		         WHERE A.NTCE_TRGT_USER_ID = #{userId}
+		         ORDER BY A.FRST_RGST_DT DESC
+		       ) A
+		 LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+    
+    <update id="updateMypSvcAlmAllCnfrYn" parameterType="egovMap">
+		UPDATE KCURE_SVC_NTCE
+		   SET CNFR_YN = 'Y'
+		      ,LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		 WHERE NTCE_TRGT_USER_ID = #{userId} 
+		 AND CNFR_YN = 'N'
+    </update>
+    
+    <update id="updateMypSvcAlmClckYn" parameterType="egovMap">
+		UPDATE KCURE_SVC_NTCE
+		   SET MVMN_BTN_CLCK_YN = 'Y'
+		      ,LAST_MODP_ID = #{frstRegpId}
+		      ,LAST_MODF_DT = NOW()
+		 WHERE NTCE_NO = #{ntceNo}
+		   AND MVMN_BTN_CLCK_YN = 'N'
+    </update>
+
+    <select id="selectMypSvcAlm" parameterType="egovMap" resultType="egovMap">
+		SELECT A.NTCE_NO
+		      ,A.NTCE_TRGT_USER_ID
+		      ,A.NTCE_SPCD
+		      ,A.MVMN_URI_ADDR
+		      ,A.NTCE_MSG_CONT
+		      ,A.CNFR_YN
+		      ,A.MVMN_BTN_CLCK_YN
+		      ,A.MVMN_BTN_CRTN_YN
+		      ,A.FRST_RGST_DT
+		      ,TO_CHAR(A.FRST_RGST_DT, 'YYYY.MM.DD') AS FRST_RGST_DT_FMT
+		  FROM KCURE_SVC_NTCE A
+		 WHERE A.NTCE_NO = #{ntceNo}
+    </select>
+</mapper>

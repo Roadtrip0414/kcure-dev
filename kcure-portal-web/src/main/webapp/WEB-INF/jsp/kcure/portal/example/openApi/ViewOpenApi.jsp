@@ -12,8 +12,8 @@
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 10px;
-	border: 1px solid #ccc;
-	padding: 10px;
+	border-bottom: 1px solid #ccc;
+	padding: 12px;
 	width: 100%;
 }
 
@@ -124,7 +124,6 @@
 <div class="wrap">
 	<div class="con">
 		<div class="area_wrap">
-			<h1 style="font-size: x-large; font-weight: 500">OPEN API</h1>
 			<div class="section">
 				<form id="srchForm" name="srchForm" method="post">
 					<input type="hidden" id="page" name="page" />
@@ -146,35 +145,33 @@
 		<div id="result_template_api">
 			<div class="result-item">
 				<div class="result-item-row">
-					<div class="category_nm">보건의료, 공공기관</div>
-					<div>
-						<span class="data_format">JSON+XML</span>
-					</div>
+<!-- 					<div class="category_nm">category_nm</div> -->
+<!-- 					<div> -->
+<!-- 						<span class="data_format">data_format</span> -->
+<!-- 					</div> -->
 				</div>
 				<div class="result-item-row">
-					<div class="title">국립암센터_위암 라이브러리 위암_진단_정보 메타정보</div>
+					<div class="title">title</div>
 					<div></div>
 				</div>
 				<div class="result-item-row">
-					<div class="list_title">위암 라이브러리 위암_진단_정보 메타정보(제공되어질 데이터 항목,
-						타입, 사이즈, 항목설명, 항목별건수, 표시형식 등)를 제공</div>
+					<div class="list_title">list_title</div>
 					<div></div>
 				</div>
 				<div class="result-item-row">
 					<div class="org_nm_updated_at_keywords">
 						<div class="caption_text">
-							<span class="caption">제공기관</span> <span class="text org_nm">국립암센터</span>
+							<span class="caption">제공기관</span> <span class="text org_nm">org_nm</span>
 						</div>
 						<div class="caption_text">
-							<span class="caption">수정일</span> <span class="text updated_at">2021-10-15</span>
+							<span class="caption">수집기간</span> <span class="text updated_at">updated_at</span>
 						</div>
 						<div class="caption_text">
-							<span class="caption">키워드</span> <span class="text keywords">암검진,코호트,코호트대상자</span>
+							<span class="caption">키워드</span> <span class="text keywords">keywords</span>
 						</div>
-					</div>
-					<div class="preview_request">
-						<a class="preview">미리보기</a> <a class="request" target="_blank"
-							href="">활용신청</a>
+						<div class="caption_text">
+							<a class="request" target="_blank" href="">활용신청</a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -205,15 +202,15 @@
 				<button class="tab-btn">
 					K-Cure<span id="cntKcureData"></span>
 				</button>
-				<button class="tab-btn">
-					파일 데이터<span id="cntFileData"></span>
-				</button>
+<!-- 				<button class="tab-btn"> -->
+<!-- 					파일 데이터<span id="cntFileData"></span> -->
+<!-- 				</button> -->
 				<button class="tab-btn">
 					오픈 API<span id="cntOpenData"></span>
 				</button>
-				<button class="tab-btn">
-					표준데이터셋<span id="cntStndData"></span>
-				</button>
+<!-- 				<button class="tab-btn"> -->
+<!-- 					표준데이터셋<span id="cntStndData"></span> -->
+<!-- 				</button> -->
 			</div>
 
 			<div class="tab-content active">
@@ -230,12 +227,12 @@
 				<div id="resKcureData"></div>
 			</div>
 
-			<div class="tab-content">
-				<div class="tab-title">
-					파일 데이터<span id="titFileData"></span>
-				</div>
-				<div id="resFileData"></div>
-			</div>
+<!-- 			<div class="tab-content"> -->
+<!-- 				<div class="tab-title"> -->
+<!-- 					파일 데이터<span id="titFileData"></span> -->
+<!-- 				</div> -->
+<!-- 				<div id="resFileData"></div> -->
+<!-- 			</div> -->
 
 			<div class="tab-content">
 				<div class="tab-title">
@@ -244,13 +241,18 @@
 				<div id="resOpenData"></div>
 			</div>
 
-			<div class="tab-content">
-				<div class="tab-title">
-					표준데이터셋<span id="titStndData"></span>
-				</div>
-				<div id="resStndData"></div>
-			</div>
+<!-- 			<div class="tab-content"> -->
+<!-- 				<div class="tab-title"> -->
+<!-- 					표준데이터셋<span id="titStndData"></span> -->
+<!-- 				</div> -->
+<!-- 				<div id="resStndData"></div> -->
+<!-- 			</div> -->
 		</div>
+		
+		<div id="pagenation">
+			
+		</div>
+		
 	</div>
 </div>
 
@@ -282,6 +284,17 @@
 	let searchKeyword = "${searchKeyword.searchKeyword}";
 	const searchElement = "${searchKeyword.searchElement}";
 
+	var resp = {};
+	resp.spdpDataList = [];
+	resp.kcureDataList = [];
+	resp.fileDataList = [];
+	resp.openDataList = [];
+	resp.stndDataList = [];
+
+	var pageCurrent = 1;
+	var pageTotal = 0;
+	var pageSize = 10;
+	
 	$("#srchForm").keydown(function (event) {
 		if (event.keyCode === 13) {
 			event.preventDefault();
@@ -296,15 +309,19 @@
 	const tabContents = document.querySelectorAll(".tab-content");
 
 	function openTab(tabIndex) {
+		
+		console.log("Debug>>> (tabIndex) " + tabIndex);
+		
 		tabButtons.forEach((btn) => {
 			btn.classList.remove("active");
 		});
 		tabContents.forEach((content) => {
 			content.classList.remove("active");
 		});
-
 		tabButtons[tabIndex].classList.add("active");
 		tabContents[tabIndex].classList.add("active");
+		
+		// reqData();
 	}
 
 	tabButtons.forEach((btn, index) => {
@@ -325,14 +342,24 @@
 		$("#" + tabCntId).html("(" + rows.length + "건)");
 		$("#" + titleCntId).html("(" + rows.length + "건)");
 
+// 		pageTotal = rows.length / pageSize;
+// 		alert("Debug>>> (pageTotal) " + pageTotal);
+// 		let pageRowNumMin = pageCurrent * pageSize - pageSize + 1;
+// 		let pageRowNumMax = pageCurrent * pageSize;
+// 		let rowNum = 0;
 		for (const row of rows) {
+// 			rowNum = rowNum + 1;
+			
+// 			if(rowNum < pageRowNumMin || rowNum > pageRowNumMax)
+// 				continue;
+			
 			const list_id = row.list_id;
 			cur = template.clone();
-			$(cur).find(".category_nm").html(row.search_keyword || row.ctlg_kyw_cont);
-			$(cur).find(".title").html(row.ctlg_cont);
-			$(cur).find(".list_title").html(row.ctlg_aplc_prcs_cont);
-			$(cur).find(".org_nm").html(row.ctlg_nm);
-			$(cur).find(".updated_at").html(row.crtn_dt);
+// 			$(cur).find(".category_nm").html(row.search_keyword || row.ctlg_kyw_cont);
+			$(cur).find(".title").html(row.ctlg_nm);
+			$(cur).find(".list_title").html(row.ctlg_smry_cont);
+			$(cur).find(".org_nm").html(row.hosp_nm);
+			$(cur).find(".updated_at").html(row.ctlg_coll_dtrn_vl);
 			$(cur).find(".keywords").html(row.ctlg_kyw_cont);
 			$(cur).find(".data_format").html(row.data_format);
 
@@ -347,7 +374,7 @@
 				// let dataDetail = $("#click-" + list_id).get(0).originData;
 				let dataDetail = $(this).get(0).originData
 				dataDetail.tags = "";
-				//console.table(dataDetail);
+				console.table(dataDetail);
 				//console.log(JSON.stringify(dataDetail));
 				$("#search_keyword").val(searchKeyword);
 				$("#ctlg_cont").val(dataDetail.ctlg_cont);
@@ -361,6 +388,7 @@
 				$("#ctlg_aplc_prcs_cont").val(dataDetail.ctlg_aplc_prcs_cont);
 				$("#ctlg_coll_dtrn_vl").val(dataDetail.ctlg_coll_dtrn_vl);
 				$("#ctlg_nm").val(dataDetail.ctlg_nm);
+				$("#hosp_nm").val(dataDetail.hosp_nm);
 				$("#crtn_dt").val(dataDetail.crtn_dt);
 				$("#version").val(dataDetail.version);
 				$("#ctlg_tbl_col_vl").val(dataDetail.ctlg_tbl_col_vl);
@@ -371,9 +399,13 @@
 				$("#detailFrm").submit();
 			});
 
-			const url = "https://www.data.go.kr/data/" + list_id + "/" + doName;
-			$(cur).find(".request").attr("href", url);
-
+ 			if(tabCntId === "cntOpenData") {
+				const url = "https://www.data.go.kr/data/" + list_id + "/" + doName;
+				$(cur).find(".request").attr("href", url); 				
+ 			} else {
+ 				$(cur).find(".request").remove();
+ 			} 
+ 			
 			$("#" + elemId).append(cur);
 		}
 	}
@@ -396,14 +428,14 @@
 			data.kcureDataList,
 			"kcureData.do"
 		);
-		showResultApiEach(
-			templateApi,
-			"resFileData",
-			"cntFileData",
-			"titFileData",
-			data.fileDataList,
-			"fileData.do"
-		);
+// 		showResultApiEach(
+// 			templateApi,
+// 			"resFileData",
+// 			"cntFileData",
+// 			"titFileData",
+// 			data.fileDataList,
+// 			"fileData.do"
+// 		);
 		showResultApiEach(
 			templateApi,
 			"resOpenData",
@@ -412,22 +444,16 @@
 			data.openDataList,
 			"openapi.do"
 		);
-		showResultApiEach(
-			templateApi,
-			"resStndData",
-			"cntStndData",
-			"titStndData",
-			data.stndDataList,
-			"standard.do"
-		);
+// 		showResultApiEach(
+// 			templateApi,
+// 			"resStndData",
+// 			"cntStndData",
+// 			"titStndData",
+// 			data.stndDataList,
+// 			"standard.do"
+// 		);
 	}
 
-	var dataSearchResponse = {};
-	dataSearchResponse.spdpDataList = [];
-	dataSearchResponse.kcureDataList = [];
-	dataSearchResponse.fileDataList = [];
-	dataSearchResponse.openDataList = [];
-	dataSearchResponse.stndDataList = [];
 
 	async function requestApi(listTitle) {
 		const page = 1;
@@ -444,10 +470,10 @@
 			dataType: "json",
 			success: function (result) {
 				// showResultApi(result.data);
-				console.log(JSON.stringify(resultdata));
-				dataSearchResponse.fileDataList = result.data.fileDataList;
-				dataSearchResponse.openDataList = result.data.openDataList;
-				dataSearchResponse.stndDataList = result.data.stndDataList;
+				// console.log(JSON.stringify(result.data));
+				resp.fileDataList = result.data.fileDataList;
+				resp.openDataList = result.data.openDataList;
+				resp.stndDataList = result.data.stndDataList;
 			},
 		});
 	}
@@ -468,7 +494,6 @@
               };
 
         const rows = await elasticCtlg1.search(JSON.stringify(query), size);
-        //console.table
         return rows;
 	}
 
@@ -480,8 +505,6 @@
 	        url: "/portal/example/elastic/nonCheck/searchExample.do",
 	        path: "/cncr_spzn_ctlg_2/_search",
 	      });
-
-
 
         const query = {
                 match: {
@@ -504,42 +527,47 @@
 		console.log("\n\nDEBUG>>> (locaton) reqData");
 		await requestApi(listTitle);
 		//
-		dataSearchResponse.spdpDataList = await requestElasticCtlg1(listTitle);
-		console.table(dataSearchResponse.spdpDataList);
+		let spdpDataList = [];
+		spdpDataList = await requestElasticCtlg1(listTitle);
+		console.table(resp.spdpDataList);
 		let doneHosp = [];
-		dataSearchResponse.spdpDataList.forEach(item => {
+		spdpDataList.forEach(item => {
 			//
-			if(!doneHosp.includes(item.hosp_nm))
-			{
-				// alert(item.hosp_nm);
-				doneHosp.push(item.hosp_nm);
-				//console.table(doneHosp);
-
-				let sampHosp = dataSearchResponse.spdpDataList.filter(x=> x.hosp_nm === item.hosp_nm);
-				let objColumns = {};
-				sampHosp.forEach( item2 => {
-					objColumns[item2.ctlg_item_spnm] = item2.ctlg_item_nm;
-				});
-				//
-				//console.table(objColumns);
-				item.columns = JSON.stringify(objColumns);
-				dataSearchResponse.spdpDataList.push(item);
+			if(item.ctlg_kyw_cont.includes(listTitle))
+			{			
+				if(!doneHosp.includes(item.hosp_seq))
+				{
+					// alert(item.hosp_seq);
+					doneHosp.push(item.hosp_seq);
+					//console.table(doneHosp);
+	
+					let sampHosp = spdpDataList.filter(x=> x.hosp_seq === item.hosp_seq);
+					let objColumns = {};
+					sampHosp.forEach( item2 => {
+						objColumns[item2.ctlg_item_spnm] = item2.ctlg_item_nm;
+					});
+					//
+					//console.table(objColumns);
+					item.columns = JSON.stringify(objColumns);
+					resp.spdpDataList.push(item);
+				}
 			}
  		});
-		console.table(dataSearchResponse.spdpDataList);
+		console.table(resp.spdpDataList);
 
 		//
-		dataSearchResponse.kcureDataList = await requestElasticCtlg2(listTitle);
+		let kcureDataList = [];
+		kcureDataList = await requestElasticCtlg2(listTitle);
 		doneHosp = [];
-		dataSearchResponse.kcureDataList.forEach(item => {
+		kcureDataList.forEach(item => {
 			//
-			if(!doneHosp.includes(item.hosp_nm))
+			if(!doneHosp.includes(item.hosp_seq))
 			{
-				// alert(item.hosp_nm);
-				doneHosp.push(item.hosp_nm);
+				// alert(item.hosp_seq);
+				doneHosp.push(item.hosp_seq);
 				//console.table(doneHosp);
 
-				let sampHosp = dataSearchResponse.kcureDataList.filter(x=> x.hosp_nm === item.hosp_nm);
+				let sampHosp = kcureDataList.filter(x=> x.hosp_seq === item.hosp_seq);
 				let objColumns = {};
 				sampHosp.forEach( item2 => {
 					objColumns[item2.ctlg_item_spnm] = item2.ctlg_item_nm;
@@ -547,46 +575,38 @@
 				//
 				//console.table(objColumns);
 				item.columns = JSON.stringify(objColumns);
-				dataSearchResponse.kcureDataList.push(item);
+				resp.kcureDataList.push(item);
 			}
  		});
 		//console.table(data.kcureDataList[0].columns);
 
 		// console.log("\n\nDEBUG>>> (data) data");
         // console.log(JSON.stringify(data));
-       	console.log(typeof(dataSearchResponse.spdpDataList));
-       	console.log(typeof(dataSearchResponse.kcureDataList));
-       	console.log(typeof(dataSearchResponse.fileDataList));
-       	console.log(typeof(dataSearchResponse.openDataList));
-       	console.log(typeof(dataSearchResponse.stndDataList));
 
         console.log("\n\nDEBUG>>> (size) data.spdpDataList");
-       	console.log(dataSearchResponse.spdpDataList.length);
+       	console.log(resp.spdpDataList.length);
         console.log("\n\nDEBUG>>> (size) data.kcureDataList");
-       	console.log(dataSearchResponse.kcureDataList.length);
+       	console.log(resp.kcureDataList.length);
        	console.log("\n\nDEBUG>>> (size) data.fileDataList");
-       	console.log(dataSearchResponse.fileDataList.length);
+       	console.log(resp.fileDataList.length);
         console.log("\n\nDEBUG>>> (size) data.openDataList");
-       	console.log(dataSearchResponse.openDataList.length);
+       	console.log(resp.openDataList.length);
         console.log("\n\nDEBUG>>> (size) data.stndDataList");
-       	console.log(dataSearchResponse.stndDataList.length);
+       	console.log(resp.stndDataList.length);
 
-     	// console.log(typeof(data.fileDataList));
-        // console.log(typeof(data.openDataList));
-        // console.log(typeof(data.stndDataList));
-        // console.log(typeof(data.spdpDataList));
+       	if(resp.openDataList.length > 0) {
+       		openTab(2);
+       	} 
 
-     	// console.table(data.fileDataList);
-        // console.table(data.openDataList);
-        // console.table(data.stndDataList);
-        // console.table(data.spdpDataList);
+       	if(resp.kcureDataList.length > 0) {
+       		openTab(1);
+       	} 
 
-        // console.log(JSON.stringify(data.fileDataList));
-        // console.log(JSON.stringify(data.openDataList));
-        // console.log(JSON.stringify(data.stndDataList));
-        // console.log(JSON.stringify(data.spdpDataList));
+       	if(resp.spdpDataList.length >= 0) {
+       		openTab(0);
+       	} 
 
-        await showResultApi(dataSearchResponse);
+        await showResultApi(resp);
 	}
 
 

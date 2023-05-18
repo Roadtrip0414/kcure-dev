@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Aum">
+
+    <select id="selectAuthorList" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="egovMap">
+            SELECT
+                   AUTH_ID, AUTH_NM, AUTH_SPCD, AUTH_EXPL_CONT, AUTH_USE_YN, TO_CHAR(FRST_RGST_DT,'yyyy-MM-dd') AS FRST_RGST_DT
+              FROM KCURE_COM_AUTH
+             WHERE 1=1
+            <if test="searchKeyword != null and searchKeyword !=''">AND
+                UPPER(AUTH_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+            </if>
+            ORDER BY AUTH_ID ASC
+            LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectAuthorListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+            SELECT COUNT(*) totcnt
+            FROM KCURE_COM_AUTH
+            WHERE 1=1
+            <if test="searchKeyword != null and searchKeyword !=''">AND
+                UPPER(AUTH_NM) LIKE CONCAT('%' , UPPER(#{searchKeyword}), '%')
+            </if>
+    </select>
+
+    <insert id="insertAuthor" parameterType="egovMap">
+		<selectKey keyProperty="authId" resultType="java.lang.String" order="BEFORE">
+			SELECT 'AU' || LPAD(CAST(MAX(CAST(substr(AUTH_ID,3,5) AS int))+1 AS TEXT),3,'0')
+			FROM KCURE_COM_AUTH
+		</selectKey>
+            INSERT INTO KCURE_COM_AUTH
+                  ( AUTH_ID
+					, AUTH_NM
+					, AUTH_SPCD
+					, AUTH_EXPL_CONT
+					, AUTH_USE_YN
+					, FRST_REGP_ID
+					, FRST_RGST_DT
+					, LAST_MODP_ID
+					, LAST_MODF_DT
+					)
+           VALUES ( #{authId}
+					,#{authNm}
+					,#{authSpcd}
+					,#{authExplCont}
+					,'Y'
+					,#{frstRegpId}
+					,now()
+					,#{lastModpId}
+					,now()
+                  )
+    </insert>
+
+    <update id="updateAuthor" parameterType="egovMap">
+
+            UPDATE KCURE_COM_AUTH
+               SET AUTH_NM=#{authNm}
+                 , AUTH_SPCD=#{authSpcd}
+                 , AUTH_EXPL_CONT=#{authExplCont}
+                 , AUTH_USE_YN=#{authUseYn}
+                 , LAST_MODP_ID = #{lastModpId}
+				 , LAST_MODF_DT = now()
+             WHERE AUTH_ID=#{authId}
+
+    </update>
+
+    <delete id="deleteAuthor" parameterType="egovMap">
+		DELETE FROM KCURE_COM_AUTH
+		WHERE AUTH_ID=#{authId}
+    </delete>
+
+    <select id="selectAuthorMenuList" parameterType="kcure.portal.sys.cmm.ComDefaultVO"  resultType="egovMap">
+
+            SELECT A.MENU_ID,
+                   A.MENU_NM,
+                   A.MENU_URI_ADDR,
+                   A.MENU_EXPL_CONT,
+                   (CASE WHEN B.MENU_ID IS NULL THEN 'N'
+                         ELSE 'Y'
+                     END) AS REG_YN,
+                   B.AUTH_ID
+              FROM KCURE_COM_MENU A
+                   LEFT OUTER JOIN (SELECT AUTH_ID , MENU_ID FROM KCURE_COM_MENU_AUTH WHERE AUTH_ID = #{searchKeyword}) B
+                ON A.MENU_ID = B.MENU_ID
+<!--              LIMIT #{recordCountPerPage} OFFSET #{firstIndex} -->
+
+    </select>
+
+	<select id="selectAuthorMenuListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+              FROM KCURE_COM_MENU A
+                   LEFT OUTER JOIN (SELECT AUTH_ID , MENU_ID FROM KCURE_COM_MENU_AUTH WHERE AUTH_ID = #{searchKeyword}) B
+                ON A.MENU_ID = B.MENU_ID
+	</select>
+
+	<insert id="insertAuthorMenu" parameterType="egovMap">
+            INSERT INTO KCURE_COM_MENU_AUTH
+                  ( AUTH_ID
+                  , MENU_ID
+                  , FRST_REGP_ID
+                  , FRST_RGST_DT
+                  , LAST_MODP_ID
+                  ,	LAST_MODF_DT
+                  )
+           VALUES ( #{authId}
+                  , #{menuId}
+                  , #{frstRegpId}
+                  , NOW()
+                  , #{lastModpId}
+                  , NOW()
+                  )
+    </insert>
+
+    <delete id="deleteAuthorMenu" parameterType="egovMap">
+            DELETE FROM KCURE_COM_MENU_AUTH
+             WHERE AUTH_ID=#{authId}
+               AND MENU_ID=#{menuId}
+    </delete>
+
+    <select id="selectAuthorUserList" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="egovMap">
+		SELECT A.USER_ID, A.USER_NM
+		, STRING_AGG(CAST(B.AUTH_ID AS VARCHAR), ',') as AUTH_ID
+		FROM KCURE_COM_USER A
+		LEFT OUTER JOIN (SELECT AUTH_ID, USER_ID FROM KCURE_COM_USER_AUTH
+						WHERE AUTH_ID IN (SELECT AUTH_ID FROM KCURE_COM_AUTH WHERE AUTH_USE_YN = 'Y')) B
+		ON A.USER_ID = B.USER_ID
+		WHERE 1=1
+		<if test="searchKeyword1 != null and searchKeyword1 !=''">
+		AND B.AUTH_ID = #{searchKeyword1}
+		</if>
+		<if test="searchKeyword2 != null and searchKeyword2 !=''">
+		AND UPPER(A.USER_ID) LIKE '%' || UPPER(#{searchKeyword2}) || '%'
+		</if>
+		<if test="searchKeyword3 != null and searchKeyword3 !=''">
+		AND UPPER(A.USER_NM) LIKE '%' || UPPER(#{searchKeyword3}) || '%'
+		</if>
+        <if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+        AND TO_CHAR(A.USER_APRV_DT, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+        </if>
+        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+        AND TO_CHAR(A.USER_APRV_DT, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+        </if>
+		GROUP BY A.user_id, A.USER_NM
+		ORDER BY A.USER_NM
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectAuthorUserListTotCnt" parameterType="kcure.portal.sys.cmm.ComDefaultVO" resultType="int">
+		SELECT COUNT(1) totcnt
+		FROM
+		(
+			SELECT A.USER_ID
+			FROM KCURE_COM_USER A
+			LEFT OUTER JOIN (SELECT AUTH_ID, USER_ID FROM KCURE_COM_USER_AUTH
+						WHERE AUTH_ID IN (SELECT AUTH_ID FROM KCURE_COM_AUTH WHERE AUTH_USE_YN = 'Y')) B
+			ON A.USER_ID = B.USER_ID
+			WHERE 1=1
+			<if test="searchKeyword1 != null and searchKeyword1 !=''">
+			AND B.AUTH_ID = #{searchKeyword1}
+			</if>
+			<if test="searchKeyword2 != null and searchKeyword2 !=''">
+			AND UPPER(A.USER_ID) LIKE '%' || UPPER(#{searchKeyword2}) || '%'
+			</if>
+			<if test="searchKeyword3 != null and searchKeyword3 !=''">
+			AND UPPER(A.USER_NM) LIKE '%' || UPPER(#{searchKeyword3}) || '%'
+			</if>
+	        <if test="searchKeywordFrom != null and searchKeywordFrom != ''">
+	        AND TO_CHAR(A.USER_APRV_DT, 'yyyy-mm-dd') >= #{searchKeywordFrom}
+	        </if>
+	        <if test="searchKeywordTo != null and searchKeywordTo != ''">
+	        AND TO_CHAR(A.USER_APRV_DT, 'yyyy-mm-dd') &lt;= #{searchKeywordTo}
+	        </if>
+			GROUP BY A.USER_ID, A.USER_NM
+		) A
+    </select>
+
+    <select id="selectAuthAllList" parameterType="egovMap" resultType="egovMap">
+    	SELECT AUTH_ID, AUTH_NM
+    	FROM KCURE_COM_AUTH
+    	WHERE AUTH_USE_YN = 'Y'
+    	AND AUTH_ID <![CDATA[<>]]> 'AU000'
+    	ORDER BY AUTH_ID
+    </select>
+
+    <select id="selectAuthAllListTotCnt" parameterType="egovMap" resultType="int">
+    	SELECT COUNT(1) AS totcnt
+    	FROM KCURE_COM_AUTH
+    	WHERE AUTH_USE_YN = 'Y'
+    	AND AUTH_ID <![CDATA[<>]]> 'AU000'
+    </select>
+
+    <insert id="insertAuthUser" parameterType="egovMap">
+    	INSERT INTO PORTAL.KCURE_COM_USER_AUTH
+    	(
+			AUTH_ID, USER_ID, FRST_REGP_ID, FRST_RGST_DT, LAST_MODP_ID, LAST_MODF_DT
+		)
+		VALUES
+		(
+			#{authId}, #{userId}, #{frstRegpId}, now(), #{lastModpId}, now()
+		)
+    </insert>
+
+    <delete id="deleteAuthUser" parameterType="egovMap">
+    	DELETE FROM KCURE_COM_USER_AUTH
+    	WHERE USER_ID = #{userId}
+    </delete>
+
+    <select id="selectPrtiAdminExist" parameterType="String" resultType="egovMap">
+		SELECT A.PRTI_ID
+			, B.USER_ID
+			, B.AUTH_ID
+		FROM KCURE_COM_USER A
+		LEFT OUTER JOIN (SELECT AUTH_ID , USER_ID FROM KCURE_COM_USER_AUTH WHERE AUTH_ID = 'AU002') B <!-- 기관관리자 -->
+		ON A.USER_ID = B.USER_ID
+		WHERE A.PRTI_ID = #{prtiId}
+		AND B.USER_ID IS NOT NULL
+	</select>
+
+	<select id="selectUserAuthList" parameterType="egovMap" resultType="String">
+		SELECT AUTH_ID
+		FROM KCURE_COM_USER_AUTH
+		WHERE USER_ID = #{userId}
+	</select>
+
+	<select id="selectAuthorUser" parameterType="egovMap" resultType="egovMap">
+		SELECT A.USER_ID, A.USER_NM
+		, STRING_AGG(CAST(B.AUTH_ID AS VARCHAR), ',') as AUTH_ID
+		FROM KCURE_COM_USER A
+		LEFT OUTER JOIN (SELECT AUTH_ID, USER_ID FROM KCURE_COM_USER_AUTH
+						WHERE AUTH_ID IN (SELECT AUTH_ID FROM KCURE_COM_AUTH WHERE AUTH_USE_YN = 'Y')) B
+		ON A.USER_ID = B.USER_ID
+		WHERE A.USER_ID = #{userId}
+		GROUP BY A.USER_ID, A.USER_NM
+	</select>
+</mapper>

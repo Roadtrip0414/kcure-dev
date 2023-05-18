@@ -154,7 +154,7 @@
 		function doSearchKeyword(elemId)
 		{
 			let elemInputSearch = document.getElementById(elemId);
-			alert("검색어 : " + elemInputSearch.value);
+			// alert("검색어 : " + elemInputSearch.value);
 			$("#searchKeyword").val(elemInputSearch.value);
 			$("#searchFrm").submit();
 		}
@@ -171,8 +171,7 @@
 
 		//
 		function doSearchShortcut(keyword){
-			console.log(keyword);
-			alert("검색어 : " + keyword);
+			// alert("검색어 : " + keyword);
 			$("#searchKeyword").val(keyword);
 			$("#searchFrm").submit();
 		}
